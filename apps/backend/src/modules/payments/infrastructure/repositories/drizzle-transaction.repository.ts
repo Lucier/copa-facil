@@ -73,7 +73,7 @@ export class DrizzleTransactionRepository implements ITransactionRepository {
           ${data.amount}, ${data.currency ?? 'BRL'}, ${data.method}, ${data.category},
           ${data.payerId ?? null}, ${data.gatewayTransactionId ?? null},
           ${data.gatewayPayload ? JSON.stringify(data.gatewayPayload) : null}::jsonb,
-          ${data.expiresAt ?? null}
+          ${data.expiresAt ? data.expiresAt.toISOString() : null}
         )
         RETURNING id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at
       `,
@@ -86,7 +86,7 @@ export class DrizzleTransactionRepository implements ITransactionRepository {
       tx<TxRow[]>`
         UPDATE transactions SET
           status     = ${status},
-          paid_at    = CASE WHEN ${paidAt !== undefined} THEN ${paidAt ?? null} ELSE paid_at END,
+          paid_at    = CASE WHEN ${paidAt !== undefined} THEN ${paidAt instanceof Date ? paidAt.toISOString() : null} ELSE paid_at END,
           updated_at = NOW()
         WHERE id = ${id}
         RETURNING id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at

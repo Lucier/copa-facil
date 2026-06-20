@@ -102,7 +102,7 @@ export class DrizzleArticleRepository implements IArticleRepository {
       tx<ArticleRow[]>`
         UPDATE articles SET
           status       = ${status},
-          published_at = CASE WHEN ${publishedAt !== undefined} THEN ${publishedAt ?? null} ELSE published_at END,
+          published_at = CASE WHEN ${publishedAt !== undefined} THEN ${publishedAt instanceof Date ? publishedAt.toISOString() : null} ELSE published_at END,
           updated_at   = NOW()
         WHERE id = ${id}
         RETURNING id, championship_id, title, slug, content, status, category, cover_image_url, author_id, published_at, created_at, updated_at

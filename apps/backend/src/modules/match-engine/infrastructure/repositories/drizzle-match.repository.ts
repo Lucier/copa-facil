@@ -96,8 +96,8 @@ export class DrizzleMatchRepository implements IMatchRepository {
       return tx<MatchRow[]>`
         UPDATE matches SET
           status     = ${status},
-          started_at = CASE WHEN ${timestamps?.startedAt ?? null} IS NOT NULL THEN ${timestamps?.startedAt ?? null} ELSE started_at END,
-          ended_at   = CASE WHEN ${timestamps?.endedAt ?? null} IS NOT NULL THEN ${timestamps?.endedAt ?? null} ELSE ended_at END
+          started_at = CASE WHEN ${timestamps?.startedAt?.toISOString() ?? null} IS NOT NULL THEN ${timestamps?.startedAt?.toISOString() ?? null} ELSE started_at END,
+          ended_at   = CASE WHEN ${timestamps?.endedAt?.toISOString() ?? null} IS NOT NULL THEN ${timestamps?.endedAt?.toISOString() ?? null} ELSE ended_at END
         WHERE id = ${id}
         RETURNING id, championship_id, round_id, home_team_id, away_team_id, group_id,
                   bracket_slot, status, home_score, away_score,
