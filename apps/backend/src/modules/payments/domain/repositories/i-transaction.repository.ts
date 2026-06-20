@@ -18,6 +18,7 @@ export interface CreateTransactionData {
 export interface ITransactionRepository {
   findById(id: string): Promise<TransactionEntity | null>
   findByGatewayId(gatewayTransactionId: string): Promise<TransactionEntity | null>
+  findAll(): Promise<TransactionEntity[]>
   findByChampionshipId(championshipId: string): Promise<TransactionEntity[]>
   create(data: CreateTransactionData): Promise<TransactionEntity>
   updateStatus(

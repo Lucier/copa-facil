@@ -81,19 +81,16 @@ export default function PaymentsPage() {
     },
   })
 
-  React.useEffect(() => {
-    if (championships.length > 0 && !selectedChampId) {
-      setSelectedChampId(championships[0].id)
-    }
-  }, [championships, selectedChampId])
-
   const { data: transactions = [], isLoading, isError } = useQuery<Transaction[]>({
     queryKey: ['payments', selectedChampId],
     queryFn: async () => {
-      const { data } = await api.get(`${API.payments.base}?championshipId=${selectedChampId}`)
+      const url = selectedChampId
+        ? `${API.payments.base}?championshipId=${selectedChampId}`
+        : API.payments.base
+      const { data } = await api.get(url)
       return data as Transaction[]
     },
-    enabled: Boolean(selectedChampId),
+    enabled: championships.length > 0 || !selectedChampId,
   })
 
   const { data: ledger = [] } = useQuery<LedgerSummary[]>({
@@ -106,7 +103,7 @@ export default function PaymentsPage() {
   })
 
   function handleSuccess() {
-    queryClient.invalidateQueries({ queryKey: ['payments', selectedChampId] })
+    queryClient.invalidateQueries({ queryKey: ['payments'] })
     queryClient.invalidateQueries({ queryKey: ['payments-ledger', selectedChampId] })
   }
 
@@ -142,6 +139,7 @@ export default function PaymentsPage() {
           onChange={(e) => setSelectedChampId((e.target as HTMLSelectElement).value)}
           className={SELECT_CLASS}
         >
+          <option value="">Todos os Campeonatos</option>
           {championships.map((c) => (
             <option key={c.id} value={c.id}>{c.name} ({c.season})</option>
           ))}
@@ -190,21 +188,20 @@ export default function PaymentsPage() {
           <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
             {selectedChamp
               ? `Transações — ${selectedChamp.name} (${selectedChamp.season})`
-              : 'Transações'}
+              : 'Todas as Transações'}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          {!selectedChampId && (
-            <p className="p-6 text-center text-sm text-muted-foreground">Selecione um campeonato acima.</p>
-          )}
-          {selectedChampId && isLoading && (
+          {isLoading && (
             <p className="p-6 text-center text-sm text-muted-foreground">Carregando...</p>
           )}
-          {selectedChampId && isError && (
+          {!isLoading && isError && (
             <p className="p-6 text-center text-sm text-destructive">Erro ao carregar transações.</p>
           )}
-          {selectedChampId && !isLoading && !isError && transactions.length === 0 && (
-            <p className="p-6 text-center text-sm text-muted-foreground">Nenhuma transação neste campeonato ainda.</p>
+          {!isLoading && !isError && transactions.length === 0 && (
+            <p className="p-6 text-center text-sm text-muted-foreground">
+              {selectedChampId ? 'Nenhuma transação neste campeonato ainda.' : 'Nenhuma transação encontrada.'}
+            </p>
           )}
           {!isLoading && transactions.length > 0 && (
             <Table>

@@ -54,6 +54,13 @@ export class DrizzleTransactionRepository implements ITransactionRepository {
     return rows[0] ? toEntity(rows[0]) : null
   }
 
+  async findAll(): Promise<TransactionEntity[]> {
+    const rows = await this.drizzle.runInTenantContext((tx) =>
+      tx<TxRow[]>`SELECT id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at FROM transactions ORDER BY created_at DESC`,
+    )
+    return rows.map(toEntity)
+  }
+
   async findByChampionshipId(championshipId: string): Promise<TransactionEntity[]> {
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<TxRow[]>`SELECT id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at FROM transactions WHERE championship_id = ${championshipId} ORDER BY created_at DESC`,

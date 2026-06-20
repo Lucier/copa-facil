@@ -11,7 +11,9 @@ export class ListTransactionsUseCase {
     @Inject(TRANSACTION_REPOSITORY) private readonly repo: ITransactionRepository,
   ) {}
 
-  execute(championshipId: string): Promise<TransactionEntity[]> {
-    return this.repo.findByChampionshipId(championshipId)
+  execute(championshipId?: string): Promise<TransactionEntity[]> {
+    return championshipId
+      ? this.repo.findByChampionshipId(championshipId)
+      : this.repo.findAll()
   }
 }

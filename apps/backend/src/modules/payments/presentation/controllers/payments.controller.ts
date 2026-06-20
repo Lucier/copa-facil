@@ -48,10 +48,10 @@ export class PaymentsController {
 
   @Get()
   @Roles(UserRole.ORGANIZADOR)
-  @ApiOperation({ summary: 'List transactions for a championship' })
-  @ApiQuery({ name: 'championshipId', required: true })
-  listAll(@Query('championshipId') championshipId: string) {
-    return this.listTx.execute(championshipId)
+  @ApiOperation({ summary: 'List transactions, optionally filtered by championship' })
+  @ApiQuery({ name: 'championshipId', required: false })
+  listAll(@Query('championshipId') championshipId?: string) {
+    return this.listTx.execute(championshipId || undefined)
   }
 
   @Get('ledger/:championshipId')
