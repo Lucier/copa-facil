@@ -1,0 +1,226 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: copa_facil_db
+    environment:
+      POSTGRES_USER: copafacil
+      POSTGRES_PASSWORD: copafacil
+      POSTGRES_DB: copafacil
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U copafacil -d copafacil']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - copa_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: copa_facil_redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - copa_network
+
+  minio:
+    image: minio/minio:latest
+    container_name: copa_facil_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - copa_network
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: copa_facil_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin123 &&
+        mc mb --ignore-existing local/copa-facil-assets &&
+        mc mb --ignore-existing local/copa-facil-documents &&
+        mc anonymous set download local/copa-facil-assets &&
+        echo 'MinIO buckets initialized.'
+      "
+    restart: 'no'
+    networks:
+      - copa_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: builder
+    container_name: copa_facil_backend
+    environment:
+      DATABASE_URL: postgresql://copafacil:copafacil@postgres:5432/copafacil
+      REDIS_URL: redis://redis:6379
+      PORT: 3001
+      NODE_ENV: development
+      JWT_SECRET: dev-secret-change-me-in-production-32c
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_SECRET: dev-refresh-secret-change-me-32chars
+      JWT_REFRESH_EXPIRES_IN: 7d
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      MINIO_BUCKET_ASSETS: copa-facil-assets
+      MINIO_BUCKET_DOCS: copa-facil-documents
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./apps/backend/src:/app/apps/backend/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    command: pnpm --filter backend dev
+    networks:
+      - copa_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      target: builder
+    container_name: copa_facil_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:3001/api/v1
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./apps/frontend/src:/app/apps/frontend/src
+    depends_on:
+      - backend
+    command: pnpm --filter frontend dev
+    networks:
+      - copa_network
+
+  # ─── Monitoring stack (docker compose --profile monitoring up -d) ─────────────
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: copa_facil_otel
+    command: ['--config=/etc/otel/config.yaml']
+    volumes:
+      - ./config/monitoring/otel-collector-config.yaml:/etc/otel/config.yaml:ro
+    ports:
+      - '4317:4317'  # OTLP gRPC
+      - '4318:4318'  # OTLP HTTP
+      - '8889:8889'  # Prometheus scrape endpoint
+    depends_on:
+      - backend
+    profiles:
+      - monitoring
+    networks:
+      - copa_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: copa_facil_prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./config/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - '9090:9090'
+    depends_on:
+      - otel-collector
+    profiles:
+      - monitoring
+    networks:
+      - copa_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: copa_facil_grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./config/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - '3002:3000'
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+    networks:
+      - copa_network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: copa_facil_pg_exporter
+    environment:
+      DATA_SOURCE_NAME: postgresql://copafacil:copafacil@postgres:5432/copafacil?sslmode=disable
+    ports:
+      - '9187:9187'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - monitoring
+    networks:
+      - copa_network
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: copa_facil_redis_exporter
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    ports:
+      - '9121:9121'
+    depends_on:
+      redis:
+        condition: service_healthy
+    profiles:
+      - monitoring
+    networks:
+      - copa_network
+
+networks:
+  copa_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
