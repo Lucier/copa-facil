@@ -129,8 +129,11 @@ export default function RegisterPage() {
   // ── Step 1 form ──────────────────────────────────────────────────────────
   const form1 = useForm<RegisterStep1Input>({
     resolver: zodResolver(registerStep1Schema),
+    mode: 'onChange',
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   })
+
+  const passwordValue = form1.watch('password')
 
   function onStep1Submit(values: RegisterStep1Input) {
     setStep1Data(values)
@@ -291,6 +294,22 @@ export default function RegisterPage() {
                       )}
                     />
                   </div>
+                  {passwordValue && (
+                    <ul className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
+                      {[
+                        { label: 'Mínimo 8 caracteres', ok: passwordValue.length >= 8 },
+                        { label: 'Letra maiúscula', ok: /[A-Z]/.test(passwordValue) },
+                        { label: 'Letra minúscula', ok: /[a-z]/.test(passwordValue) },
+                        { label: 'Número', ok: /[0-9]/.test(passwordValue) },
+                        { label: 'Caractere especial', ok: /[^A-Za-z0-9]/.test(passwordValue) },
+                      ].map(({ label, ok }) => (
+                        <li key={label} className={`flex items-center gap-1.5 ${ok ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                          <CheckCircle2 className="size-3 shrink-0" />
+                          {label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   <Button type="submit" className="w-full gap-2">
                     Próximo <ArrowRight className="size-4" />
                   </Button>
