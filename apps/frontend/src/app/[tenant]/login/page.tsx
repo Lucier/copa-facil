@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { Loader2, Trophy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -116,6 +117,13 @@ export default function LoginPage() {
         <p className="text-center text-xs text-muted-foreground">
           Demo: <span className="font-mono text-foreground">admin@demo.com</span> /{' '}
           <span className="font-mono text-foreground">Demo1234!!</span>
+        </p>
+
+        <p className="text-center text-xs text-muted-foreground">
+          Não tem conta?{' '}
+          <Link href="/register" className="font-medium text-primary hover:underline">
+            Criar organização
+          </Link>
         </p>
       </div>
     </div>

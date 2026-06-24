@@ -62,7 +62,7 @@ const PLANS = [
     description: 'Para testar e conhecer a plataforma.',
     features: ['1 campeonato ativo', 'Até 8 times', '30 jogadores', 'Portal público'],
     cta: 'Começar grátis',
-    href: '/demo/login',
+    href: '/register',
     highlight: false,
   },
   {
@@ -72,7 +72,7 @@ const PLANS = [
     description: 'Para organizadores sérios e torneios recorrentes.',
     features: ['Campeonatos ilimitados', 'Times ilimitados', 'Jogadores ilimitados', 'Estatísticas avançadas', 'Suporte prioritário'],
     cta: 'Assinar agora',
-    href: '/demo/login',
+    href: '/register',
     highlight: true,
   },
   {
@@ -82,7 +82,7 @@ const PLANS = [
     description: 'Para ligas profissionais e federações.',
     features: ['Tudo do Profissional', 'Múltiplas organizações', 'API de integração', 'Relatórios exportáveis', 'Onboarding dedicado'],
     cta: 'Falar com vendas',
-    href: '/demo/login',
+    href: '/register',
     highlight: false,
   },
 ]
@@ -135,7 +135,7 @@ export default function LandingPage() {
               Entrar
             </Link>
             <Link
-              href="/demo/login"
+              href="/register"
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               Começar grátis <ArrowRight className="size-3.5" />
@@ -170,7 +170,7 @@ export default function LandingPage() {
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/demo/login"
+              href="/register"
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:opacity-90 hover:shadow-primary/40"
             >
               <Zap className="size-4" />

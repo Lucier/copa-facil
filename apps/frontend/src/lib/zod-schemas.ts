@@ -5,6 +5,29 @@ export const loginSchema = z.object({
   password: z.string().min(6, 'Senha deve ter pelo menos 6 caracteres'),
 })
 
+export const registerStep1Schema = z.object({
+  name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(8, 'Senha deve ter pelo menos 8 caracteres'),
+  confirmPassword: z.string(),
+}).refine((d) => d.password === d.confirmPassword, {
+  message: 'As senhas não coincidem',
+  path: ['confirmPassword'],
+})
+
+export const registerStep2Schema = z.object({
+  organizationName: z.string().min(3, 'Nome da organização deve ter pelo menos 3 caracteres'),
+  organizationSlug: z
+    .string()
+    .min(3, 'Identificador deve ter pelo menos 3 caracteres')
+    .max(30, 'Identificador deve ter no máximo 30 caracteres')
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Use apenas letras minúsculas, números e hífens'),
+  plan: z.enum(['starter', 'professional', 'liga']),
+})
+
+export type RegisterStep1Input = z.infer<typeof registerStep1Schema>
+export type RegisterStep2Input = z.infer<typeof registerStep2Schema>
+
 export const createChampionshipSchema = z.object({
   name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
   season: z.string().min(4, 'Temporada inválida'),
