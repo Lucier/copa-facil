@@ -4,68 +4,89 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { getInitials } from '@/lib/utils'
+import { publicFetch, type Paginated } from '@/lib/server-api'
 
-// SSR — leaderboards reflect latest match data
 export const dynamic = 'force-dynamic'
+
+interface Props { params: Promise<{ tenant: string }> }
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Estatísticas',
-    description: 'Artilharia, assistências e tabela fair play dos campeonatos.',
+    description: 'Artilharia, assistências e fair play dos campeonatos.',
     openGraph: { title: 'Estatísticas — Artilharia e Assistências' },
   }
 }
 
-const TOP_SCORERS = [
-  { rank: 1, name: 'Carlos Mendes', team: 'Rápidos FC', goals: 12, assists: 5, apps: 8 },
-  { rank: 2, name: 'Fernando Alves', team: 'Leões do Norte', goals: 9, assists: 3, apps: 8 },
-  { rank: 3, name: 'Rafael Costa', team: 'Unidos SC', goals: 7, assists: 11, apps: 8 },
-  { rank: 4, name: 'Pedro Rocha', team: 'Estrela Azul', goals: 6, assists: 4, apps: 7 },
-  { rank: 5, name: 'Matheus Rocha', team: 'Tornado FC', goals: 4, assists: 8, apps: 8 },
-  { rank: 6, name: 'Anderson Lima', team: 'Sport Clube', goals: 4, assists: 2, apps: 8 },
-  { rank: 7, name: 'Lucas Santana', team: 'Estrela Azul', goals: 3, assists: 6, apps: 7 },
-  { rank: 8, name: 'Rafael Lima', team: 'Rápidos FC', goals: 3, assists: 4, apps: 8 },
-]
+interface StatRow {
+  id: string; championship_id: string; team_id: string; player_id: string
+  goals: number; assists: number; yellow_cards: number; red_cards: number
+  fair_play_points: number
+}
 
-const TOP_ASSISTS = [
-  { rank: 1, name: 'Rafael Costa', team: 'Unidos SC', goals: 7, assists: 11, apps: 8 },
-  { rank: 2, name: 'Matheus Rocha', team: 'Tornado FC', goals: 4, assists: 8, apps: 8 },
-  { rank: 3, name: 'Lucas Santana', team: 'Estrela Azul', goals: 3, assists: 6, apps: 7 },
-  { rank: 4, name: 'Carlos Mendes', team: 'Rápidos FC', goals: 12, assists: 5, apps: 8 },
-  { rank: 5, name: 'Rafael Lima', team: 'Rápidos FC', goals: 3, assists: 4, apps: 8 },
-]
+interface Player { id: string; full_name: string; main_position: string }
+interface Team { id: string; name: string; acronym: string | null }
 
-const FAIR_PLAY = [
-  { rank: 1, team: 'Rápidos FC', yellow: 6, red: 0, pts: 6 },
-  { rank: 2, team: 'Tornado FC', yellow: 8, red: 0, pts: 8 },
-  { rank: 3, team: 'Estrela Azul', yellow: 9, red: 0, pts: 9 },
-  { rank: 4, team: 'Unidos SC', yellow: 10, red: 1, pts: 13 },
-  { rank: 5, name: 'Leões do Norte', yellow: 11, red: 1, pts: 14 },
-  { rank: 6, team: 'Guerreiros', yellow: 12, red: 2, pts: 18 },
-]
+function PlayerRow({
+  rank, stat, playerMap, teamMap, metric,
+}: {
+  rank: number
+  stat: StatRow
+  playerMap: Record<string, Player>
+  teamMap: Record<string, Team>
+  metric: 'goals' | 'assists'
+}) {
+  const player = playerMap[stat.player_id]
+  const team = teamMap[stat.team_id]
+  const name = player?.full_name ?? 'Jogador'
+  const teamName = team?.acronym ?? team?.name ?? '—'
 
-function PlayerRow({ player, metric }: { player: typeof TOP_SCORERS[0]; metric: 'goals' | 'assists' }) {
   return (
     <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-accent/50">
-      <span className={`w-6 text-center text-sm font-bold font-display ${player.rank <= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-        {player.rank}
+      <span className={`w-6 text-center text-sm font-bold font-display ${rank <= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+        {rank}
       </span>
       <Avatar className="size-8">
-        <AvatarFallback className="text-[10px]">{getInitials(player.name)}</AvatarFallback>
+        <AvatarFallback className="text-[10px]">{getInitials(name)}</AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold truncate">{player.name}</p>
-        <p className="text-[11px] text-muted-foreground truncate">{player.team}</p>
+        <p className="text-sm font-semibold truncate">{name}</p>
+        <p className="text-[11px] text-muted-foreground truncate">{teamName}</p>
       </div>
       <div className="text-right">
-        <p className="font-display text-xl font-bold text-primary">{player[metric]}</p>
-        <p className="text-[10px] text-muted-foreground">{player.apps} jog</p>
+        <p className="font-display text-xl font-bold text-primary">{stat[metric]}</p>
       </div>
     </div>
   )
 }
 
-export default async function StatisticsPublicPage() {
+export default async function StatisticsPublicPage({ params }: Props) {
+  const { tenant } = await params
+
+  const [goalsRes, assistsRes, fairPlayRes, playersRes, teamsRes] = await Promise.allSettled([
+    publicFetch<Paginated<StatRow>>(tenant, 'statistics/leaderboard', { type: 'goals', limit: '10' }),
+    publicFetch<Paginated<StatRow>>(tenant, 'statistics/leaderboard', { type: 'assists', limit: '10' }),
+    publicFetch<Paginated<StatRow>>(tenant, 'statistics/leaderboard', { type: 'fair_play', limit: '10' }),
+    publicFetch<Paginated<Player>>(tenant, 'players', { limit: '100' }),
+    publicFetch<Paginated<Team>>(tenant, 'teams', { limit: '100' }),
+  ])
+
+  const topScorers = goalsRes.status === 'fulfilled' ? goalsRes.value.data : []
+  const topAssists = assistsRes.status === 'fulfilled' ? assistsRes.value.data : []
+  const fairPlay = fairPlayRes.status === 'fulfilled' ? fairPlayRes.value.data : []
+
+  const playerMap = Object.fromEntries(
+    (playersRes.status === 'fulfilled' ? playersRes.value.data : []).map((p) => [p.id, p]),
+  )
+  const teamMap = Object.fromEntries(
+    (teamsRes.status === 'fulfilled' ? teamsRes.value.data : []).map((t) => [t.id, t]),
+  )
+
+  const totalGoals = topScorers.reduce((s, r) => s + r.goals, 0)
+  const topScorer = topScorers[0] ? playerMap[topScorers[0].player_id]?.full_name?.split(' ')[0] : '—'
+  const topAssist = topAssists[0] ? playerMap[topAssists[0].player_id]?.full_name?.split(' ')[0] : '—'
+  const fairPlayTeam = fairPlay[0] ? (teamMap[fairPlay[0].team_id]?.name ?? '—') : '—'
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 space-y-8">
       <div>
@@ -76,13 +97,12 @@ export default async function StatisticsPublicPage() {
         <p className="mt-2 text-muted-foreground">Artilharia, assistências e fair play atualizados em tempo real.</p>
       </div>
 
-      {/* Summary stats */}
       <div className="grid gap-4 sm:grid-cols-4">
         {[
-          { label: 'Gols Marcados', value: '85', icon: Target },
-          { label: 'Artilheiro', value: 'C. Mendes', icon: Target },
-          { label: 'Assistências', value: '41', icon: Star },
-          { label: 'Menos Cartões', value: 'Rápidos FC', icon: Shield },
+          { label: 'Gols Marcados', value: String(totalGoals), icon: Target },
+          { label: 'Artilheiro', value: topScorer, icon: Target },
+          { label: 'Mais Assistências', value: topAssist, icon: Star },
+          { label: 'Menos Cartões', value: fairPlayTeam, icon: Shield },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="flex items-center gap-3 p-4">
@@ -97,8 +117,7 @@ export default async function StatisticsPublicPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Top Scorers */}
-        <Card className="lg:col-span-1">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
               <Target className="size-4 text-primary" />
@@ -106,12 +125,15 @@ export default async function StatisticsPublicPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-0.5 p-2">
-            {TOP_SCORERS.map((p) => <PlayerRow key={p.name} player={p} metric="goals" />)}
+            {topScorers.length === 0 ? (
+              <p className="p-4 text-center text-sm text-muted-foreground">Sem dados ainda.</p>
+            ) : topScorers.map((s, i) => (
+              <PlayerRow key={s.id} rank={i + 1} stat={s} playerMap={playerMap} teamMap={teamMap} metric="goals" />
+            ))}
           </CardContent>
         </Card>
 
-        {/* Top Assists */}
-        <Card className="lg:col-span-1">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
               <Star className="size-4 text-primary" />
@@ -119,32 +141,39 @@ export default async function StatisticsPublicPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-0.5 p-2">
-            {TOP_ASSISTS.map((p) => <PlayerRow key={p.name} player={p} metric="assists" />)}
+            {topAssists.length === 0 ? (
+              <p className="p-4 text-center text-sm text-muted-foreground">Sem dados ainda.</p>
+            ) : topAssists.map((s, i) => (
+              <PlayerRow key={s.id} rank={i + 1} stat={s} playerMap={playerMap} teamMap={teamMap} metric="assists" />
+            ))}
           </CardContent>
         </Card>
 
-        {/* Fair Play */}
-        <Card className="lg:col-span-1">
+        <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
               <Shield className="size-4 text-primary" />
-              Fair Play (menos pontos = melhor)
+              Fair Play
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-0.5 p-2">
-            {FAIR_PLAY.map((row) => (
-              <div key={row.rank} className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-accent/50 transition-colors">
-                <span className={`w-6 text-center text-sm font-bold font-display ${row.rank <= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {row.rank}
-                </span>
-                <span className="flex-1 text-sm font-medium">{(row as any).team ?? (row as any).name}</span>
-                <div className="flex items-center gap-2 text-xs">
-                  <Badge variant="warning" className="gap-1">{row.yellow} CA</Badge>
-                  {row.red > 0 && <Badge variant="destructive" className="gap-1">{row.red} CV</Badge>}
+            {fairPlay.length === 0 ? (
+              <p className="p-4 text-center text-sm text-muted-foreground">Sem dados ainda.</p>
+            ) : fairPlay.map((row, i) => {
+              const team = teamMap[row.team_id]
+              return (
+                <div key={row.id} className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-accent/50 transition-colors">
+                  <span className={`w-6 text-center text-sm font-bold font-display ${i < 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {i + 1}
+                  </span>
+                  <span className="flex-1 text-sm font-medium">{team?.name ?? '—'}</span>
+                  <div className="flex items-center gap-2 text-xs">
+                    {row.yellow_cards > 0 && <Badge variant="warning">{row.yellow_cards} CA</Badge>}
+                    {row.red_cards > 0 && <Badge variant="destructive">{row.red_cards} CV</Badge>}
+                  </div>
                 </div>
-                <span className="font-display font-bold text-sm">{row.pts}</span>
-              </div>
-            ))}
+              )
+            })}
           </CardContent>
         </Card>
       </div>

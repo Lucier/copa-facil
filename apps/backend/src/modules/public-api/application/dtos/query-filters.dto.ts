@@ -75,6 +75,11 @@ export class PublicQueryFiltersDto {
   @IsString()
   search?: string
 
+  @ApiPropertyOptional({ description: 'Filter by team UUID' })
+  @IsOptional()
+  @IsUUID()
+  teamId?: string
+
   @ApiPropertyOptional({
     description: 'Statistics leaderboard type',
     enum: ['goals', 'assists', 'fair_play'],

@@ -32,7 +32,7 @@ export class PublicPlayersController {
   @Get()
   @ApiOperation({ summary: 'List players' })
   async list(@Query() filters: PublicQueryFiltersDto) {
-    const { page, limit, search, position, minAge, maxAge } = filters
+    const { page, limit, search, position, minAge, maxAge, teamId } = filters
 
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<(PlayerRow & { total: string })[]>`
@@ -43,6 +43,7 @@ export class PublicPlayersController {
         FROM   players
         WHERE  (${search ?? null}::text IS NULL OR full_name ILIKE ${'%' + (search ?? '') + '%'})
           AND  (${position ?? null}::text IS NULL OR main_position = ${position ?? null})
+          AND  (${teamId ?? null}::uuid IS NULL OR team_id = ${teamId ?? null}::uuid)
           AND  (${minAge ?? null}::int IS NULL
                 OR EXTRACT(YEAR FROM AGE(NOW(), birthdate::date)) >= ${minAge ?? null})
           AND  (${maxAge ?? null}::int IS NULL

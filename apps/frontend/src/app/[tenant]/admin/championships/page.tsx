@@ -1,12 +1,13 @@
 'use client'
 import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Trophy, Calendar, Users, Loader2 } from 'lucide-react'
+import { Plus, Trophy, Calendar, Users, Loader2, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { NewChampionshipDialog } from '@/components/admin/NewChampionshipDialog'
+import { GenerateFixturesDialog } from '@/components/admin/GenerateFixturesDialog'
 import { formatDate } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
@@ -20,6 +21,14 @@ interface Championship {
   status: 'active' | 'finished' | 'draft'
   createdAt: string
   updatedAt: string
+}
+
+interface Team {
+  id: string
+  name: string
+  acronym: string | null
+  city: string | null
+  primaryColor: string | null
 }
 
 const FORMAT_LABELS: Record<string, string> = {
@@ -39,12 +48,22 @@ async function fetchChampionships(): Promise<Championship[]> {
   return data
 }
 
+async function fetchTeams(): Promise<Team[]> {
+  const { data } = await api.get<Team[]>(API.teams.base)
+  return data
+}
+
 export default function ChampionshipsPage() {
   const queryClient = useQueryClient()
 
   const { data: championships = [], isLoading, isError } = useQuery({
     queryKey: ['championships'],
     queryFn: fetchChampionships,
+  })
+
+  const { data: teams = [] } = useQuery({
+    queryKey: ['teams'],
+    queryFn: fetchTeams,
   })
 
   function handleCreated() {
@@ -114,14 +133,15 @@ export default function ChampionshipsPage() {
                   <TableHead>Formato</TableHead>
                   <TableHead>Turno</TableHead>
                   <TableHead>Criado em</TableHead>
-                  <TableHead className="text-right">Status</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {championships.map((c) => {
                   const st = STATUS_VARIANTS[c.status] ?? STATUS_VARIANTS.draft
                   return (
-                    <TableRow key={c.id} className="cursor-pointer">
+                    <TableRow key={c.id}>
                       <TableCell className="font-medium">{c.name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{c.season}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
@@ -133,8 +153,22 @@ export default function ChampionshipsPage() {
                       <TableCell className="text-xs text-muted-foreground">
                         {formatDate(c.createdAt)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-center">
                         <Badge variant={st.variant}>{st.label}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {c.status === 'draft' && (
+                          <GenerateFixturesDialog
+                            championship={c}
+                            teams={teams}
+                            onSuccess={handleCreated}
+                          >
+                            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+                              <Zap className="size-3.5" />
+                              Gerar Partidas
+                            </Button>
+                          </GenerateFixturesDialog>
+                        )}
                       </TableCell>
                     </TableRow>
                   )
