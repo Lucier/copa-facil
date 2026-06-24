@@ -16,6 +16,9 @@ import {
 import { NotificationBell } from './NotificationBell'
 import { useAuthStore } from '@/store/useAuthStore'
 import { getInitials } from '@/lib/utils'
+import api from '@/services/api'
+import { API } from '@/services/endpoints'
+import { useRouter } from 'next/navigation'
 
 const SEGMENT_LABELS: Record<string, string> = {
   admin: 'Admin',
@@ -49,9 +52,22 @@ export function AdminHeader() {
   const { theme, setTheme } = useTheme()
   const user = useAuthStore((s) => s.user)
   const clearAuth = useAuthStore((s) => s.clearAuth)
+  const router = useRouter()
+  const params = useParams()
+  const tenant = params.tenant as string
 
-  const displayName = (user as any)?.name ?? 'Usuário'
-  const email = (user as any)?.email ?? ''
+  async function handleLogout() {
+    try {
+      await api.post(API.auth.logout)
+    } catch {
+      // ignore — cookie will expire naturally
+    }
+    clearAuth()
+    router.replace(`/${tenant}/login`)
+  }
+
+  const displayName = user?.name ?? 'Usuário'
+  const email = user?.email ?? ''
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background/80 px-5 backdrop-blur-sm">
@@ -106,7 +122,7 @@ export function AdminHeader() {
               Perfil
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={clearAuth} className="gap-2 text-destructive focus:text-destructive">
+            <DropdownMenuItem onClick={() => void handleLogout()} className="gap-2 text-destructive focus:text-destructive">
               <LogOut className="size-4" />
               Sair
             </DropdownMenuItem>

@@ -3,6 +3,9 @@ import { ConfigService } from '@nestjs/config'
 import { MercadoPagoConfig } from 'mercadopago'
 import { DrizzleModule } from '../../database/drizzle.module'
 import { AuthModule } from '../auth/auth.module'
+import { AUDIT_REPOSITORY } from '../auth/domain/repositories/i-audit.repository'
+import { DrizzleAuditRepository } from '../auth/infrastructure/repositories/drizzle-audit.repository'
+import { EncryptionService } from '../../infrastructure/encryption/encryption.service'
 import { PAYMENT_GATEWAY } from './domain/gateways/i-payment-gateway'
 import { LEDGER_REPOSITORY } from './domain/repositories/i-ledger.repository'
 import { TRANSACTION_REPOSITORY } from './domain/repositories/i-transaction.repository'
@@ -39,6 +42,8 @@ import { PaymentWebhooksController } from './presentation/webhooks/payment-webho
     },
     { provide: TRANSACTION_REPOSITORY, useClass: DrizzleTransactionRepository },
     { provide: LEDGER_REPOSITORY, useClass: DrizzleLedgerRepository },
+    { provide: AUDIT_REPOSITORY, useClass: DrizzleAuditRepository },
+    EncryptionService,
     CreatePaymentOrderUseCase,
     ProcessWebhookUseCase,
     RefundTransactionUseCase,

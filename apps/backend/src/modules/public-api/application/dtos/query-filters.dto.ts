@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer'
 import {
   IsDateString,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -26,9 +27,12 @@ export class PublicQueryFiltersDto {
   @Max(100)
   limit: number = 20
 
-  @ApiPropertyOptional({ description: 'Filter by status (e.g. active, finished, draft, scheduled, live)' })
+  @ApiPropertyOptional({
+    description: 'Filter by status',
+    enum: ['scheduled', 'live', 'finished', 'cancelled', 'active', 'draft', 'published'],
+  })
   @IsOptional()
-  @IsString()
+  @IsIn(['scheduled', 'live', 'finished', 'cancelled', 'active', 'draft', 'published'])
   status?: string
 
   @ApiPropertyOptional({ description: 'Filter matches by date (ISO 8601: YYYY-MM-DD)' })
@@ -86,6 +90,6 @@ export class PublicQueryFiltersDto {
     default: 'goals',
   })
   @IsOptional()
-  @IsString()
+  @IsIn(['goals', 'assists', 'fair_play'])
   type?: 'goals' | 'assists' | 'fair_play'
 }

@@ -32,10 +32,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = exception.message
       code = exception.code
     } else {
-      this.logger.error(
-        'Unhandled exception',
-        exception instanceof Error ? exception.stack : String(exception),
-      )
+      const detail = process.env.NODE_ENV !== 'production'
+        ? (exception instanceof Error ? exception.stack : String(exception))
+        : undefined
+      this.logger.error('Unhandled exception', detail)
     }
 
     response.status(status).json({

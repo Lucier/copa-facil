@@ -2,6 +2,7 @@ import {
   Body, Controller, Get, HttpCode, HttpStatus,
   Param, ParseUUIDPipe, Post, Query, UseGuards,
 } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard'
 import { TenantRolesGuard } from '../../../auth/presentation/guards/tenant-roles.guard'
@@ -42,12 +43,14 @@ export class PaymentsController {
   refundOne(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: RefundTransactionDto,
+    @CurrentUser('sub') userId: string,
   ) {
-    return this.refund.execute(id, dto)
+    return this.refund.execute(id, dto, userId)
   }
 
   @Get()
   @Roles(UserRole.ORGANIZADOR)
+  @Throttle({ global: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'List transactions, optionally filtered by championship' })
   @ApiQuery({ name: 'championshipId', required: false })
   listAll(@Query('championshipId') championshipId?: string) {

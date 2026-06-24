@@ -20,7 +20,7 @@ export function TenantSwitcher() {
   const currentTenant = (params.tenant as string) ?? ''
   const user = useAuthStore((s) => s.user)
 
-  const tenants: { slug: string; name: string }[] = (user as any)?.organizations ?? []
+  const tenants = user?.organizations ?? []
 
   const currentOrg = tenants.find((t) => t.slug === currentTenant)
   const displayName = currentOrg?.name ?? currentTenant

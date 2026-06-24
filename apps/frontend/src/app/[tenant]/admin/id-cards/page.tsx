@@ -57,7 +57,7 @@ function contrastColor(hex: string): string {
 
 // ── ID Card Component (preview) ───────────────────────────────────────────────
 
-export function PlayerIdCard({
+function PlayerIdCard({
   player,
   team,
   orgName,

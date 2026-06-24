@@ -1,4 +1,5 @@
 import { createHmac } from 'crypto'
+import { BadRequestException } from '@nestjs/common'
 import { MercadoPagoConfig, Payment, PaymentRefund } from 'mercadopago'
 import {
   BoletoPaymentRequest,
@@ -25,6 +26,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
   }
 
   async createPix(req: PixPaymentRequest): Promise<PixPaymentResponse> {
+    if (!req.payerEmail) throw new BadRequestException('payerEmail is required for PIX payments')
     const ttl = req.ttlMinutes ?? 30
     const expiresAt = new Date(Date.now() + ttl * 60_000)
 
@@ -34,7 +36,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
         description: req.description,
         payment_method_id: 'pix',
         date_of_expiration: expiresAt.toISOString(),
-        payer: { email: req.payerEmail ?? 'pagador@copafacil.com.br' },
+        payer: { email: req.payerEmail },
       },
     })
 
@@ -48,6 +50,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
   }
 
   async createBoleto(req: BoletoPaymentRequest): Promise<BoletoPaymentResponse> {
+    if (!req.payerEmail) throw new BadRequestException('payerEmail is required for Boleto payments')
     const nameParts = req.payerName.split(' ')
     const response = await this.paymentClient.create({
       body: {
@@ -56,7 +59,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
         payment_method_id: 'bolbradesco',
         date_of_expiration: req.dueDate.toISOString(),
         payer: {
-          email: req.payerEmail ?? 'pagador@copafacil.com.br',
+          email: req.payerEmail,
           first_name: nameParts[0],
           last_name: nameParts.slice(1).join(' ') || nameParts[0],
           identification: {
@@ -82,6 +85,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
   }
 
   async chargeCreditCard(req: CreditCardPaymentRequest): Promise<CreditCardPaymentResponse> {
+    if (!req.payerEmail) throw new BadRequestException('payerEmail is required for credit card payments')
     const response = await this.paymentClient.create({
       body: {
         transaction_amount: req.amount / 100,
@@ -91,7 +95,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
         payment_method_id: req.paymentMethodId,
         issuer_id: req.issuerId ? Number(req.issuerId) : undefined,
         three_d_secure_mode: 'optional' as const,
-        payer: { email: req.payerEmail ?? 'pagador@copafacil.com.br' },
+        payer: { email: req.payerEmail },
       },
     })
 

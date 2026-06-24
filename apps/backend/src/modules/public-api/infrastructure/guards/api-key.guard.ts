@@ -18,6 +18,16 @@ const RATE_LIMIT = 60
 const WINDOW_SECONDS = 60
 const CACHE_TTL_SECONDS = 300
 
+// Atomically increment a sliding-window counter.
+// Sets TTL only on the first increment so concurrent requests can't skip expiry.
+const INCR_WITH_TTL = `
+  local count = redis.call('INCR', KEYS[1])
+  if count == 1 then
+    redis.call('EXPIRE', KEYS[1], ARGV[1])
+  end
+  return count
+`
+
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
   private readonly logger = new Logger(ApiKeyGuard.name)
@@ -58,7 +68,11 @@ export class ApiKeyGuard implements CanActivate {
 
     const cached = await this.redis.get(cacheKey)
     if (cached) {
-      return JSON.parse(cached) as { id: string; organizationSlug: string; schemaName: string; isActive: boolean }
+      const parsed: unknown = JSON.parse(cached)
+      if (this.isValidCachedKey(parsed)) return parsed
+      // Corrupted cache entry — evict and fall through to DB
+      this.logger.warn(`Evicting corrupted cache entry for key hash ${hash.slice(0, 8)}…`)
+      await this.redis.del(cacheKey)
     }
 
     const lookup = await this.apiKeyRepo.findByKeyHash(hash)
@@ -68,20 +82,34 @@ export class ApiKeyGuard implements CanActivate {
     return lookup
   }
 
+  private isValidCachedKey(
+    v: unknown,
+  ): v is { id: string; organizationSlug: string; schemaName: string; isActive: boolean } {
+    return (
+      typeof v === 'object' &&
+      v !== null &&
+      typeof (v as Record<string, unknown>).id === 'string' &&
+      typeof (v as Record<string, unknown>).organizationSlug === 'string' &&
+      typeof (v as Record<string, unknown>).schemaName === 'string' &&
+      typeof (v as Record<string, unknown>).isActive === 'boolean'
+    )
+  }
+
   private async enforceRateLimit(hash: string): Promise<void> {
-    const windowStart = Math.floor(Date.now() / 1000 / WINDOW_SECONDS) * WINDOW_SECONDS
-    const windowEnd = windowStart + WINDOW_SECONDS
-    const key = `ratelimit:public:${hash}:${windowStart}`
+    const window = Math.floor(Date.now() / 1000 / WINDOW_SECONDS)
+    const key = `ratelimit:public:${hash}:${window}`
 
-    const results = await this.redis
-      .pipeline()
-      .incr(key)
-      .expireat(key, windowEnd)
-      .exec()
+    // Lua script guarantees INCR + EXPIRE are atomic — no risk of an unexpired
+    // orphan key if the process crashes between the two Redis commands.
+    const count = await (this.redis.eval(
+      INCR_WITH_TTL,
+      1,
+      key,
+      String(WINDOW_SECONDS),
+    ) as Promise<number>)
 
-    const count = (results?.[0]?.[1] as number) ?? 0
     if (count > RATE_LIMIT) {
-      throw new HttpException('Rate limit exceeded: 60 requests per minute', HttpStatus.TOO_MANY_REQUESTS)
+      throw new HttpException(`Rate limit exceeded: ${RATE_LIMIT} requests per ${WINDOW_SECONDS}s`, HttpStatus.TOO_MANY_REQUESTS)
     }
   }
 }

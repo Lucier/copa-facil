@@ -32,15 +32,20 @@ export class PublicTeamsController {
   async list(@Query() filters: PublicQueryFiltersDto) {
     const { page, limit, search } = filters
 
+    // Escape ILIKE special chars so user input can't widen or pin the pattern.
+    const likePattern = search
+      ? '%' + search.replace(/[\\%_]/g, (c) => `\\${c}`) + '%'
+      : null
+
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<(TeamRow & { total: string })[]>`
         SELECT id, name, acronym, city, nickname, logo_url,
                primary_color, secondary_color, seed, created_at,
                COUNT(*) OVER () AS total
         FROM   teams
-        WHERE  (${search ?? null}::text IS NULL
-                OR name ILIKE ${'%' + (search ?? '') + '%'}
-                OR acronym ILIKE ${'%' + (search ?? '') + '%'})
+        WHERE  (${likePattern}::text IS NULL
+                OR name ILIKE ${likePattern} ESCAPE '\\'
+                OR acronym ILIKE ${likePattern} ESCAPE '\\')
         ORDER  BY name ASC
         LIMIT  ${limit} OFFSET ${(page - 1) * limit}
       `,

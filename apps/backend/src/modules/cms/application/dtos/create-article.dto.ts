@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsOptional, IsString, IsUUID, MinLength } from 'class-validator'
+import { IsEnum, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator'
 import { ArticleStatus } from '../../domain/enums'
 
 export class CreateArticleDto {
@@ -20,6 +20,7 @@ export class CreateArticleDto {
 
   @ApiProperty({ description: 'Markdown or HTML content' })
   @IsString()
+  @MaxLength(100_000)
   content!: string
 
   @ApiPropertyOptional()

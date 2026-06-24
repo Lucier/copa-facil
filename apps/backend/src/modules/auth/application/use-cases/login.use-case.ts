@@ -78,15 +78,17 @@ export class LoginUseCase {
     const accessExpiresIn = this.config.get<string>('jwt.expiresIn') ?? '15m'
     const refreshExpiresIn = this.config.get<string>('jwt.refreshExpiresIn') ?? '7d'
 
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    const accessToken = this.jwtService.sign(accessPayload as any, {
-      expiresIn: accessExpiresIn,
-    } as any)
-    const refreshToken = this.jwtService.sign(refreshPayload as any, {
-      secret: this.config.getOrThrow<string>('jwt.refreshSecret'),
-      expiresIn: refreshExpiresIn,
-    } as any)
-    /* eslint-enable @typescript-eslint/no-explicit-any */
+    const accessToken = this.jwtService.sign(
+      { ...accessPayload },
+      { expiresIn: this.parseTtlToSeconds(accessExpiresIn) },
+    )
+    const refreshToken = this.jwtService.sign(
+      { ...refreshPayload },
+      {
+        secret: this.config.getOrThrow<string>('jwt.refreshSecret'),
+        expiresIn: this.parseTtlToSeconds(refreshExpiresIn),
+      },
+    )
 
     const refreshTtl = this.parseTtlToSeconds(refreshExpiresIn)
     await this.tokenStore.storeRefreshToken(userId, refreshJti, refreshTtl)

@@ -1,6 +1,8 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { randomBytes } from 'crypto'
 import { CryptService } from '../../../../infrastructure/crypt/crypt.service'
+import { AUDIT_REPOSITORY, IAuditRepository } from '../../domain/repositories/i-audit.repository'
 import { IUserRepository, USER_REPOSITORY } from '../../domain/repositories/i-user.repository'
 import { Password } from '../../domain/value-objects/password.vo'
 import { RedisTokenStoreService } from '../../infrastructure/services/redis-token-store.service'
@@ -9,22 +11,41 @@ import { ResetPasswordRequestDto } from '../dtos/reset-password-request.dto'
 
 @Injectable()
 export class ResetPasswordUseCase {
+  private readonly logger = new Logger(ResetPasswordUseCase.name)
+
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepo: IUserRepository,
+    @Inject(AUDIT_REPOSITORY) private readonly audit: IAuditRepository,
     private readonly tokenStore: RedisTokenStoreService,
     private readonly crypt: CryptService,
+    private readonly config: ConfigService,
   ) {}
 
-  // Always returns success to prevent user enumeration
+  // Always returns success and runs the same work to prevent:
+  //   1. User enumeration via response content
+  //   2. User enumeration via timing difference (bcrypt hash equalises latency)
   async requestReset(dto: ResetPasswordRequestDto): Promise<void> {
-    const user = await this.userRepo.findByEmail(dto.email)
-    if (!user) return
-
     const token = randomBytes(32).toString('hex')
-    await this.tokenStore.storeResetToken(token, user.id)
 
-    // TODO: dispatch email via NotificationsModule
-    // The reset link would be: /auth/reset-password/confirm?token={token}
+    const [user] = await Promise.all([
+      this.userRepo.findByEmail(dto.email),
+      // Dummy hash keeps response time constant whether or not the user exists
+      this.crypt.hash(token),
+    ])
+
+    if (user) {
+      await this.tokenStore.storeResetToken(token, user.id)
+
+      const appUrl = this.config.get<string>('APP_URL') ?? 'http://localhost:3000'
+      const resetUrl = `${appUrl}/auth/reset-password/confirm?token=${token}`
+
+      if (this.config.get<string>('NODE_ENV') !== 'production') {
+        this.logger.log(`[DEV] Password reset link for ${dto.email}: ${resetUrl}`)
+      } else {
+        // TODO: replace with real email dispatch via NotificationsModule / SES / SendGrid
+        this.logger.warn(`Password reset requested for user ${user.id} — email delivery not yet configured`)
+      }
+    }
   }
 
   async confirmReset(dto: ResetPasswordConfirmDto): Promise<void> {
@@ -38,5 +59,12 @@ export class ResetPasswordUseCase {
     const passwordHash = await this.crypt.hash(dto.newPassword)
     await this.userRepo.updatePassword(userId, passwordHash)
     await this.tokenStore.deleteResetToken(dto.token)
+
+    await this.audit.log({
+      userId,
+      action: 'auth.password_reset',
+      resource: 'user',
+      resourceId: userId,
+    })
   }
 }

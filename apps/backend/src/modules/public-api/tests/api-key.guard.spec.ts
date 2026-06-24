@@ -39,20 +39,15 @@ describe('ApiKeyGuard', () => {
   let mockRedis: {
     get: MockInstance
     setex: MockInstance
-    pipeline: MockInstance
+    eval: MockInstance
   }
-  let pipelineExec: MockInstance
 
   beforeEach(async () => {
-    pipelineExec = vi.fn().mockResolvedValue([[null, 1], [null, 1]])
     mockRedis = {
       get: vi.fn().mockResolvedValue(null),
       setex: vi.fn().mockResolvedValue('OK'),
-      pipeline: vi.fn().mockReturnValue({
-        incr: vi.fn().mockReturnThis(),
-        expireat: vi.fn().mockReturnThis(),
-        exec: pipelineExec,
-      }),
+      // Lua script returns current counter (1 = first request in window)
+      eval: vi.fn().mockResolvedValue(1),
     }
 
     mockRepo = {
@@ -89,10 +84,10 @@ describe('ApiKeyGuard', () => {
   })
 
   it('throws 429 when rate limit is exceeded', async () => {
-    pipelineExec.mockResolvedValue([[null, 61], [null, 1]])
+    mockRedis.eval.mockResolvedValue(61) // counter above RATE_LIMIT (60)
     const ctx = makeContext({ 'x-api-key': VALID_KEY })
     await expect(guard.canActivate(ctx)).rejects.toThrow(
-      new HttpException('Rate limit exceeded: 60 requests per minute', HttpStatus.TOO_MANY_REQUESTS),
+      new HttpException('Rate limit exceeded: 60 requests per 60s', HttpStatus.TOO_MANY_REQUESTS),
     )
   })
 

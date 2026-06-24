@@ -117,15 +117,16 @@ export default async function ArticlePage({ params }: Props) {
   const article = ARTICLES_DATA[slug]
   if (!article) notFound()
 
-  // JSON-LD for article SEO
-  const jsonLd = {
+  // JSON-LD for article SEO.
+  // Replace </script> to prevent tag injection when serialised into an inline script block.
+  const jsonLdString = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.title,
     description: article.excerpt,
     datePublished: article.publishedAt,
     author: { '@type': 'Person', name: article.author },
-  }
+  }).replace(/<\/script>/gi, '<\\/script>')
 
   const RELATED = Object.values(ARTICLES_DATA)
     .filter((a) => a.slug !== slug)
@@ -133,7 +134,7 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString }} />
 
       <div className="mx-auto max-w-4xl px-4 py-10">
         <Link href={`/${tenant}/news`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">

@@ -1,4 +1,5 @@
 import { Controller, Get, Query, UseGuards, UseInterceptors } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { DrizzleService } from '../../../../database/drizzle.service'
 import { PublicQueryFiltersDto } from '../../application/dtos/query-filters.dto'
@@ -34,6 +35,7 @@ export class PublicStandingsController {
   constructor(private readonly drizzle: DrizzleService) {}
 
   @Get()
+  @Throttle({ global: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'List standings, optionally filtered by championship or group' })
   async list(@Query() filters: PublicQueryFiltersDto) {
     const { page, limit, championshipId, groupId } = filters

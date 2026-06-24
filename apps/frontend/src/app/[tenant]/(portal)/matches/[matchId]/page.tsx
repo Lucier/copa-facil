@@ -86,8 +86,7 @@ export default async function MatchCenterPage({ params }: Props) {
 
   const isLive = match.status === 'live'
 
-  // JSON-LD structured data
-  const jsonLd = {
+  const jsonLdString = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'SportsEvent',
     name: `${match.home} vs ${match.away}`,
@@ -96,11 +95,11 @@ export default async function MatchCenterPage({ params }: Props) {
     awayTeam: { '@type': 'SportsTeam', name: match.away },
     location: { '@type': 'Place', name: 'Estádio Municipal' },
     superEvent: { '@type': 'SportsOrganization', name: match.championship },
-  }
+  }).replace(/<\/script>/gi, '<\\/script>')
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString }} />
 
       <div className="mx-auto max-w-4xl px-4 py-10 space-y-8">
         <Link href={`/${tenant}/matches`} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">

@@ -11,7 +11,12 @@ export class DrizzleService implements OnModuleDestroy {
   readonly db: PostgresJsDatabase<typeof coreSchema>
 
   constructor(private readonly config: ConfigService) {
-    this.client = postgres(this.config.getOrThrow<string>('DATABASE_URL'))
+    this.client = postgres(this.config.getOrThrow<string>('DATABASE_URL'), {
+      max: this.config.get<number>('DB_POOL_MAX') ?? 10,
+      idle_timeout: 20,       // seconds before idle connections are closed
+      connect_timeout: 10,    // seconds to wait for a connection
+      max_lifetime: 1800,     // seconds before a connection is retired (30 min)
+    })
     this.db = drizzle(this.client, { schema: coreSchema })
   }
 

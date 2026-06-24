@@ -38,10 +38,7 @@ export default function LoginPage() {
     setServerError(null)
     try {
       const { data } = await api.post<TokenResponse>(API.auth.login, values)
-      setAuth(
-        { id: data.user.id, name: data.user.name, email: data.user.email, role: 'organizador' },
-        data.accessToken,
-      )
+      setAuth({ id: data.user.id, name: data.user.name, email: data.user.email, role: 'organizador' })
       router.push(`/${tenant}/admin`)
     } catch {
       setServerError('E-mail ou senha incorretos.')
@@ -78,7 +75,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>E-mail</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="admin@demo.com" autoComplete="email" {...field} />
+                        <Input type="email" placeholder="seu@email.com" autoComplete="email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -113,11 +110,6 @@ export default function LoginPage() {
             </Form>
           </CardContent>
         </Card>
-
-        <p className="text-center text-xs text-muted-foreground">
-          Demo: <span className="font-mono text-foreground">admin@demo.com</span> /{' '}
-          <span className="font-mono text-foreground">Demo1234!!</span>
-        </p>
 
         <p className="text-center text-xs text-muted-foreground">
           Não tem conta?{' '}

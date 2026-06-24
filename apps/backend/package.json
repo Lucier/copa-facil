@@ -10,9 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "drizzle-kit generate --config drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts"
   },
   "dependencies": {
     "@nestjs/axios": "^4.0.1",
@@ -28,11 +28,13 @@
     "@nestjs/swagger": "^8.1.0",
     "@nestjs/throttler": "^6.5.0",
     "@nestjs/websockets": "^10.4.22",
+    "@types/cookie-parser": "^1.4.10",
     "axios": "^1.17.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.78.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "cookie-parser": "^1.4.7",
     "drizzle-orm": "^0.38.3",
     "helmet": "^8.2.0",
     "ioredis": "^5.11.1",

@@ -170,10 +170,7 @@ export default function RegisterPage() {
         organizationName: step2Data.organizationName,
         organizationSlug: step2Data.organizationSlug,
       })
-      setAuth(
-        { id: data.user.id, name: data.user.name, email: data.user.email, role: 'organizador' },
-        data.accessToken,
-      )
+      setAuth({ id: data.user.id, name: data.user.name, email: data.user.email, role: 'organizador' })
       setCreatedSlug(step2Data.organizationSlug)
       setDone(true)
     } catch (err: unknown) {

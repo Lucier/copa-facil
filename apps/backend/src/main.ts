@@ -1,14 +1,20 @@
 import { NestFactory } from '@nestjs/core'
+import type { NestExpressApplication } from '@nestjs/platform-express'
 import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { Logger } from 'nestjs-pino'
 import helmet from 'helmet'
+import cookieParser from 'cookie-parser'
 import { AppModule } from './app.module'
 import { CorsIoAdapter } from './infrastructure/websockets/cors-io.adapter'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true, rawBody: true })
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true, rawBody: true })
+
+  // Limit request body size to 1 MB to prevent DoS via large payloads
+  app.useBodyParser('json', { limit: '1mb' })
+  app.useBodyParser('urlencoded', { extended: true, limit: '1mb' })
 
   // Use pino as the NestJS logger (covers framework internals + bootstrap logs)
   app.useLogger(app.get(Logger))
@@ -20,6 +26,7 @@ async function bootstrap() {
     .split(',')
     .map((o) => o.trim())
 
+  app.use(cookieParser())
   app.use(helmet())
   app.enableCors({
     origin: corsOrigins,

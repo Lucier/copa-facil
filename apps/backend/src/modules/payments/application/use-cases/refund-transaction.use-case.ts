@@ -1,5 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { AppError, NotFoundError } from '../../../../shared/errors'
+import {
+  AUDIT_REPOSITORY,
+  IAuditRepository,
+} from '../../../auth/domain/repositories/i-audit.repository'
 import { TransactionEntity } from '../../domain/entities/transaction.entity'
 import { TransactionStatus } from '../../domain/enums'
 import {
@@ -17,9 +21,10 @@ export class RefundTransactionUseCase {
   constructor(
     @Inject(TRANSACTION_REPOSITORY) private readonly txRepo: ITransactionRepository,
     @Inject(PAYMENT_GATEWAY) private readonly gateway: IPaymentGateway,
+    @Inject(AUDIT_REPOSITORY) private readonly audit: IAuditRepository,
   ) {}
 
-  async execute(id: string, dto: RefundTransactionDto): Promise<TransactionEntity> {
+  async execute(id: string, dto: RefundTransactionDto, userId: string): Promise<TransactionEntity> {
     const tx = await this.txRepo.findById(id)
     if (!tx) throw new NotFoundError('Transaction', id)
 
@@ -35,6 +40,16 @@ export class RefundTransactionUseCase {
       amount: dto.amount,
     })
 
-    return this.txRepo.updateStatus(id, TransactionStatus.REFUNDED)
+    const refunded = await this.txRepo.updateStatus(id, TransactionStatus.REFUNDED)
+
+    await this.audit.log({
+      userId,
+      action: 'transaction.refund',
+      resource: 'transaction',
+      resourceId: id,
+      metadata: { amount: dto.amount, gatewayTransactionId: tx.gatewayTransactionId },
+    })
+
+    return refunded
   }
 }

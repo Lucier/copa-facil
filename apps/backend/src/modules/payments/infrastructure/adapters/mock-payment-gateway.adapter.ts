@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { createHmac, timingSafeEqual } from 'crypto'
 import {
   BoletoPaymentRequest,
   BoletoPaymentResponse,
@@ -61,12 +62,62 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     return 'approved'
   }
 
+  /**
+   * Verifica assinatura HMAC-SHA256 conforme protocolo Mercado Pago.
+   *
+   * Formato do header x-signature: ts=<timestamp>,v1=<hmac_hex>
+   * Manifesto:  id:<dataId>;request-id:<xRequestId>;ts:<timestamp>
+   * HMAC:       HMAC-SHA256(key=MP_WEBHOOK_SECRET, data=manifesto)
+   *
+   * Se MP_WEBHOOK_SECRET não estiver configurado em ambiente não-produção,
+   * loga aviso e permite a requisição para facilitar desenvolvimento local.
+   */
   verifyWebhookSignature(
     _payload: Buffer,
-    _xSignature: string,
-    _xRequestId?: string,
-    _dataId?: string,
+    xSignature: string,
+    xRequestId?: string,
+    dataId?: string,
   ): boolean {
-    return true
+    const secret = process.env.MP_WEBHOOK_SECRET
+
+    if (!secret) {
+      if (process.env.NODE_ENV === 'production') return false
+      // Dev mode without secret configured — allow but warn
+      console.warn('[MockPaymentGateway] MP_WEBHOOK_SECRET not set — skipping signature check (dev only)')
+      return true
+    }
+
+    if (!xSignature) return false
+
+    // Parse "ts=<timestamp>,v1=<hmac>"
+    const parts = new Map(
+      xSignature.split(',').map((part) => {
+        const idx = part.indexOf('=')
+        return [part.slice(0, idx), part.slice(idx + 1)] as [string, string]
+      }),
+    )
+    const ts = parts.get('ts')
+    const v1 = parts.get('v1')
+
+    if (!ts || !v1) return false
+
+    // Build canonical manifest
+    const components: string[] = []
+    if (dataId) components.push(`id:${dataId}`)
+    if (xRequestId) components.push(`request-id:${xRequestId}`)
+    components.push(`ts:${ts}`)
+    const manifest = components.join(';')
+
+    const expected = createHmac('sha256', secret).update(manifest).digest('hex')
+
+    // Constant-time comparison to prevent timing attacks
+    try {
+      const expectedBuf = Buffer.from(expected, 'hex')
+      const receivedBuf = Buffer.from(v1, 'hex')
+      if (expectedBuf.length !== receivedBuf.length) return false
+      return timingSafeEqual(expectedBuf, receivedBuf)
+    } catch {
+      return false
+    }
   }
 }

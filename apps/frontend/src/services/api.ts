@@ -4,27 +4,21 @@ import { useAuthStore } from '@/store/useAuthStore'
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001',
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 })
 
-// Inject auth token + tenant header on every request
+// Inject tenant header on every request (JWT travels via HTTP-only cookie automatically)
 api.interceptors.request.use((config) => {
-  const { token } = useAuthStore.getState()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-
-  // Tenant header — read from cookie or localStorage in browser
   if (typeof window !== 'undefined') {
     const tenantSlug = window.location.pathname.split('/')[1]
     if (tenantSlug) {
       config.headers['x-tenant-id'] = tenantSlug
     }
   }
-
   return config
 })
 
-// Handle 401 — clear auth state
+// Handle 401 — clear client-side user state (cookie is cleared server-side on logout)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
