@@ -23,6 +23,7 @@ function makeChampionship(
     format,
     legs,
     status,
+    null,
     new Date(),
     new Date(),
   )

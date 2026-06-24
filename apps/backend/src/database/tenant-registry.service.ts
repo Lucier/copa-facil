@@ -58,6 +58,7 @@ export class TenantRegistryService {
           id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
           team_id          UUID        NOT NULL,
           full_name        TEXT        NOT NULL,
+          photo_url        TEXT,
           birthdate        DATE,
           document         TEXT,
           document_type    TEXT        NOT NULL DEFAULT 'cpf',
@@ -107,10 +108,14 @@ export class TenantRegistryService {
           format      TEXT        NOT NULL DEFAULT 'pontos_corridos',
           legs        INTEGER     NOT NULL DEFAULT 1,
           status      TEXT        NOT NULL DEFAULT 'draft',
+          logo_url    TEXT,
           created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
       `
+      await sql`ALTER TABLE ${sql(s)}.championships ADD COLUMN IF NOT EXISTS logo_url TEXT`
+      await sql`ALTER TABLE ${sql(s)}.players ADD COLUMN IF NOT EXISTS photo_url TEXT`
+
       await sql`
         CREATE TABLE IF NOT EXISTS ${sql(s)}.groups (
           id              UUID    PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -26,6 +26,8 @@ async function bootstrap() {
     .split(',')
     .map((o) => o.trim())
 
+  app.useStaticAssets(require('path').resolve(process.cwd(), 'uploads'), { prefix: '/uploads' })
+
   app.use(cookieParser())
   app.use(helmet())
   app.enableCors({

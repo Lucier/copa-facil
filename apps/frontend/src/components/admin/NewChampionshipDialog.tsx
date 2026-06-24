@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ImagePlus } from 'lucide-react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
 } from '@/components/ui/dialog'
@@ -34,6 +34,16 @@ interface NewChampionshipDialogProps {
 export function NewChampionshipDialog({ children, onCreated }: NewChampionshipDialogProps) {
   const [open, setOpen] = React.useState(false)
   const [serverError, setServerError] = React.useState<string | null>(null)
+  const [logoPreview, setLogoPreview] = React.useState<string | null>(null)
+  const [logoFile, setLogoFile] = React.useState<File | null>(null)
+  const logoInputRef = React.useRef<HTMLInputElement>(null)
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoFile(file)
+    setLogoPreview(URL.createObjectURL(file))
+  }
 
   const form = useForm<CreateChampionshipInput>({
     resolver: zodResolver(createChampionshipSchema),
@@ -47,13 +57,35 @@ export function NewChampionshipDialog({ children, onCreated }: NewChampionshipDi
 
   const { isSubmitting } = form.formState
 
+  async function uploadFile(file: File): Promise<string> {
+    const fd = new FormData()
+    fd.append('file', file)
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1'
+    const tenantId = window.location.pathname.split('/')[1] ?? ''
+    const res = await fetch(`${baseUrl}/upload`, {
+      method: 'POST',
+      body: fd,
+      credentials: 'include',
+      headers: tenantId ? { 'x-tenant-id': tenantId } : {},
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({})) as { message?: string }
+      throw new Error(err.message ?? 'Erro ao enviar arquivo')
+    }
+    return ((await res.json()) as { url: string }).url
+  }
+
   async function onSubmit(values: CreateChampionshipInput) {
     setServerError(null)
     try {
-      await api.post(API.championships.base, values)
+      const logoUrl = logoFile ? await uploadFile(logoFile) : undefined
+      const payload = { ...values, ...(logoUrl ? { logoUrl } : {}) }
+      await api.post(API.championships.base, payload)
       onCreated?.()
       setOpen(false)
       form.reset()
+      setLogoFile(null)
+      setLogoPreview(null)
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
@@ -66,6 +98,8 @@ export function NewChampionshipDialog({ children, onCreated }: NewChampionshipDi
     if (!next) {
       form.reset()
       setServerError(null)
+      setLogoFile(null)
+      setLogoPreview(null)
     }
     setOpen(next)
   }
@@ -80,6 +114,30 @@ export function NewChampionshipDialog({ children, onCreated }: NewChampionshipDi
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+            <div className="flex flex-col items-center gap-2">
+              <span className="self-start text-sm font-medium">Logo do Campeonato</span>
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-input bg-muted transition-colors hover:border-primary hover:bg-muted/80"
+              >
+                {logoPreview ? (
+                  <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" />
+                ) : (
+                  <ImagePlus className="size-8 text-muted-foreground" />
+                )}
+              </button>
+              <span className="text-xs text-muted-foreground">PNG, JPG ou SVG</span>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleLogoChange}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="name"

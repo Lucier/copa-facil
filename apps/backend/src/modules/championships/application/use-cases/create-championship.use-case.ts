@@ -19,6 +19,7 @@ export class CreateChampionshipUseCase {
       season: dto.season,
       format: dto.format,
       legs: dto.legs,
+      logoUrl: dto.logoUrl,
     })
   }
 }

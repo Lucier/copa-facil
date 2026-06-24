@@ -6,6 +6,7 @@ export interface PlayerRow {
   id: string
   team_id: string
   full_name: string
+  photo_url: string | null
   birthdate: Date | null
   document: string | null
   document_type: string
@@ -40,6 +41,7 @@ export class PlayerMapper {
       row.id,
       row.team_id,
       row.full_name,
+      row.photo_url ?? null,
       row.birthdate,
       row.document,
       row.document_type as DocumentType,

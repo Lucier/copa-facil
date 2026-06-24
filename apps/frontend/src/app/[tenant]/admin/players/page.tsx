@@ -5,7 +5,7 @@ import { Plus, Users, Target, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { PlayerDialog } from '@/components/admin/PlayerDialog'
@@ -33,6 +33,7 @@ interface Player {
   id: string
   teamId: string
   fullName: string
+  photoUrl: string | null
   birthdate: string | null
   document: string | null
   documentType: string
@@ -160,6 +161,7 @@ export default function PlayersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">Foto</TableHead>
                   <TableHead>Jogador</TableHead>
                   <TableHead className="w-12 text-center">#</TableHead>
                   <TableHead>Posição</TableHead>
@@ -174,20 +176,15 @@ export default function PlayersPage() {
                 {players.map((player) => (
                   <TableRow key={player.id}>
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="size-7">
-                          {selectedTeam?.primaryColor && (
-                            <div
-                              className="flex size-full items-center justify-center text-[9px] font-bold text-white"
-                              style={{ backgroundColor: selectedTeam.primaryColor }}
-                            >
-                              {getInitials(player.fullName)}
-                            </div>
-                          )}
-                          <AvatarFallback className="text-[9px]">{getInitials(player.fullName)}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium">{player.fullName}</span>
-                      </div>
+                      <Avatar className="size-8">
+                        {player.photoUrl && <AvatarImage src={player.photoUrl} alt={player.fullName} className="object-cover" />}
+                        {!player.photoUrl && selectedTeam?.primaryColor
+                          ? <div className="flex size-full items-center justify-center text-[9px] font-bold text-white" style={{ backgroundColor: selectedTeam.primaryColor }}>{getInitials(player.fullName)}</div>
+                          : <AvatarFallback className="text-[9px]">{getInitials(player.fullName)}</AvatarFallback>}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm font-medium">{player.fullName}</span>
                     </TableCell>
                     <TableCell className="text-center text-sm text-muted-foreground">
                       {player.jerseyNumber ?? '—'}

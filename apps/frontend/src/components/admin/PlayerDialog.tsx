@@ -1,24 +1,41 @@
 'use client'
-import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger,
-} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
-  Form, FormField, FormItem, FormLabel, FormControl, FormMessage,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { registerPlayerSchema, type RegisterPlayerInput } from '@/lib/zod-schemas'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2, UserRound } from 'lucide-react'
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
 
 const POSITIONS = [
-  'Goleiro', 'Zagueiro', 'Lateral Direito', 'Lateral Esquerdo',
-  'Volante', 'Meio-Campo', 'Meia Atacante', 'Atacante',
-  'Ponta Direita', 'Ponta Esquerda',
+  'Goleiro',
+  'Zagueiro',
+  'Lateral Direito',
+  'Lateral Esquerdo',
+  'Volante',
+  'Meio-Campo',
+  'Meia Atacante',
+  'Atacante',
+  'Ponta Direita',
+  'Ponta Esquerda',
 ]
 
 const SELECT_CLASS =
@@ -47,7 +64,17 @@ interface PlayerDialogProps {
 export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDialogProps) {
   const [open, setOpen] = React.useState(false)
   const [serverError, setServerError] = React.useState<string | null>(null)
+  const [photoPreview, setPhotoPreview] = React.useState<string | null>(null)
+  const [photoFile, setPhotoFile] = React.useState<File | null>(null)
+  const photoInputRef = React.useRef<HTMLInputElement>(null)
   const isEditing = Boolean(player)
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setPhotoFile(file)
+    setPhotoPreview(URL.createObjectURL(file))
+  }
 
   const form = useForm<RegisterPlayerInput>({
     resolver: zodResolver(registerPlayerSchema),
@@ -55,7 +82,7 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
       fullName: player?.fullName ?? '',
       birthdate: player?.birthdate ? player.birthdate.split('T')[0] : '',
       document: player?.document ?? '',
-      documentType: (player?.documentType as 'cpf' | 'passaporte') ?? 'cpf',
+      documentType: (player?.documentType as 'cpf' | 'titulo_eleitor') ?? 'cpf',
       jerseyNumber: player?.jerseyNumber ?? undefined,
       preferredFoot: (player?.preferredFoot as 'direito' | 'esquerdo' | 'ambidestro') ?? 'direito',
       mainPosition: player?.mainPosition ?? '',
@@ -65,17 +92,39 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
 
   const { isSubmitting } = form.formState
 
+  async function uploadFile(file: File): Promise<string> {
+    const fd = new FormData()
+    fd.append('file', file)
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1'
+    const tenantId = window.location.pathname.split('/')[1] ?? ''
+    const res = await fetch(`${baseUrl}/upload`, {
+      method: 'POST',
+      body: fd,
+      credentials: 'include',
+      headers: tenantId ? { 'x-tenant-id': tenantId } : {},
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({})) as { message?: string }
+      throw new Error(err.message ?? 'Erro ao enviar arquivo')
+    }
+    return ((await res.json()) as { url: string }).url
+  }
+
   async function onSubmit(values: RegisterPlayerInput) {
     setServerError(null)
     try {
+      const photoUrl = photoFile ? await uploadFile(photoFile) : undefined
+      const payload = { ...values, ...(photoUrl ? { photoUrl } : {}) }
       if (isEditing && player) {
-        await api.patch(API.teams.playerById(teamId, player.id), values)
+        await api.patch(API.teams.playerById(teamId, player.id), payload)
       } else {
-        await api.post(API.teams.players(teamId), values)
+        await api.post(API.teams.players(teamId), payload)
       }
       onSuccess?.()
       setOpen(false)
       form.reset()
+      setPhotoFile(null)
+      setPhotoPreview(null)
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
@@ -90,13 +139,16 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
         fullName: player?.fullName ?? '',
         birthdate: player?.birthdate ? player.birthdate.split('T')[0] : '',
         document: player?.document ?? '',
-        documentType: (player?.documentType as 'cpf' | 'passaporte') ?? 'cpf',
+        documentType: (player?.documentType as 'cpf' | 'titulo_eleitor') ?? 'cpf',
         jerseyNumber: player?.jerseyNumber ?? undefined,
-        preferredFoot: (player?.preferredFoot as 'direito' | 'esquerdo' | 'ambidestro') ?? 'direito',
+        preferredFoot:
+          (player?.preferredFoot as 'direito' | 'esquerdo' | 'ambidestro') ?? 'direito',
         mainPosition: player?.mainPosition ?? '',
         subPositions: player?.subPositions ?? [],
       })
       setServerError(null)
+      setPhotoFile(null)
+      setPhotoPreview(null)
     }
     setOpen(next)
   }
@@ -111,6 +163,30 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+            <div className="flex flex-col items-center gap-2">
+              <span className="self-start text-sm font-medium">Foto do Jogador</span>
+              <button
+                type="button"
+                onClick={() => photoInputRef.current?.click()}
+                className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-input bg-muted transition-colors hover:border-primary hover:bg-muted/80"
+              >
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Foto" className="h-full w-full object-cover" />
+                ) : (
+                  <UserRound className="size-8 text-muted-foreground" />
+                )}
+              </button>
+              <span className="text-xs text-muted-foreground">PNG ou JPG</span>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handlePhotoChange}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="fullName"
@@ -154,7 +230,10 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
                         placeholder="10"
                         {...field}
                         value={field.value ?? ''}
-                        onChange={(e) => { const v = (e.target as HTMLInputElement).value; field.onChange(v === '' ? undefined : Number(v)) }}
+                        onChange={(e) => {
+                          const v = (e.target as HTMLInputElement).value
+                          field.onChange(v === '' ? undefined : Number(v))
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -187,7 +266,7 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
                     <FormControl>
                       <select {...field} className={SELECT_CLASS}>
                         <option value="cpf">CPF</option>
-                        <option value="passaporte">Passaporte</option>
+                        <option value="titulo_eleitor">Título de Eleitor</option>
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -207,7 +286,9 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
                       <select {...field} className={SELECT_CLASS}>
                         <option value="">Selecione...</option>
                         {POSITIONS.map((p) => (
-                          <option key={p} value={p}>{p}</option>
+                          <option key={p} value={p}>
+                            {p}
+                          </option>
                         ))}
                       </select>
                     </FormControl>

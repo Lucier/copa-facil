@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -137,6 +137,7 @@ export default function TeamsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-14">Escudo</TableHead>
                   <TableHead>Time</TableHead>
                   <TableHead>Sigla</TableHead>
                   <TableHead>Cidade</TableHead>
@@ -149,22 +150,17 @@ export default function TeamsPage() {
                 {teams.map((team) => (
                   <TableRow key={team.id}>
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="size-8">
-                          {team.primaryColor && (
-                            <div
-                              className="flex size-full items-center justify-center text-[10px] font-bold text-white"
-                              style={{ backgroundColor: team.primaryColor }}
-                            >
-                              {getInitials(team.name)}
-                            </div>
-                          )}
-                          <AvatarFallback className="text-[10px]">{getInitials(team.name)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{team.name}</p>
-                          {team.nickname && <p className="text-xs text-muted-foreground">{team.nickname}</p>}
-                        </div>
+                      <Avatar className="size-9 rounded-md">
+                        {team.logoUrl && <AvatarImage src={team.logoUrl} alt={team.name} className="object-contain p-0.5" />}
+                        {!team.logoUrl && team.primaryColor
+                          ? <div className="flex size-full items-center justify-center rounded-md text-[10px] font-bold text-white" style={{ backgroundColor: team.primaryColor }}>{getInitials(team.name)}</div>
+                          : <AvatarFallback className="rounded-md text-[10px]">{getInitials(team.name)}</AvatarFallback>}
+                      </Avatar>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{team.name}</p>
+                        {team.nickname && <p className="text-xs text-muted-foreground">{team.nickname}</p>}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">

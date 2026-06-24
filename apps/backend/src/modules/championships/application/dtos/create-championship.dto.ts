@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsInt, IsString, Max, Min, MinLength } from 'class-validator'
+import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Max, Min, MinLength } from 'class-validator'
 import { TournamentFormat } from '../../domain/enums'
 
 export class CreateChampionshipDto {
@@ -22,4 +22,9 @@ export class CreateChampionshipDto {
   @Min(1)
   @Max(2)
   legs: number = 1
+
+  @ApiPropertyOptional({ description: 'Public URL of the championship logo' })
+  @IsOptional()
+  @IsString()
+  logoUrl?: string
 }

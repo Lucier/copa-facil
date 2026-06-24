@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   Min,
+  IsUrl,
 } from 'class-validator'
 import { DocumentType, PreferredFoot } from '../../domain/enums'
 
@@ -51,4 +52,9 @@ export class RegisterPlayerDto {
   @IsOptional()
   @IsString({ each: true })
   subPositions?: string[]
+
+  @ApiPropertyOptional({ description: 'Public URL of the player photo' })
+  @IsOptional()
+  @IsString()
+  photoUrl?: string
 }

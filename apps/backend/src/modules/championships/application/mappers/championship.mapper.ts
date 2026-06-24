@@ -13,6 +13,7 @@ export class ChampionshipMapper {
       row.format as TournamentFormat,
       row.legs,
       row.status as ChampionshipStatus,
+      row.logoUrl ?? null,
       row.createdAt,
       row.updatedAt,
     )

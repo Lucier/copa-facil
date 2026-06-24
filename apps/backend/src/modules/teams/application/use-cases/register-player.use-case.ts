@@ -19,6 +19,7 @@ export class RegisterPlayerUseCase {
     return this.playerRepo.create({
       teamId,
       fullName: dto.fullName,
+      photoUrl: dto.photoUrl,
       birthdate: dto.birthdate ? new Date(dto.birthdate) : null,
       document: dto.document,
       documentType: dto.documentType,

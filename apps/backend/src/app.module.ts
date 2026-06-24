@@ -23,6 +23,7 @@ import { RegistrationsModule } from './modules/registrations/registrations.modul
 import { TeamsModule } from './modules/teams/teams.module'
 import { WebsocketsModule } from './websockets/websockets.module'
 import { PublicApiModule } from './modules/public-api/public-api.module'
+import { UploadModule } from './modules/upload/upload.module'
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { PublicApiModule } from './modules/public-api/public-api.module'
     OrganizationsModule,
     HealthModule,
     PublicApiModule,
+    UploadModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: TenantInterceptor },

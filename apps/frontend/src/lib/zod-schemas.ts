@@ -60,9 +60,10 @@ export const createTeamSchema = z.object({
 
 export const registerPlayerSchema = z.object({
   fullName: z.string().min(3, 'Nome completo obrigatório'),
+  photoUrl: z.string().optional(),
   birthdate: z.string().optional().or(z.literal('')).transform((v) => v || undefined),
   document: z.string().optional().or(z.literal('')).transform((v) => v || undefined),
-  documentType: z.enum(['cpf', 'passaporte']).optional(),
+  documentType: z.enum(['cpf', 'titulo_eleitor']).optional(),
   jerseyNumber: z.number().int().min(1).max(99).optional(),
   preferredFoot: z.enum(['direito', 'esquerdo', 'ambidestro']).optional(),
   mainPosition: z.string().min(1, 'Posição obrigatória'),

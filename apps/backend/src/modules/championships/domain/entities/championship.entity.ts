@@ -9,6 +9,7 @@ export class ChampionshipEntity extends BaseEntity {
     public readonly format: TournamentFormat,
     public readonly legs: number,
     public readonly status: ChampionshipStatus,
+    public readonly logoUrl: string | null,
     createdAt: Date,
     updatedAt: Date,
   ) {

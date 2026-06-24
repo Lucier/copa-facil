@@ -5,6 +5,7 @@ import { DocumentType, PreferredFoot } from '../enums'
 export interface CreatePlayerData {
   teamId: string
   fullName: string
+  photoUrl?: string | null
   birthdate?: Date | null
   document?: string | null
   documentType?: DocumentType
@@ -16,6 +17,7 @@ export interface CreatePlayerData {
 
 export interface UpdatePlayerData {
   fullName?: string
+  photoUrl?: string | null
   birthdate?: Date | null
   document?: string | null
   documentType?: DocumentType

@@ -15,6 +15,7 @@ interface ChampRow {
   format: string
   legs: number
   status: string
+  logo_url: string | null
   created_at: Date
   updated_at: Date
 }
@@ -26,7 +27,7 @@ export class DrizzleChampionshipRepository implements IChampionshipRepository {
   async findById(id: string): Promise<ChampionshipEntity | null> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<ChampRow[]>`
-        SELECT id, name, season, format, legs, status, created_at, updated_at
+        SELECT id, name, season, format, legs, status, logo_url, created_at, updated_at
         FROM championships
         WHERE id = ${id}
         LIMIT 1
@@ -38,7 +39,7 @@ export class DrizzleChampionshipRepository implements IChampionshipRepository {
   async findAll(): Promise<ChampionshipEntity[]> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<ChampRow[]>`
-        SELECT id, name, season, format, legs, status, created_at, updated_at
+        SELECT id, name, season, format, legs, status, logo_url, created_at, updated_at
         FROM championships
         ORDER BY created_at DESC
       `
@@ -49,9 +50,9 @@ export class DrizzleChampionshipRepository implements IChampionshipRepository {
   async create(data: CreateChampionshipData): Promise<ChampionshipEntity> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<ChampRow[]>`
-        INSERT INTO championships (name, season, format, legs, status)
-        VALUES (${data.name}, ${data.season}, ${data.format}, ${data.legs}, 'draft')
-        RETURNING id, name, season, format, legs, status, created_at, updated_at
+        INSERT INTO championships (name, season, format, legs, status, logo_url)
+        VALUES (${data.name}, ${data.season}, ${data.format}, ${data.legs}, 'draft', ${data.logoUrl ?? null})
+        RETURNING id, name, season, format, legs, status, logo_url, created_at, updated_at
       `
     })
     return this.toEntity(rows[0])
@@ -75,6 +76,7 @@ export class DrizzleChampionshipRepository implements IChampionshipRepository {
       row.format as TournamentFormat,
       row.legs,
       row.status as ChampionshipStatus,
+      row.logo_url ?? null,
       row.created_at,
       row.updated_at,
     )

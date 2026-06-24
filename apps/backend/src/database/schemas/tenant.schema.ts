@@ -11,6 +11,7 @@ export const championships = pgTable('championships', {
     .default('pontos_corridos'),
   legs: integer('legs').notNull().default(1),
   status: text('status', { enum: ['draft', 'active', 'finished'] }).default('draft').notNull(),
+  logoUrl: text('logo_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -34,6 +35,7 @@ export const players = pgTable('players', {
   id: uuid('id').primaryKey().defaultRandom(),
   teamId: uuid('team_id').notNull(),
   fullName: text('full_name').notNull(),
+  photoUrl: text('photo_url'),
   birthdate: date('birthdate'),
   document: text('document'),
   documentType: text('document_type', { enum: ['cpf', 'passaporte'] }).notNull().default('cpf'),

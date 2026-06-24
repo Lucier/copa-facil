@@ -13,6 +13,7 @@ export class UpdatePlayerUseCase {
     if (!existing) throw new NotFoundError('Player', id)
     return this.repo.update(id, {
       fullName: dto.fullName,
+      photoUrl: dto.photoUrl,
       birthdate: dto.birthdate ? new Date(dto.birthdate) : undefined,
       document: dto.document,
       documentType: dto.documentType,

@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Trophy, Calendar, Users, Loader2, Zap } from 'lucide-react'
+import { Plus, Trophy, Calendar, Users, Loader2, Zap, ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +19,7 @@ interface Championship {
   format: string
   legs: number
   status: 'active' | 'finished' | 'draft'
+  logoUrl: string | null
   createdAt: string
   updatedAt: string
 }
@@ -128,6 +129,7 @@ export default function ChampionshipsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-14">Logo</TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead>Temporada</TableHead>
                   <TableHead>Formato</TableHead>
@@ -142,6 +144,13 @@ export default function ChampionshipsPage() {
                   const st = STATUS_VARIANTS[c.status] ?? STATUS_VARIANTS.draft
                   return (
                     <TableRow key={c.id}>
+                      <TableCell>
+                        <div className="flex size-9 items-center justify-center overflow-hidden rounded-md border border-border bg-muted">
+                          {c.logoUrl
+                            ? <img src={c.logoUrl} alt={c.name} className="size-full object-cover" />
+                            : <ImageIcon className="size-4 text-muted-foreground" />}
+                        </div>
+                      </TableCell>
                       <TableCell className="font-medium">{c.name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{c.season}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">

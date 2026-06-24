@@ -5,6 +5,7 @@ export class PlayerEntity {
     public readonly id: string,
     public readonly teamId: string,
     public readonly fullName: string,
+    public readonly photoUrl: string | null,
     public readonly birthdate: Date | null,
     public readonly document: string | null,
     public readonly documentType: DocumentType,

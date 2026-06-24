@@ -28,6 +28,7 @@ interface Player {
   id: string
   teamId: string
   fullName: string
+  photoUrl: string | null
   birthdate: string | null
   document: string | null
   documentType: string | null
@@ -122,9 +123,14 @@ function PlayerIdCard({
               fontSize: '20px',
               color: textOnSecondary,
               letterSpacing: '-0.5px',
+              overflow: 'hidden',
+              flexShrink: 0,
             }}
           >
-            {getInitials(player.fullName)}
+            {player.photoUrl
+              ? <img src={player.photoUrl} alt={player.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : getInitials(player.fullName)
+            }
           </div>
 
           {/* Jersey number badge */}
@@ -304,7 +310,7 @@ function buildCardHTML(player: Player, team: Team, orgName: string): string {
       <div class="top-bar" style="background:${primary}"></div>
       <div class="body">
         <div class="left" style="background:${primary}">
-          <div class="avatar" style="background:${secondary};color:${textOnSecondary}">${initials}</div>
+          <div class="avatar" style="background:${secondary};color:${textOnSecondary}">${player.photoUrl ? `<img src="${player.photoUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : initials}</div>
           ${player.jerseyNumber != null ? `<div class="number" style="background:${secondary};color:${textOnSecondary}">#${player.jerseyNumber}</div>` : ''}
           <span class="team-name" style="color:${textOnPrimary}">${team.acronym ?? team.name.slice(0, 8)}</span>
         </div>
@@ -660,10 +666,13 @@ export default function IdCardsPage() {
 
                           {/* Avatar */}
                           <div
-                            className="flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
+                            className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full text-[10px] font-bold text-white"
                             style={{ backgroundColor: selectedTeam.primaryColor ?? '#1a7a00' }}
                           >
-                            {getInitials(player.fullName)}
+                            {player.photoUrl
+                              ? <img src={player.photoUrl} alt={player.fullName} className="size-full object-cover" />
+                              : getInitials(player.fullName)
+                            }
                           </div>
 
                           {/* Name + position */}

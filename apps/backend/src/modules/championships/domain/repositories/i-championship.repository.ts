@@ -8,6 +8,7 @@ export interface CreateChampionshipData {
   season: string
   format: TournamentFormat
   legs: number
+  logoUrl?: string | null
 }
 
 export interface IChampionshipRepository {

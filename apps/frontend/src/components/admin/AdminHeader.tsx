@@ -63,7 +63,7 @@ export function AdminHeader() {
       // ignore — cookie will expire naturally
     }
     clearAuth()
-    router.replace(`/${tenant}/login`)
+    window.location.href = '/'
   }
 
   const displayName = user?.name ?? 'Usuário'

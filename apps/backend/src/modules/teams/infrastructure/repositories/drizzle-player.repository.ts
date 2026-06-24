@@ -15,7 +15,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
   private readonly selectCols = `
-    id, team_id, full_name, birthdate, document, document_type, jersey_number,
+    id, team_id, full_name, photo_url, birthdate, document, document_type, jersey_number,
     preferred_foot, main_position, sub_positions, goals, yellow_cards, red_cards,
     created_at, updated_at
   `
@@ -35,7 +35,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
   async findByTeamId(teamId: string): Promise<PlayerEntity[]> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<PlayerRow[]>`
-        SELECT id, team_id, full_name, birthdate, document, document_type, jersey_number,
+        SELECT id, team_id, full_name, photo_url, birthdate, document, document_type, jersey_number,
                preferred_foot, main_position, sub_positions, goals, yellow_cards, red_cards,
                created_at, updated_at
         FROM players
@@ -50,12 +50,13 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<PlayerRow[]>`
         INSERT INTO players (
-          team_id, full_name, birthdate, document, document_type,
+          team_id, full_name, photo_url, birthdate, document, document_type,
           jersey_number, preferred_foot, main_position, sub_positions
         )
         VALUES (
           ${data.teamId},
           ${data.fullName},
+          ${data.photoUrl ?? null},
           ${data.birthdate ? data.birthdate.toISOString().split('T')[0] : null},
           ${data.document ?? null},
           ${data.documentType ?? 'cpf'},
@@ -64,7 +65,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
           ${data.mainPosition ?? 'goleiro'},
           ${JSON.stringify(data.subPositions ?? [])}
         )
-        RETURNING id, team_id, full_name, birthdate, document, document_type, jersey_number,
+        RETURNING id, team_id, full_name, photo_url, birthdate, document, document_type, jersey_number,
                   preferred_foot, main_position, sub_positions, goals, yellow_cards, red_cards,
                   created_at, updated_at
       `
@@ -77,6 +78,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
       return tx<PlayerRow[]>`
         UPDATE players SET
           full_name      = COALESCE(${data.fullName ?? null}, full_name),
+          photo_url      = CASE WHEN ${data.photoUrl !== undefined} THEN ${data.photoUrl ?? null} ELSE photo_url END,
           birthdate      = CASE WHEN ${data.birthdate !== undefined} THEN ${data.birthdate ? data.birthdate.toISOString().split('T')[0] : null} ELSE birthdate END,
           document       = CASE WHEN ${data.document !== undefined} THEN ${data.document ?? null} ELSE document END,
           document_type  = COALESCE(${data.documentType ?? null}, document_type),
@@ -86,7 +88,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
           sub_positions  = CASE WHEN ${data.subPositions !== undefined} THEN ${JSON.stringify(data.subPositions ?? [])}::jsonb ELSE sub_positions END,
           updated_at     = NOW()
         WHERE id = ${id}
-        RETURNING id, team_id, full_name, birthdate, document, document_type, jersey_number,
+        RETURNING id, team_id, full_name, photo_url, birthdate, document, document_type, jersey_number,
                   preferred_foot, main_position, sub_positions, goals, yellow_cards, red_cards,
                   created_at, updated_at
       `
@@ -106,7 +108,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
         UPDATE players
         SET team_id = ${toTeamId}, updated_at = NOW()
         WHERE id = ${playerId}
-        RETURNING id, team_id, full_name, birthdate, document, document_type, jersey_number,
+        RETURNING id, team_id, full_name, photo_url, birthdate, document, document_type, jersey_number,
                   preferred_foot, main_position, sub_positions, goals, yellow_cards, red_cards,
                   created_at, updated_at
       `

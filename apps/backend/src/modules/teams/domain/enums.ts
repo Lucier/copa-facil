@@ -6,7 +6,7 @@ export enum PreferredFoot {
 
 export enum DocumentType {
   CPF = 'cpf',
-  PASSAPORTE = 'passaporte',
+  TITULO_ELEITOR = 'titulo_eleitor',
 }
 
 export enum StaffRole {
