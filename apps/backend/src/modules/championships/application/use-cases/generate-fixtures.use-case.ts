@@ -148,6 +148,21 @@ export class GenerateFixturesUseCase {
       }
     }
 
+    // Assign scheduledAt per round if the caller supplied scheduling params
+    if (dto.startDate) {
+      const [hours, minutes] = (dto.defaultTime ?? '10:00').split(':').map(Number)
+      const daysBetween = dto.daysBetweenRounds ?? 7
+      const uniqueRoundNumbers = [...new Set(roundInputs.map((r) => r.number))].sort((a, b) => a - b)
+      const roundIndexMap = new Map(uniqueRoundNumbers.map((n, i) => [n, i]))
+      for (const ri of roundInputs) {
+        const roundIndex = roundIndexMap.get(ri.number) ?? 0
+        const date = new Date(`${dto.startDate}T00:00:00`)
+        date.setDate(date.getDate() + roundIndex * daysBetween)
+        date.setHours(hours, minutes, 0, 0)
+        ri.matches = ri.matches.map((m) => ({ ...m, scheduledAt: new Date(date) }))
+      }
+    }
+
     const savedRounds = await this.roundRepo.saveFixtures(
       championshipId,
       roundInputs,

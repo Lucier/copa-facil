@@ -9,6 +9,7 @@ export interface MatchInput {
   awayTeamId: string | null
   bracketSlot?: number
   groupId?: string
+  scheduledAt?: Date
 }
 
 export interface RoundInput {

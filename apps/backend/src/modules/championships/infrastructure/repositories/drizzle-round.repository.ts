@@ -62,10 +62,11 @@ export class DrizzleRoundRepository implements IRoundRepository {
 
         for (const mi of ri.matches) {
           const matchGroupId = (mi as { groupId?: string }).groupId ?? resolvedGroupId ?? null
+          const scheduledAt = mi.scheduledAt ?? null
           const [matchRow] = await tx<MatchRow[]>`
             INSERT INTO matches (
               championship_id, round_id, home_team_id, away_team_id,
-              group_id, bracket_slot, status
+              group_id, bracket_slot, status, scheduled_at
             )
             VALUES (
               ${championshipId},
@@ -74,7 +75,8 @@ export class DrizzleRoundRepository implements IRoundRepository {
               ${mi.awayTeamId ?? null},
               ${matchGroupId},
               ${mi.bracketSlot ?? null},
-              'scheduled'
+              'scheduled',
+              ${scheduledAt}
             )
             RETURNING *
           `

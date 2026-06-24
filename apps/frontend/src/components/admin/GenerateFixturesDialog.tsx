@@ -43,6 +43,9 @@ export function GenerateFixturesDialog({ children, championship, teams, onSucces
   const [selectedIds, setSelectedIds] = React.useState<string[]>([])
   const [groupCount, setGroupCount] = React.useState(2)
   const [qualifiersPerGroup, setQualifiersPerGroup] = React.useState(2)
+  const [startDate, setStartDate] = React.useState('')
+  const [daysBetweenRounds, setDaysBetweenRounds] = React.useState(7)
+  const [defaultTime, setDefaultTime] = React.useState('10:00')
   const [loading, setLoading] = React.useState(false)
   const [serverError, setServerError] = React.useState<string | null>(null)
   const [done, setDone] = React.useState(false)
@@ -86,6 +89,11 @@ export function GenerateFixturesDialog({ children, championship, teams, onSucces
         body.groupCount = groupCount
         body.qualifiersPerGroup = qualifiersPerGroup
       }
+      if (startDate) {
+        body.startDate = startDate
+        body.daysBetweenRounds = daysBetweenRounds
+        body.defaultTime = defaultTime
+      }
       await api.post(API.championships.fixtures(championship.id), body)
       setDone(true)
       onSuccess?.()
@@ -106,6 +114,9 @@ export function GenerateFixturesDialog({ children, championship, teams, onSucces
       setDone(false)
       setGroupCount(2)
       setQualifiersPerGroup(2)
+      setStartDate('')
+      setDaysBetweenRounds(7)
+      setDefaultTime('10:00')
     }
     setOpen(next)
   }
@@ -249,6 +260,43 @@ export function GenerateFixturesDialog({ children, championship, teams, onSucces
                 </div>
               </div>
             )}
+
+            {/* Schedule */}
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Agendamento <span className="font-normal text-muted-foreground">(opcional)</span></p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Data da 1ª rodada</label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate((e.target as HTMLInputElement).value)}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Horário padrão</label>
+                  <Input
+                    type="time"
+                    value={defaultTime}
+                    onChange={(e) => setDefaultTime((e.target as HTMLInputElement).value)}
+                    disabled={!startDate}
+                  />
+                </div>
+              </div>
+              {startDate && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Dias entre rodadas</label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={daysBetweenRounds}
+                    onChange={(e) => setDaysBetweenRounds(Number((e.target as HTMLInputElement).value))}
+                    className="w-32"
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
               Formato: <strong>{championship.format === 'pontos_corridos' ? 'Pontos Corridos' : championship.format === 'mata_mata' ? 'Mata-Mata' : 'Grupos + Mata-Mata'}</strong>
