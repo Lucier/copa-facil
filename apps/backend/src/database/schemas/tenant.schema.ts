@@ -25,6 +25,7 @@ export const teams = pgTable('teams', {
   primaryColor: text('primary_color'),
   secondaryColor: text('secondary_color'),
   seed: integer('seed'),
+  inviteToken: uuid('invite_token').defaultRandom().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

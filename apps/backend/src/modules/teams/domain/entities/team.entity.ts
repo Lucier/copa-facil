@@ -9,6 +9,7 @@ export class TeamEntity {
     public readonly primaryColor: string | null,
     public readonly secondaryColor: string | null,
     public readonly seed: number | null,
+    public readonly inviteToken: string,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
   ) {}

@@ -10,6 +10,7 @@ export interface TeamRow {
   primary_color: string | null
   secondary_color: string | null
   seed: number | null
+  invite_token: string
   created_at: Date
   updated_at: Date
 }
@@ -26,6 +27,7 @@ export class TeamMapper {
       row.primary_color,
       row.secondary_color,
       row.seed,
+      row.invite_token,
       row.created_at,
       row.updated_at,
     )

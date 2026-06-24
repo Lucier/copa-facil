@@ -1,7 +1,8 @@
 'use client'
 import * as React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Shield, Users, Trash2 } from 'lucide-react'
+import { Plus, Shield, Users, Trash2, Link2, Check } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -24,8 +25,28 @@ interface Team {
   logoUrl: string | null
   primaryColor: string | null
   secondaryColor: string | null
+  inviteToken: string
   createdAt: string
   updatedAt: string
+}
+
+function CopyInviteLinkButton({ token, tenant }: { token: string; tenant: string }) {
+  const [copied, setCopied] = React.useState(false)
+
+  function handleCopy() {
+    const url = `${window.location.origin}/${tenant}/join/${token}`
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <Button variant="outline" size="sm" onClick={handleCopy} className="gap-1.5">
+      {copied ? <Check className="size-3.5 text-green-500" /> : <Link2 className="size-3.5" />}
+      {copied ? 'Copiado!' : 'Link de Convite'}
+    </Button>
+  )
 }
 
 function ColorSwatch({ color }: { color: string | null }) {
@@ -40,6 +61,8 @@ function ColorSwatch({ color }: { color: string | null }) {
 
 export default function TeamsPage() {
   const queryClient = useQueryClient()
+  const params = useParams()
+  const tenant = params.tenant as string
   const [teamToDelete, setTeamToDelete] = React.useState<Team | null>(null)
 
   const { data: teams = [], isLoading, isError } = useQuery<Team[]>({
@@ -154,6 +177,7 @@ export default function TeamsPage() {
                     <TableCell><ColorSwatch color={team.secondaryColor} /></TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <CopyInviteLinkButton token={team.inviteToken} tenant={tenant} />
                         <TeamDialog team={team} onSuccess={handleSuccess}>
                           <Button variant="outline" size="sm">Editar</Button>
                         </TeamDialog>

@@ -12,13 +12,26 @@ import { TeamMapper, TeamRow } from '../../application/mappers/team.mapper'
 export class DrizzleTeamRepository implements ITeamRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
+  private readonly cols = `id, name, acronym, city, nickname, logo_url, primary_color, secondary_color, seed, invite_token, created_at, updated_at`
+
   async findById(id: string): Promise<TeamEntity | null> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<TeamRow[]>`
-        SELECT id, name, acronym, city, nickname, logo_url, primary_color, secondary_color,
-               seed, created_at, updated_at
+        SELECT ${tx.unsafe(this.cols)}
         FROM teams
         WHERE id = ${id}
+        LIMIT 1
+      `
+    })
+    return rows[0] ? TeamMapper.toEntity(rows[0]) : null
+  }
+
+  async findByInviteToken(token: string): Promise<TeamEntity | null> {
+    const rows = await this.drizzle.runInTenantContext(async (tx) => {
+      return tx<TeamRow[]>`
+        SELECT ${tx.unsafe(this.cols)}
+        FROM teams
+        WHERE invite_token = ${token}
         LIMIT 1
       `
     })
@@ -28,8 +41,7 @@ export class DrizzleTeamRepository implements ITeamRepository {
   async findAll(): Promise<TeamEntity[]> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {
       return tx<TeamRow[]>`
-        SELECT id, name, acronym, city, nickname, logo_url, primary_color, secondary_color,
-               seed, created_at, updated_at
+        SELECT ${tx.unsafe(this.cols)}
         FROM teams
         ORDER BY name ASC
       `
@@ -51,8 +63,7 @@ export class DrizzleTeamRepository implements ITeamRepository {
           ${data.secondaryColor ?? null},
           ${data.seed ?? null}
         )
-        RETURNING id, name, acronym, city, nickname, logo_url, primary_color, secondary_color,
-                  seed, created_at, updated_at
+        RETURNING ${tx.unsafe(this.cols)}
       `
     })
     return TeamMapper.toEntity(rows[0])
@@ -72,8 +83,7 @@ export class DrizzleTeamRepository implements ITeamRepository {
           seed             = CASE WHEN ${data.seed !== undefined} THEN ${data.seed ?? null} ELSE seed END,
           updated_at       = NOW()
         WHERE id = ${id}
-        RETURNING id, name, acronym, city, nickname, logo_url, primary_color, secondary_color,
-                  seed, created_at, updated_at
+        RETURNING ${tx.unsafe(this.cols)}
       `
     })
     return TeamMapper.toEntity(rows[0])

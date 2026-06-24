@@ -20,12 +20,14 @@ import { TransferPlayerUseCase } from './application/use-cases/transfer-player.u
 import { UpdatePlayerUseCase } from './application/use-cases/update-player.use-case'
 import { UpdateStaffUseCase } from './application/use-cases/update-staff.use-case'
 import { UpdateTeamUseCase } from './application/use-cases/update-team.use-case'
+import { JoinTeamUseCase } from './application/use-cases/join-team.use-case'
 import { DrizzlePlayerRepository } from './infrastructure/repositories/drizzle-player.repository'
 import { DrizzleStaffRepository } from './infrastructure/repositories/drizzle-staff.repository'
 import { DrizzleTeamRepository } from './infrastructure/repositories/drizzle-team.repository'
 import { PlayersController } from './presentation/controllers/players.controller'
 import { StaffController } from './presentation/controllers/staff.controller'
 import { TeamsController } from './presentation/controllers/teams.controller'
+import { TeamJoinController } from './presentation/controllers/team-join.controller'
 
 @Module({
   imports: [DrizzleModule, AuthModule],
@@ -49,7 +51,8 @@ import { TeamsController } from './presentation/controllers/teams.controller'
     ListStaffUseCase,
     UpdateStaffUseCase,
     RemoveStaffUseCase,
+    JoinTeamUseCase,
   ],
-  controllers: [TeamsController, PlayersController, StaffController],
+  controllers: [TeamsController, PlayersController, StaffController, TeamJoinController],
 })
 export class TeamsModule {}

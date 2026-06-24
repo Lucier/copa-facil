@@ -48,6 +48,7 @@ export class TenantRegistryService {
           primary_color    TEXT,
           secondary_color  TEXT,
           seed             INTEGER,
+          invite_token     UUID        NOT NULL DEFAULT gen_random_uuid(),
           created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )

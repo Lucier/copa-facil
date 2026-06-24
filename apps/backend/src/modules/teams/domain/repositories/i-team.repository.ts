@@ -24,6 +24,7 @@ export interface UpdateTeamData {
 
 export interface ITeamRepository {
   findById(id: string): Promise<TeamEntity | null>
+  findByInviteToken(token: string): Promise<TeamEntity | null>
   findAll(): Promise<TeamEntity[]>
   create(data: CreateTeamData): Promise<TeamEntity>
   update(id: string, data: UpdateTeamData): Promise<TeamEntity>
