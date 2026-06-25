@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Get, HttpCode, HttpStatus,
+  Body, Controller, Delete, Get, HttpCode, HttpStatus,
   Param, ParseUUIDPipe, Post, Query, UseGuards,
 } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
@@ -15,6 +15,13 @@ import { CreatePaymentOrderUseCase } from '../../application/use-cases/create-pa
 import { GetLedgerSummaryUseCase } from '../../application/use-cases/get-ledger-summary.use-case'
 import { ListTransactionsUseCase } from '../../application/use-cases/list-transactions.use-case'
 import { RefundTransactionUseCase } from '../../application/use-cases/refund-transaction.use-case'
+import {
+  CreateExpenseDto,
+  CreateExpenseUseCase,
+  DeleteExpenseUseCase,
+  GetFinancialDashboardUseCase,
+  ListExpensesUseCase,
+} from '../../application/use-cases/expense.use-cases'
 
 @ApiTags('Payments')
 @ApiSecurity('x-tenant-id')
@@ -27,6 +34,10 @@ export class PaymentsController {
     private readonly refund: RefundTransactionUseCase,
     private readonly listTx: ListTransactionsUseCase,
     private readonly ledger: GetLedgerSummaryUseCase,
+    private readonly createExpense: CreateExpenseUseCase,
+    private readonly listExpenses: ListExpensesUseCase,
+    private readonly deleteExpense: DeleteExpenseUseCase,
+    private readonly dashboard: GetFinancialDashboardUseCase,
   ) {}
 
   @Post()
@@ -62,5 +73,40 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Get ledger summary grouped by income category' })
   summary(@Param('championshipId', ParseUUIDPipe) championshipId: string) {
     return this.ledger.execute(championshipId)
+  }
+
+  /* ── Expenses ── */
+
+  @Post('expenses')
+  @Roles(UserRole.ORGANIZADOR)
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register an expense entry' })
+  addExpense(@Body() dto: CreateExpenseDto) {
+    return this.createExpense.execute(dto)
+  }
+
+  @Get('expenses')
+  @Roles(UserRole.ORGANIZADOR)
+  @ApiOperation({ summary: 'List expense entries, optionally filtered by championship' })
+  @ApiQuery({ name: 'championshipId', required: false })
+  getExpenses(@Query('championshipId') championshipId?: string) {
+    return this.listExpenses.execute(championshipId || undefined)
+  }
+
+  @Delete('expenses/:id')
+  @Roles(UserRole.ORGANIZADOR)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete an expense entry' })
+  removeExpense(@Param('id', ParseUUIDPipe) id: string) {
+    return this.deleteExpense.execute(id)
+  }
+
+  /* ── Financial Dashboard ── */
+
+  @Get('dashboard/:championshipId')
+  @Roles(UserRole.ORGANIZADOR)
+  @ApiOperation({ summary: 'P&L financial dashboard — income vs expenses by category' })
+  financialDashboard(@Param('championshipId', ParseUUIDPipe) championshipId: string) {
+    return this.dashboard.execute(championshipId)
   }
 }

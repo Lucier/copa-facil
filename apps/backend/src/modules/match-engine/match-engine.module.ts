@@ -12,6 +12,13 @@ import { ConcludeMatchUseCase } from './application/use-cases/conclude-match.use
 import { GetMatchEventsUseCase } from './application/use-cases/get-match-events.use-case'
 import { GetStandingsUseCase } from './application/use-cases/get-standings.use-case'
 import { GetTopScorersUseCase } from './application/use-cases/get-top-scorers.use-case'
+import { GetChampionshipReportUseCase } from './application/use-cases/get-championship-report.use-case'
+import {
+  CreateCustomRankingUseCase,
+  ListCustomRankingsUseCase,
+  DeleteCustomRankingUseCase,
+  ComputeCustomRankingUseCase,
+} from './application/use-cases/custom-rankings.use-case'
 import { RegisterMatchEventUseCase } from './application/use-cases/register-match-event.use-case'
 import { StartMatchUseCase } from './application/use-cases/start-match.use-case'
 import { ListMatchesForAdminUseCase } from './application/use-cases/list-matches-for-admin.use-case'
@@ -39,10 +46,16 @@ import { StatisticsController } from './presentation/controllers/statistics.cont
     GetMatchEventsUseCase,
     GetStandingsUseCase,
     GetTopScorersUseCase,
+    GetChampionshipReportUseCase,
+    CreateCustomRankingUseCase,
+    ListCustomRankingsUseCase,
+    DeleteCustomRankingUseCase,
+    ComputeCustomRankingUseCase,
     UpdateStandingsHandler,
     UpdatePlayerStatsHandler,
     HandleFairPlayHandler,
   ],
   controllers: [ChampionshipMatchesController, MatchesController, MatchEventsController, StandingsController, StatisticsController],
+  exports: [MATCH_REPOSITORY, MATCH_EVENT_REPOSITORY],
 })
 export class MatchEngineModule {}

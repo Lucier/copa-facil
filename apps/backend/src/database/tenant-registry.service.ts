@@ -297,6 +297,65 @@ export class TenantRegistryService {
         )
       `
 
+      // Judges
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.judges (
+          id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          full_name        TEXT        NOT NULL,
+          document         TEXT,
+          license_number   TEXT,
+          license_category TEXT,
+          role             TEXT        NOT NULL DEFAULT 'arbitro_principal',
+          phone            TEXT,
+          email            TEXT,
+          photo_url        TEXT,
+          is_active        BOOLEAN     NOT NULL DEFAULT true,
+          created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+
+      // Sumula
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.sumulas (
+          id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          match_id        UUID        NOT NULL UNIQUE,
+          championship_id UUID        NOT NULL,
+          venue           TEXT,
+          observations    TEXT,
+          status          TEXT        NOT NULL DEFAULT 'aberta',
+          closed_at       TIMESTAMPTZ,
+          closed_by       UUID,
+          integrity_hash  TEXT,
+          created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.match_lineups (
+          id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          match_id      UUID        NOT NULL,
+          team_id       UUID        NOT NULL,
+          player_id     UUID        NOT NULL,
+          jersey_number INTEGER,
+          position      TEXT,
+          is_starter    BOOLEAN     NOT NULL DEFAULT true,
+          is_captain    BOOLEAN     NOT NULL DEFAULT false,
+          added_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          UNIQUE (match_id, player_id)
+        )
+      `
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.match_officials (
+          id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          match_id       UUID        NOT NULL,
+          name           TEXT        NOT NULL,
+          role           TEXT        NOT NULL,
+          license_number TEXT,
+          created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+
       // Payments
       await sql`
         CREATE TABLE IF NOT EXISTS ${sql(s)}.transactions (
@@ -326,6 +385,79 @@ export class TenantRegistryService {
           category         TEXT        NOT NULL,
           amount           INTEGER     NOT NULL,
           description      TEXT        NOT NULL DEFAULT '',
+          created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.suspensions (
+          id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          championship_id  UUID        NOT NULL,
+          player_id        UUID        NOT NULL,
+          team_id          UUID        NOT NULL,
+          reason           TEXT        NOT NULL,
+          source           TEXT        NOT NULL DEFAULT 'manual',
+          matches_to_serve INTEGER     NOT NULL DEFAULT 1,
+          matches_served   INTEGER     NOT NULL DEFAULT 0,
+          status           TEXT        NOT NULL DEFAULT 'ativa',
+          event_id         UUID,
+          notes            TEXT,
+          created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+
+      // Polls
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.polls (
+          id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          championship_id  UUID        NOT NULL,
+          question         TEXT        NOT NULL,
+          status           TEXT        NOT NULL DEFAULT 'draft',
+          created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          closed_at        TIMESTAMPTZ
+        )
+      `
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.poll_options (
+          id          UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
+          poll_id     UUID    NOT NULL,
+          text        TEXT    NOT NULL,
+          votes_count INTEGER NOT NULL DEFAULT 0
+        )
+      `
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.poll_votes (
+          id        UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          poll_id   UUID        NOT NULL,
+          option_id UUID        NOT NULL,
+          user_id   UUID        NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          UNIQUE (poll_id, user_id)
+        )
+      `
+
+      // Custom Rankings
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.custom_rankings (
+          id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          championship_id  UUID        NOT NULL,
+          name             TEXT        NOT NULL,
+          weights          JSONB       NOT NULL DEFAULT '{}',
+          created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+
+      // Expense Entries
+      await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.expense_entries (
+          id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          championship_id  UUID,
+          category         TEXT        NOT NULL,
+          amount           INTEGER     NOT NULL,
+          description      TEXT        NOT NULL,
+          notes            TEXT,
+          expense_date     DATE        NOT NULL DEFAULT CURRENT_DATE,
           created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
       `

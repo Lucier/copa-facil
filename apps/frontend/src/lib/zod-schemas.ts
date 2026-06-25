@@ -100,6 +100,19 @@ export const reviewRegistrationSchema = z.object({
   reviewNote: z.string().optional().or(z.literal('')).transform((v) => v || undefined),
 })
 
+export const createJudgeSchema = z.object({
+  fullName: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
+  document: z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  licenseNumber: z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  licenseCategory: z.enum(['federal', 'estadual', 'municipal']).optional(),
+  role: z.enum(['arbitro_principal', 'assistente', 'quarto_arbitro', 'assessor', 'delegado']),
+  phone: z.string().optional().or(z.literal('')).transform((v) => v || undefined),
+  email: z.string().email('E-mail inválido').optional().or(z.literal('')).transform((v) => v || undefined),
+  isActive: z.boolean().optional(),
+})
+
+export type CreateJudgeInput = z.infer<typeof createJudgeSchema>
+
 export const concludeMatchSchema = z.object({
   homeScore: z.number().int().min(0, 'Placar inválido'),
   awayScore: z.number().int().min(0, 'Placar inválido'),

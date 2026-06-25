@@ -1,7 +1,9 @@
 'use client'
 import * as React from 'react'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CalendarDays, Clock, CheckCircle2, Play, Flag } from 'lucide-react'
+import { CalendarDays, Clock, CheckCircle2, Play, Flag, ClipboardList, FileBarChart2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -56,6 +58,7 @@ function teamLabel(name: string | null, acronym: string | null): string {
 }
 
 export default function MatchesPage() {
+  const { tenant } = useParams<{ tenant: string }>()
   const queryClient = useQueryClient()
   const [selectedChampId, setSelectedChampId] = React.useState<string>('')
   const [matchToStart, setMatchToStart] = React.useState<MatchAdmin | null>(null)
@@ -129,7 +132,7 @@ export default function MatchesPage() {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <label className="text-sm font-medium text-muted-foreground whitespace-nowrap">Campeonato:</label>
         <select
           value={selectedChampId}
@@ -140,6 +143,14 @@ export default function MatchesPage() {
             <option key={c.id} value={c.id}>{c.name} ({c.season})</option>
           ))}
         </select>
+        {selectedChampId && (
+          <Link href={`/${tenant}/admin/championships/${selectedChampId}/report`}>
+            <Button size="sm" variant="outline" className="gap-1.5 whitespace-nowrap">
+              <FileBarChart2 className="size-3.5" />
+              Relatório
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -247,8 +258,17 @@ export default function MatchesPage() {
                               Encerrar
                             </Button>
                           )}
-                          {m.status === 'finished' && (
-                            <span className="text-xs text-muted-foreground">Finalizada</span>
+                          {(m.status === 'live' || m.status === 'finished') && (
+                            <Link href={`/${tenant}/admin/matches/${m.id}/sumula?champId=${selectedChampId}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="gap-1"
+                              >
+                                <ClipboardList className="size-3" />
+                                Súmula
+                              </Button>
+                            </Link>
                           )}
                         </div>
                       </TableCell>

@@ -24,6 +24,10 @@ import { TeamsModule } from './modules/teams/teams.module'
 import { WebsocketsModule } from './websockets/websockets.module'
 import { PublicApiModule } from './modules/public-api/public-api.module'
 import { UploadModule } from './modules/upload/upload.module'
+import { SumulaModule } from './modules/sumula/sumula.module'
+import { JudgesModule } from './modules/judges/judges.module'
+import { DisciplinaryModule } from './modules/disciplinary/disciplinary.module'
+import { PollsModule } from './modules/polls/polls.module'
 
 @Module({
   imports: [
@@ -85,6 +89,10 @@ import { UploadModule } from './modules/upload/upload.module'
     HealthModule,
     PublicApiModule,
     UploadModule,
+    SumulaModule,
+    JudgesModule,
+    DisciplinaryModule,
+    PollsModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: TenantInterceptor },

@@ -13,10 +13,14 @@ export default async function AdminLayout({ children, params }: AdminLayoutProps
   return (
     <AuthGuard tenant={tenant}>
       <div className="flex h-screen overflow-hidden bg-background">
-        <AdminSidebar tenant={tenant} />
+        <div className="print:hidden">
+          <AdminSidebar tenant={tenant} />
+        </div>
         <div className="flex flex-1 flex-col overflow-hidden">
-          <AdminHeader />
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          <div className="print:hidden">
+            <AdminHeader />
+          </div>
+          <main className="flex-1 overflow-y-auto p-6 print:overflow-visible print:p-0">{children}</main>
         </div>
       </div>
     </AuthGuard>

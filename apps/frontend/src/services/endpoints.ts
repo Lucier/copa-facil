@@ -12,6 +12,7 @@ export const API = {
     fixtures: (id: string) => `/championships/${id}/generate-fixtures`,
     standings: (id: string) => `/championships/${id}/standings`,
     statistics: (id: string, type: string) => `/championships/${id}/statistics/${type}`,
+    report: (id: string) => `/championships/${id}/statistics/report`,
   },
   teams: {
     base: '/teams',
@@ -41,5 +42,45 @@ export const API = {
     articles: '/articles',
     galleries: '/galleries',
     videos: '/videos',
+  },
+  judges: {
+    base: '/judges',
+    byId: (id: string) => `/judges/${id}`,
+  },
+  disciplinary: {
+    list: (champId: string, status?: string) =>
+      `/championships/${champId}/suspensions${status ? `?status=${status}` : ''}`,
+    create: (champId: string) => `/championships/${champId}/suspensions`,
+    serve: (champId: string, id: string) => `/championships/${champId}/suspensions/${id}/serve`,
+    cancel: (champId: string, id: string) => `/championships/${champId}/suspensions/${id}`,
+  },
+  polls: {
+    list: (champId: string) => `/championships/${champId}/polls`,
+    create: (champId: string) => `/championships/${champId}/polls`,
+    results: (champId: string, pollId: string) => `/championships/${champId}/polls/${pollId}/results`,
+    publish: (champId: string, pollId: string) => `/championships/${champId}/polls/${pollId}/publish`,
+    close: (champId: string, pollId: string) => `/championships/${champId}/polls/${pollId}/close`,
+    vote: (champId: string, pollId: string) => `/championships/${champId}/polls/${pollId}/vote`,
+  },
+  rankings: {
+    list: (champId: string) => `/championships/${champId}/statistics/rankings`,
+    create: (champId: string) => `/championships/${champId}/statistics/rankings`,
+    compute: (champId: string, rankingId: string) => `/championships/${champId}/statistics/rankings/${rankingId}/compute`,
+    delete: (champId: string, rankingId: string) => `/championships/${champId}/statistics/rankings/${rankingId}`,
+  },
+  expenses: {
+    list: (champId?: string) => `/payments/expenses${champId ? `?championshipId=${champId}` : ''}`,
+    create: '/payments/expenses',
+    delete: (id: string) => `/payments/expenses/${id}`,
+    dashboard: (champId: string) => `/payments/dashboard/${champId}`,
+  },
+  sumula: {
+    get: (matchId: string) => `/matches/${matchId}/sumula`,
+    open: (matchId: string) => `/matches/${matchId}/sumula`,
+    close: (matchId: string) => `/matches/${matchId}/sumula/close`,
+    lineup: (matchId: string) => `/matches/${matchId}/sumula/lineup`,
+    removeLineup: (matchId: string, lineupId: string) => `/matches/${matchId}/sumula/lineup/${lineupId}`,
+    officials: (matchId: string) => `/matches/${matchId}/sumula/officials`,
+    observations: (matchId: string) => `/matches/${matchId}/sumula/observations`,
   },
 } as const

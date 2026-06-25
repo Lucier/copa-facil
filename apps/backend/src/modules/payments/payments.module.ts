@@ -14,6 +14,12 @@ import { GetLedgerSummaryUseCase } from './application/use-cases/get-ledger-summ
 import { ListTransactionsUseCase } from './application/use-cases/list-transactions.use-case'
 import { ProcessWebhookUseCase } from './application/use-cases/process-webhook.use-case'
 import { RefundTransactionUseCase } from './application/use-cases/refund-transaction.use-case'
+import {
+  CreateExpenseUseCase,
+  DeleteExpenseUseCase,
+  GetFinancialDashboardUseCase,
+  ListExpensesUseCase,
+} from './application/use-cases/expense.use-cases'
 import { MercadoPagoPaymentGatewayAdapter } from './infrastructure/adapters/mercadopago-payment-gateway.adapter'
 import { MockPaymentGatewayAdapter } from './infrastructure/adapters/mock-payment-gateway.adapter'
 import { DrizzleLedgerRepository } from './infrastructure/repositories/drizzle-ledger.repository'
@@ -49,6 +55,10 @@ import { PaymentWebhooksController } from './presentation/webhooks/payment-webho
     RefundTransactionUseCase,
     ListTransactionsUseCase,
     GetLedgerSummaryUseCase,
+    CreateExpenseUseCase,
+    ListExpensesUseCase,
+    DeleteExpenseUseCase,
+    GetFinancialDashboardUseCase,
   ],
   controllers: [PaymentsController, PaymentWebhooksController, MercadoPagoWebhookController],
 })

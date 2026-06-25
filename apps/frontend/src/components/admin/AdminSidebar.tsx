@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Trophy, Shield, Users, CalendarDays,
-  BarChart3, FileText, Settings, ChevronLeft, Zap, ClipboardList, Wallet, CreditCard,
+  BarChart3, FileText, Settings, ChevronLeft, Zap, ClipboardList, Wallet, CreditCard, Gavel, ShieldAlert, MessageSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/store/useUIStore'
@@ -24,9 +24,12 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Jogadores', href: '/players', icon: Users },
   { label: 'Carteirinhas', href: '/id-cards', icon: CreditCard },
   { label: 'Partidas', href: '/matches', icon: CalendarDays },
+  { label: 'Juízes', href: '/judges', icon: Gavel },
+  { label: 'Disciplinar', href: '/disciplinary', icon: ShieldAlert },
   { label: 'Inscrições', href: '/registrations', icon: ClipboardList },
   { label: 'Pagamentos', href: '/payments', icon: Wallet },
   { label: 'Estatísticas', href: '/statistics', icon: BarChart3 },
+  { label: 'Enquetes', href: '/polls', icon: MessageSquare },
   { label: 'CMS', href: '/cms', icon: FileText },
 ]
 
