@@ -61,6 +61,13 @@ export function SubmitRegistrationDialog({
     },
   })
 
+  // Sync form value when the pre-selected championship becomes available after initial mount
+  React.useEffect(() => {
+    if (defaultChampionshipId && !form.getValues('championshipId')) {
+      form.setValue('championshipId', defaultChampionshipId)
+    }
+  }, [defaultChampionshipId, form])
+
   const { isSubmitting } = form.formState
 
   async function onSubmit(values: SubmitRegistrationInput) {
