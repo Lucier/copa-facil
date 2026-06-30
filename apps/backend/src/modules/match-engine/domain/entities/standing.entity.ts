@@ -15,6 +15,7 @@ export class StandingEntity {
     public readonly yellowCards: number,
     public readonly redCards: number,
     public readonly fairPlayPoints: number,
+    public readonly extraPoints: number,
     public readonly updatedAt: Date,
   ) {}
 }

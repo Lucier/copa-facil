@@ -59,7 +59,7 @@ function toDto(r: ExpenseRow): ExpenseEntryDto {
     description: r.description,
     notes: r.notes,
     expenseDate: r.expense_date,
-    createdAt: r.created_at.toISOString(),
+    createdAt: new Date(r.created_at).toISOString(),
   }
 }
 

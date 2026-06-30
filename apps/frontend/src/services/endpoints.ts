@@ -74,6 +74,20 @@ export const API = {
     delete: (id: string) => `/payments/expenses/${id}`,
     dashboard: (champId: string) => `/payments/dashboard/${champId}`,
   },
+  standings: {
+    byChampionship: (champId: string) => `/championships/${champId}/standings`,
+    full: (champId: string) => `/championships/${champId}/standings/full`,
+    extraPoints: (champId: string, teamId: string) => `/championships/${champId}/standings/${teamId}/extra-points`,
+  },
+  structure: {
+    phases: (id: string) => `/championships/${id}/phases`,
+    phaseById: (id: string, phaseId: string) => `/championships/${id}/phases/${phaseId}`,
+    rounds: (id: string) => `/championships/${id}/rounds`,
+    roundById: (id: string, roundId: string) => `/championships/${id}/rounds/${roundId}`,
+    matches: (id: string, roundId: string) => `/championships/${id}/rounds/${roundId}/matches`,
+    matchById: (id: string, roundId: string, matchId: string) =>
+      `/championships/${id}/rounds/${roundId}/matches/${matchId}`,
+  },
   sumula: {
     get: (matchId: string) => `/matches/${matchId}/sumula`,
     open: (matchId: string) => `/matches/${matchId}/sumula`,

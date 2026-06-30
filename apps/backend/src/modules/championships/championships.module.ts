@@ -12,6 +12,7 @@ import { DrizzleChampionshipRepository } from './infrastructure/repositories/dri
 import { DrizzleRoundRepository } from './infrastructure/repositories/drizzle-round.repository'
 import { DrizzleTeamRepository } from './infrastructure/repositories/drizzle-team.repository'
 import { ChampionshipController } from './presentation/controllers/championship.controller'
+import { StructureController } from './presentation/controllers/structure.controller'
 
 @Module({
   imports: [DrizzleModule, AuthModule],
@@ -24,6 +25,6 @@ import { ChampionshipController } from './presentation/controllers/championship.
     GetBracketTreeUseCase,
     ListChampionshipsUseCase,
   ],
-  controllers: [ChampionshipController],
+  controllers: [ChampionshipController, StructureController],
 })
 export class ChampionshipsModule {}

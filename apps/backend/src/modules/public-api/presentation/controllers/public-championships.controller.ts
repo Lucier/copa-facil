@@ -14,6 +14,7 @@ interface ChampionshipRow {
   format: string
   legs: number
   status: string
+  logo_url: string | null
   created_at: Date
 }
 
@@ -43,7 +44,7 @@ export class PublicChampionshipsController {
 
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<(ChampionshipRow & { total: string })[]>`
-        SELECT id, name, season, format, legs, status, created_at,
+        SELECT id, name, season, format, legs, status, logo_url, created_at,
                COUNT(*) OVER () AS total
         FROM   championships
         WHERE  (${status ?? null}::text IS NULL OR status = ${status ?? null})
@@ -62,7 +63,7 @@ export class PublicChampionshipsController {
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<ChampionshipRow[]>`
-        SELECT id, name, season, format, legs, status, created_at
+        SELECT id, name, season, format, legs, status, logo_url, created_at
         FROM   championships
         WHERE  id = ${id}
         LIMIT  1

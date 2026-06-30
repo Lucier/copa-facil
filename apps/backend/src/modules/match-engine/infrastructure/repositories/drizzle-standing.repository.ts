@@ -22,6 +22,7 @@ interface StandingRow {
   yellow_cards: number
   red_cards: number
   fair_play_points: number
+  extra_points: number
   updated_at: Date
 }
 
@@ -42,6 +43,7 @@ function toEntity(row: StandingRow): StandingEntity {
     row.yellow_cards,
     row.red_cards,
     row.fair_play_points,
+    row.extra_points,
     row.updated_at,
   )
 }
@@ -55,7 +57,7 @@ export class DrizzleStandingRepository implements IStandingRepository {
       return tx<StandingRow[]>`
         SELECT id, championship_id, group_id, team_id, matches_played, wins, draws, losses,
                goals_for, goals_against, goal_difference, points,
-               yellow_cards, red_cards, fair_play_points, updated_at
+               yellow_cards, red_cards, fair_play_points, extra_points, updated_at
         FROM standings
         WHERE championship_id = ${championshipId}
         ORDER BY points DESC, goal_difference DESC, goals_for DESC
@@ -72,7 +74,7 @@ export class DrizzleStandingRepository implements IStandingRepository {
       return tx<StandingRow[]>`
         SELECT id, championship_id, group_id, team_id, matches_played, wins, draws, losses,
                goals_for, goals_against, goal_difference, points,
-               yellow_cards, red_cards, fair_play_points, updated_at
+               yellow_cards, red_cards, fair_play_points, extra_points, updated_at
         FROM standings
         WHERE championship_id = ${championshipId} AND group_id = ${groupId}
         ORDER BY points DESC, goal_difference DESC, goals_for DESC
@@ -111,7 +113,7 @@ export class DrizzleStandingRepository implements IStandingRepository {
           updated_at       = NOW()
         RETURNING id, championship_id, group_id, team_id, matches_played, wins, draws, losses,
                   goals_for, goals_against, goal_difference, points,
-                  yellow_cards, red_cards, fair_play_points, updated_at
+                  yellow_cards, red_cards, fair_play_points, extra_points, updated_at
       `
     })
     return toEntity(rows[0])

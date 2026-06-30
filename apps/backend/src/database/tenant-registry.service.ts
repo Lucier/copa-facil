@@ -134,6 +134,15 @@ export class TenantRegistryService {
         )
       `
       await sql`
+        CREATE TABLE IF NOT EXISTS ${sql(s)}.phases (
+          id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+          championship_id  UUID        NOT NULL,
+          name             TEXT        NOT NULL,
+          order_index      INTEGER     NOT NULL DEFAULT 0,
+          created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `
+      await sql`
         CREATE TABLE IF NOT EXISTS ${sql(s)}.rounds (
           id              UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
           championship_id UUID    NOT NULL,
@@ -141,9 +150,11 @@ export class TenantRegistryService {
           name            TEXT    NOT NULL,
           phase           TEXT    NOT NULL DEFAULT 'knockout',
           group_id        UUID,
+          phase_id        UUID,
           created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
       `
+      await sql`ALTER TABLE ${sql(s)}.rounds ADD COLUMN IF NOT EXISTS phase_id UUID`
       await sql`
         CREATE TABLE IF NOT EXISTS ${sql(s)}.matches (
           id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -196,10 +207,12 @@ export class TenantRegistryService {
           yellow_cards     INTEGER NOT NULL DEFAULT 0,
           red_cards        INTEGER NOT NULL DEFAULT 0,
           fair_play_points INTEGER NOT NULL DEFAULT 0,
+          extra_points     INTEGER NOT NULL DEFAULT 0,
           updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           UNIQUE (championship_id, team_id)
         )
       `
+      await sql`ALTER TABLE ${sql(s)}.standings ADD COLUMN IF NOT EXISTS extra_points INTEGER NOT NULL DEFAULT 0`
       await sql`
         CREATE TABLE IF NOT EXISTS ${sql(s)}.player_statistics (
           id               UUID    PRIMARY KEY DEFAULT gen_random_uuid(),

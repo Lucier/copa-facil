@@ -3,6 +3,7 @@ import * as React from 'react'
 import { usePathname, useParams } from 'next/navigation'
 import { ChevronRight, LogOut, User, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
+import { useQuery } from '@tanstack/react-query'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,9 +30,16 @@ const SEGMENT_LABELS: Record<string, string> = {
   statistics: 'Estatísticas',
   cms: 'CMS',
   settings: 'Configurações',
+  estrutura: 'Estrutura',
+  classificacao: 'Classificação',
+  ranking: 'Ranking',
+  report: 'Relatório',
+  sumula: 'Súmula',
 }
 
-function useBreadcrumbs() {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function useBreadcrumbs(championshipNames: Record<string, string>) {
   const pathname = usePathname()
   const params = useParams()
   const tenant = params.tenant as string
@@ -40,15 +48,36 @@ function useBreadcrumbs() {
   const tenantIndex = segments.indexOf(tenant)
   const afterTenant = segments.slice(tenantIndex + 1)
 
-  return afterTenant.map((seg, i) => ({
-    label: SEGMENT_LABELS[seg] ?? seg,
-    href: '/' + segments.slice(0, tenantIndex + 1 + i + 1).join('/'),
-    isLast: i === afterTenant.length - 1,
-  }))
+  return afterTenant.map((seg, i) => {
+    let label = SEGMENT_LABELS[seg] ?? seg
+    if (UUID_RE.test(seg) && championshipNames[seg]) {
+      label = championshipNames[seg]
+    }
+    return {
+      label,
+      href: '/' + segments.slice(0, tenantIndex + 1 + i + 1).join('/'),
+      isLast: i === afterTenant.length - 1,
+    }
+  })
 }
 
 export function AdminHeader() {
-  const breadcrumbs = useBreadcrumbs()
+  const pathname = usePathname()
+  const hasChampionshipId = UUID_RE.test(pathname.split('/').find((s) => UUID_RE.test(s)) ?? '')
+
+  const { data: championships = [] } = useQuery<{ id: string; name: string }[]>({
+    queryKey: ['championships'],
+    queryFn: async () => { const { data } = await api.get(API.championships.base); return data },
+    enabled: hasChampionshipId,
+    staleTime: 60_000,
+  })
+
+  const championshipNames = React.useMemo(
+    () => Object.fromEntries(championships.map((c) => [c.id, c.name])),
+    [championships],
+  )
+
+  const breadcrumbs = useBreadcrumbs(championshipNames)
   const { theme, setTheme } = useTheme()
   const user = useAuthStore((s) => s.user)
   const clearAuth = useAuthStore((s) => s.clearAuth)

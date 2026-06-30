@@ -29,7 +29,7 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginInputDto): Promise<TokenOutputDto> {
-    const user = await this.userRepo.findByEmail(dto.email)
+    const user = await this.userRepo.findByEmail(dto.email.toLowerCase().trim())
     if (!user || !user.isActive) throw new UnauthorizedException('Invalid credentials')
 
     const passwordValid = await this.crypt.compare(dto.password, user.passwordHash)

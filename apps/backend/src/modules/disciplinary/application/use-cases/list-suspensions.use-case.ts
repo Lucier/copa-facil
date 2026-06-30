@@ -92,8 +92,8 @@ export class ListSuspensionsUseCase {
       status: row.status,
       eventId: row.event_id,
       notes: row.notes,
-      createdAt: row.created_at.toISOString(),
-      updatedAt: row.updated_at.toISOString(),
+      createdAt: new Date(row.created_at).toISOString(),
+      updatedAt: new Date(row.updated_at).toISOString(),
     }))
   }
 }

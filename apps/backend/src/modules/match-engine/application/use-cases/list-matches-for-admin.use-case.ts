@@ -13,9 +13,9 @@ interface MatchAdminRow {
   away_team_acronym: string | null
   home_score: number
   away_score: number
-  scheduled_at: Date | null
-  started_at: Date | null
-  ended_at: Date | null
+  scheduled_at: Date | string | null
+  started_at: Date | string | null
+  ended_at: Date | string | null
   round_id: string
   round_number: number
   round_name: string
@@ -23,6 +23,11 @@ interface MatchAdminRow {
   group_id: string | null
   bracket_slot: number | null
   is_bye: boolean
+}
+
+function toIso(v: Date | string | null | undefined): string | null {
+  if (v == null) return null
+  return v instanceof Date ? v.toISOString() : new Date(v).toISOString()
 }
 
 @Injectable()
@@ -73,9 +78,9 @@ export class ListMatchesForAdminUseCase {
       awayTeamAcronym: row.away_team_acronym,
       homeScore: row.home_score,
       awayScore: row.away_score,
-      scheduledAt: row.scheduled_at?.toISOString() ?? null,
-      startedAt: row.started_at?.toISOString() ?? null,
-      endedAt: row.ended_at?.toISOString() ?? null,
+      scheduledAt: toIso(row.scheduled_at),
+      startedAt: toIso(row.started_at),
+      endedAt: toIso(row.ended_at),
       roundId: row.round_id,
       roundNumber: row.round_number,
       roundName: row.round_name,

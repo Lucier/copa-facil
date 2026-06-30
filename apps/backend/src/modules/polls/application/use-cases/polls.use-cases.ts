@@ -52,8 +52,8 @@ function buildResults(
       percentage: totalVotes > 0 ? Math.round((o.votesCount / totalVotes) * 100) : 0,
     })),
     userVotedOptionId,
-    createdAt: poll.createdAt.toISOString(),
-    closedAt: poll.closedAt?.toISOString() ?? null,
+    createdAt: new Date(poll.createdAt).toISOString(),
+    closedAt: poll.closedAt ? new Date(poll.closedAt).toISOString() : null,
   }
 }
 

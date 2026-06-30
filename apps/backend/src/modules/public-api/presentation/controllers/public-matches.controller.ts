@@ -16,6 +16,8 @@ interface MatchRow {
   group_id: string | null
   bracket_slot: number | null
   status: string
+  home_score: number
+  away_score: number
   scheduled_at: Date | null
   created_at: Date
 }
@@ -48,7 +50,8 @@ export class PublicMatchesController {
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<(MatchRow & { total: string })[]>`
         SELECT id, championship_id, round_id, home_team_id, away_team_id,
-               group_id, bracket_slot, status, scheduled_at, created_at,
+               group_id, bracket_slot, status, home_score, away_score,
+               scheduled_at, created_at,
                COUNT(*) OVER () AS total
         FROM   matches
         WHERE  (${status ?? null}::text IS NULL OR status = ${status ?? null})
@@ -71,7 +74,8 @@ export class PublicMatchesController {
     const rows = await this.drizzle.runInTenantContext((tx) =>
       tx<MatchRow[]>`
         SELECT id, championship_id, round_id, home_team_id, away_team_id,
-               group_id, bracket_slot, status, scheduled_at, created_at
+               group_id, bracket_slot, status, home_score, away_score,
+               scheduled_at, created_at
         FROM   matches
         WHERE  id = ${id}
         LIMIT  1

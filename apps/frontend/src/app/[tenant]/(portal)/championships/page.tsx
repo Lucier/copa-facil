@@ -91,10 +91,10 @@ export default async function ChampionshipsPublicPage({ params }: Props) {
                   </div>
 
                   <Link
-                    href={`/${tenant}/standings?championshipId=${c.id}`}
+                    href={`/${tenant}/championships/${c.id}`}
                     className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2 text-sm font-medium transition-colors hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
                   >
-                    <span>Ver classificação</span>
+                    <span>Ver campeonato</span>
                     <ChevronRight className="size-4" />
                   </Link>
                 </CardContent>

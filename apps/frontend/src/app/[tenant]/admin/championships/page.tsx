@@ -1,11 +1,13 @@
 'use client'
 import * as React from 'react'
+import { useParams } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trophy, Calendar, Users, Loader2, Zap, ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import Link from 'next/link'
 import { NewChampionshipDialog } from '@/components/admin/NewChampionshipDialog'
 import { GenerateFixturesDialog } from '@/components/admin/GenerateFixturesDialog'
 import { formatDate } from '@/lib/utils'
@@ -55,6 +57,7 @@ async function fetchTeams(): Promise<Team[]> {
 }
 
 export default function ChampionshipsPage() {
+  const { tenant } = useParams<{ tenant: string }>()
   const queryClient = useQueryClient()
 
   const { data: championships = [], isLoading, isError } = useQuery({
@@ -166,18 +169,30 @@ export default function ChampionshipsPage() {
                         <Badge variant={st.variant}>{st.label}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {c.status === 'draft' && (
-                          <GenerateFixturesDialog
-                            championship={c}
-                            teams={teams}
-                            onSuccess={handleCreated}
-                          >
+                        <div className="flex items-center gap-1.5 justify-end">
+                          {c.status === 'draft' && (
+                            <GenerateFixturesDialog
+                              championship={c}
+                              teams={teams}
+                              onSuccess={handleCreated}
+                            >
+                              <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+                                <Zap className="size-3.5" />
+                                Gerar
+                              </Button>
+                            </GenerateFixturesDialog>
+                          )}
+                          <Link href={`/${tenant}/admin/championships/${c.id}/classificacao`}>
                             <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-                              <Zap className="size-3.5" />
-                              Gerar Partidas
+                              Classificação
                             </Button>
-                          </GenerateFixturesDialog>
-                        )}
+                          </Link>
+                          <Link href={`/${tenant}/admin/championships/${c.id}/estrutura`}>
+                            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+                              Estrutura
+                            </Button>
+                          </Link>
+                        </div>
                       </TableCell>
                     </TableRow>
                   )

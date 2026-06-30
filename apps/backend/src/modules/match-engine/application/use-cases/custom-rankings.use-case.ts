@@ -72,7 +72,7 @@ export class CreateCustomRankingUseCase {
       `,
     )
     const r = rows[0]
-    return { id: r.id, championshipId: r.championship_id, name: r.name, weights: r.weights, createdAt: r.created_at.toISOString() }
+    return { id: r.id, championshipId: r.championship_id, name: r.name, weights: r.weights, createdAt: new Date(r.created_at).toISOString() }
   }
 }
 
@@ -88,7 +88,7 @@ export class ListCustomRankingsUseCase {
     )
     return rows.map((r) => ({
       id: r.id, championshipId: r.championship_id, name: r.name, weights: r.weights,
-      createdAt: r.created_at.toISOString(),
+      createdAt: new Date(r.created_at).toISOString(),
     }))
   }
 }

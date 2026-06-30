@@ -23,6 +23,7 @@ interface StandingRow {
   yellow_cards: number
   red_cards: number
   fair_play_points: number
+  extra_points: number
   updated_at: Date
 }
 
@@ -45,7 +46,7 @@ export class PublicStandingsController {
         SELECT id, championship_id, group_id, team_id,
                matches_played, wins, draws, losses,
                goals_for, goals_against, goal_difference, points,
-               yellow_cards, red_cards, fair_play_points, updated_at,
+               yellow_cards, red_cards, fair_play_points, extra_points, updated_at,
                COUNT(*) OVER () AS total
         FROM   standings
         WHERE  (${championshipId ?? null}::uuid IS NULL OR championship_id = ${championshipId ?? null}::uuid)
