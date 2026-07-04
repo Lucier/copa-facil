@@ -115,7 +115,7 @@ services:
       target: builder
     container_name: copa_facil_frontend
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:3001/api/v1
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
     ports:
       - '3000:3000'
     volumes:

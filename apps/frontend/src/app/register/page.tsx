@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Trophy, Loader2, CheckCircle2, ArrowLeft, ArrowRight,
-  User, Building2, Zap, Check,
+  User, Building2, Zap, Check, CreditCard, QrCode, Copy,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -64,18 +64,37 @@ const PLANS = [
   },
 ]
 
+// ── billing ───────────────────────────────────────────────────────────────────
+
+const MONTHLY_PRICE: Record<string, number> = { professional: 49, liga: 99 }
+
+const BILLING_PERIODS = [
+  { id: 'mensal' as const, label: 'Mensal', months: 1, discount: 0 },
+  { id: 'trimestral' as const, label: 'Trimestral', months: 3, discount: 0.05 },
+  { id: 'semestral' as const, label: 'Semestral', months: 6, discount: 0.1 },
+  { id: 'anual' as const, label: 'Anual', months: 12, discount: 0.2 },
+]
+
+type BillingPeriodId = (typeof BILLING_PERIODS)[number]['id']
+type PaymentMethod = 'cartao' | 'pix'
+
+function formatBRL(value: number) {
+  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
 // ── steps indicator ───────────────────────────────────────────────────────────
 
 const STEPS = [
   { label: 'Sua conta', icon: User },
   { label: 'Organização', icon: Building2 },
   { label: 'Confirmação', icon: CheckCircle2 },
+  { label: 'Pagamento', icon: CreditCard },
 ]
 
-function StepIndicator({ current }: { current: number }) {
+function StepIndicator({ current, steps }: { current: number; steps: typeof STEPS }) {
   return (
     <div className="flex items-center justify-center gap-0">
-      {STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const done = i < current
         const active = i === current
         return (
@@ -96,7 +115,7 @@ function StepIndicator({ current }: { current: number }) {
                 {step.label}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`mb-4 h-px w-12 transition-colors ${done ? 'bg-primary' : 'bg-border'}`} />
             )}
           </React.Fragment>
@@ -125,6 +144,14 @@ export default function RegisterPage() {
   const [submitting, setSubmitting] = React.useState(false)
   const [done, setDone] = React.useState(false)
   const [createdSlug, setCreatedSlug] = React.useState('')
+
+  const [billingPeriod, setBillingPeriod] = React.useState<BillingPeriodId>('mensal')
+  const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod>('cartao')
+  const [pixCopied, setPixCopied] = React.useState(false)
+  const [card, setCard] = React.useState({ number: '', name: '', expiry: '', cvv: '' })
+  const [installments, setInstallments] = React.useState(1)
+
+  const isPaidPlan = step2Data ? step2Data.plan !== 'starter' : false
 
   // ── Step 1 form ──────────────────────────────────────────────────────────
   const form1 = useForm<RegisterStep1Input>({
@@ -160,7 +187,7 @@ export default function RegisterPage() {
     setStep(2)
   }
 
-  // ── Step 3 — submit ──────────────────────────────────────────────────────
+  // ── Registration submit ──────────────────────────────────────────────────
   async function handleRegister() {
     if (!step1Data || !step2Data) return
     setServerError(null)
@@ -185,6 +212,42 @@ export default function RegisterPage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  function onConfirm() {
+    if (isPaidPlan) setStep(3)
+    else void handleRegister()
+  }
+
+  const monthlyPrice = step2Data ? (MONTHLY_PRICE[step2Data.plan] ?? 0) : 0
+  const period = BILLING_PERIODS.find((p) => p.id === billingPeriod)!
+  const totalPrice = monthlyPrice * period.months * (1 - period.discount)
+  const pixCode = `00020126580014br.gov.bcb.pix0136copafacil-${step2Data?.organizationSlug ?? ''}-${billingPeriod}5204000053039865802BR`
+
+  // Parcelamento: até 12x, com parcela mínima de R$ 25
+  const maxInstallments = Math.max(1, Math.min(12, Math.floor(totalPrice / 25)))
+  const installmentOptions = Array.from({ length: maxInstallments }, (_, i) => i + 1)
+  const installmentValue = totalPrice / installments
+
+  const cardValid =
+    card.number.replace(/\D/g, '').length >= 13 &&
+    card.name.trim().length >= 3 &&
+    /^\d{2}\/\d{2}$/.test(card.expiry) &&
+    /^\d{3,4}$/.test(card.cvv)
+
+  async function handlePay() {
+    setServerError(null)
+    setSubmitting(true)
+    // Pagamento simulado — integração real com gateway virá depois
+    await new Promise((r) => setTimeout(r, 1500))
+    setSubmitting(false)
+    await handleRegister()
+  }
+
+  function copyPix() {
+    void navigator.clipboard.writeText(pixCode)
+    setPixCopied(true)
+    setTimeout(() => setPixCopied(false), 2000)
   }
 
   // ── Success screen ───────────────────────────────────────────────────────
@@ -231,7 +294,10 @@ export default function RegisterPage() {
         </div>
 
         {/* Step indicator */}
-        <StepIndicator current={step} />
+        <StepIndicator
+          current={step}
+          steps={form2.watch('plan') === 'starter' ? STEPS.slice(0, 3) : STEPS}
+        />
 
         {/* ── Step 1: Conta ─────────────────────────────────────────── */}
         {step === 0 && (
@@ -462,12 +528,205 @@ export default function RegisterPage() {
                 </Button>
                 <Button
                   className="flex-1 gap-2"
-                  onClick={handleRegister}
+                  onClick={onConfirm}
                   disabled={submitting}
                 >
                   {submitting
                     ? <><Loader2 className="size-4 animate-spin" /> Criando...</>
+                    : isPaidPlan
+                    ? <>Ir para pagamento <ArrowRight className="size-4" /></>
                     : <><Zap className="size-4" /> Criar minha conta</>
+                  }
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ── Step 4: Pagamento ─────────────────────────────────────── */}
+        {step === 3 && step2Data && (
+          <Card>
+            <CardContent className="pt-6 space-y-5">
+              <h2 className="font-display text-base font-bold">Pagamento</h2>
+
+              {/* Billing period */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Período de cobrança</p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {BILLING_PERIODS.map((p) => {
+                    const isSelected = billingPeriod === p.id
+                    const total = monthlyPrice * p.months * (1 - p.discount)
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => { setBillingPeriod(p.id); setInstallments(1) }}
+                        className={`relative rounded-xl border p-3 text-left transition-all ${
+                          isSelected
+                            ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                            : 'border-border bg-card hover:border-primary/40'
+                        }`}
+                      >
+                        {p.discount > 0 && (
+                          <span className="absolute -top-2 right-2 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold text-primary-foreground">
+                            -{Math.round(p.discount * 100)}%
+                          </span>
+                        )}
+                        <p className="text-xs font-semibold">{p.label}</p>
+                        <p className="font-display mt-0.5 text-sm font-bold">{formatBRL(total)}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {formatBRL(total / p.months)}/mês
+                        </p>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Payment method */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Forma de pagamento</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {([
+                    { id: 'cartao', label: 'Cartão de crédito', icon: CreditCard },
+                    { id: 'pix', label: 'Pix', icon: QrCode },
+                  ] as const).map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setPaymentMethod(m.id)}
+                      className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
+                        paymentMethod === m.id
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                          : 'border-border bg-card hover:border-primary/40'
+                      }`}
+                    >
+                      <m.icon className="size-4" /> {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card form */}
+              {paymentMethod === 'cartao' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium">Número do cartão</label>
+                    <Input
+                      className="mt-1"
+                      placeholder="0000 0000 0000 0000"
+                      inputMode="numeric"
+                      value={card.number}
+                      onChange={(e) =>
+                        setCard({ ...card, number: e.target.value.replace(/[^\d\s]/g, '').slice(0, 19) })
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Nome impresso no cartão</label>
+                    <Input
+                      className="mt-1"
+                      placeholder="JOAO S SILVA"
+                      value={card.name}
+                      onChange={(e) => setCard({ ...card, name: e.target.value.toUpperCase() })}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium">Validade</label>
+                      <Input
+                        className="mt-1"
+                        placeholder="MM/AA"
+                        inputMode="numeric"
+                        value={card.expiry}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
+                          setCard({
+                            ...card,
+                            expiry: digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits,
+                          })
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">CVV</label>
+                      <Input
+                        className="mt-1"
+                        placeholder="123"
+                        inputMode="numeric"
+                        value={card.cvv}
+                        onChange={(e) => setCard({ ...card, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Parcelamento</label>
+                    <select
+                      className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      value={installments}
+                      onChange={(e) => setInstallments(Number(e.target.value))}
+                    >
+                      {installmentOptions.map((n) => (
+                        <option key={n} value={n}>
+                          {n}x de {formatBRL(totalPrice / n)} sem juros
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Pix */}
+              {paymentMethod === 'pix' && (
+                <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/30 p-4">
+                  <div className="flex size-40 items-center justify-center rounded-lg border-2 border-dashed border-border bg-background">
+                    <QrCode className="size-24 text-muted-foreground" />
+                  </div>
+                  <p className="max-w-full truncate text-[11px] text-muted-foreground">{pixCode}</p>
+                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={copyPix}>
+                    <Copy className="size-3.5" />
+                    {pixCopied ? 'Copiado!' : 'Copiar código Pix'}
+                  </Button>
+                  <p className="text-center text-[11px] text-muted-foreground">
+                    Escaneie o QR Code ou copie o código e pague no app do seu banco.
+                  </p>
+                </div>
+              )}
+
+              {/* Summary */}
+              <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3 text-sm">
+                <span className="text-muted-foreground">
+                  {PLANS.find((p) => p.id === step2Data.plan)?.name} · {period.label}
+                </span>
+                <span className="font-display text-base font-bold">
+                  {paymentMethod === 'cartao' && installments > 1
+                    ? `${installments}x ${formatBRL(installmentValue)}`
+                    : formatBRL(totalPrice)}
+                </span>
+              </div>
+
+              {serverError && (
+                <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  {serverError}
+                </p>
+              )}
+
+              <div className="flex gap-3">
+                <Button type="button" variant="outline" className="gap-2" onClick={() => setStep(2)} disabled={submitting}>
+                  <ArrowLeft className="size-4" /> Voltar
+                </Button>
+                <Button
+                  className="flex-1 gap-2"
+                  onClick={handlePay}
+                  disabled={submitting || (paymentMethod === 'cartao' && !cardValid)}
+                >
+                  {submitting
+                    ? <><Loader2 className="size-4 animate-spin" /> Processando...</>
+                    : <><Zap className="size-4" /> {paymentMethod === 'pix'
+                        ? 'Já paguei, confirmar'
+                        : installments > 1
+                        ? `Pagar em ${installments}x de ${formatBRL(installmentValue)}`
+                        : `Pagar ${formatBRL(totalPrice)}`}</>
                   }
                 </Button>
               </div>
