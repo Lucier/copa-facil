@@ -94,6 +94,16 @@ describe.runIf(dbUp)('Tenant isolation (integration)', () => {
     )
   })
 
+  it('accepts kebab-case tenant schema names (quoted identifiers)', async () => {
+    const schema = 'tenant_e2e-kebab-case'
+    await runner.runTenantMigrations(schema)
+    const rows = await drizzle.runRaw(
+      (sql) => sql`SELECT count(*)::int AS c FROM ${sql(schema)}.schema_migrations`,
+    )
+    expect(rows[0].c).toBeGreaterThan(0)
+    await drizzle.runRaw((sql) => sql`DROP SCHEMA ${sql(schema)} CASCADE`)
+  })
+
   it('writes in tenant A are not visible in tenant B', async () => {
     await TenantContext.run(TENANT_A, () =>
       drizzle.runInTenantContext(async (tx) => {

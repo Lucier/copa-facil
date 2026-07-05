@@ -5,7 +5,9 @@ import { coreMigrations } from './migrations/core'
 import { tenantMigrations } from './migrations/tenant'
 import type { Migration } from './migrations/types'
 
-const SCHEMA_NAME_PATTERN = /^[a-z_][a-z0-9_]*$/
+// Hyphens are allowed: slugs are kebab-case and the schema identifier is always
+// quoted via tx(schemaName), never interpolated raw.
+const SCHEMA_NAME_PATTERN = /^[a-z_][a-z0-9_-]*$/
 // Prevents concurrent app instances from racing on DDL during boot.
 const MIGRATION_LOCK_KEY = 727201
 
