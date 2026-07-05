@@ -19,14 +19,8 @@ interface Notification {
   createdAt: string
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: '1', title: 'Nova inscrição', body: 'Time FC Rápidos solicitou inscrição no Campeonato Regional.', read: false, createdAt: '2 min atrás' },
-  { id: '2', title: 'Pagamento confirmado', body: 'Transação #TXN-4821 aprovada — R$ 250,00.', read: false, createdAt: '18 min atrás' },
-  { id: '3', title: 'Partida encerrada', body: 'Rápidos FC 3 × 1 Unidos SC registrada com sucesso.', read: true, createdAt: '1h atrás' },
-]
-
 export function NotificationBell() {
-  const [notifications, setNotifications] = React.useState(MOCK_NOTIFICATIONS)
+  const [notifications, setNotifications] = React.useState<Notification[]>([])
   const unread = notifications.filter((n) => !n.read).length
 
   const markAllRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))

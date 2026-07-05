@@ -1,23 +1,42 @@
-import { Trophy, Shield, Users, CalendarDays, BarChart3, TrendingUp, Clock, AlertCircle } from 'lucide-react'
+'use client'
+import { useQuery } from '@tanstack/react-query'
+import { Trophy, Shield, CalendarDays, BarChart3, TrendingUp, AlertCircle, ClipboardList } from 'lucide-react'
 import { StatsCard } from '@/components/admin/StatsCard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatDateTime } from '@/lib/utils'
+import api from '@/services/api'
+import { API } from '@/services/endpoints'
 
-const STATS = [
-  { label: 'Campeonatos Ativos', value: 3, icon: Trophy, trend: 50, highlight: true },
-  { label: 'Times Inscritos', value: 24, icon: Shield, trend: 20 },
-  { label: 'Jogadores Cadastrados', value: 312, icon: Users, trend: 8 },
-  { label: 'Partidas Realizadas', value: 47, icon: CalendarDays, trend: -5 },
-]
+interface Championship {
+  id: string
+  name: string
+  status: 'active' | 'finished' | 'draft'
+}
 
-const RECENT_MATCHES = [
-  { id: '1', home: 'Rápidos FC', away: 'Unidos SC', score: '3 – 1', championship: 'Regional 2024', status: 'finished', date: '2026-06-08T20:00:00Z' },
-  { id: '2', home: 'Estrela Azul', away: 'Leões do Norte', score: '—', championship: 'Copa Cidade', status: 'live', date: '2026-06-09T19:00:00Z' },
-  { id: '3', home: 'Tornado FC', away: 'Sport Clube', score: '—', championship: 'Regional 2024', status: 'scheduled', date: '2026-06-10T20:00:00Z' },
-  { id: '4', home: 'Guerreiros', away: 'Falcões EC', score: '1 – 1', championship: 'Copa Cidade', status: 'finished', date: '2026-06-07T19:30:00Z' },
-]
+interface Match {
+  id: string
+  homeTeamName: string | null
+  homeTeamAcronym: string | null
+  awayTeamName: string | null
+  awayTeamAcronym: string | null
+  homeScore: number
+  awayScore: number
+  scheduledAt: string | null
+  status: string
+  championshipName?: string
+}
+
+interface Registration {
+  id: string
+  status: string
+}
+
+interface Payment {
+  id: string
+  status: string
+}
 
 const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'live' | 'destructive' }> = {
   live: { label: 'Ao Vivo', variant: 'live' },
@@ -25,13 +44,87 @@ const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'success'
   scheduled: { label: 'Agendada', variant: 'default' },
 }
 
-const PENDING_ACTIONS = [
-  { id: '1', type: 'registration', label: '4 inscrições aguardando aprovação', icon: AlertCircle, urgent: true },
-  { id: '2', type: 'payment', label: '2 pagamentos pendentes de confirmação', icon: TrendingUp, urgent: false },
-  { id: '3', type: 'document', label: '7 documentos aguardando revisão', icon: Clock, urgent: false },
-]
+function teamLabel(name: string | null, acronym: string | null) {
+  return name ?? acronym ?? 'A definir'
+}
 
 export default function DashboardPage() {
+  const { data: championships = [] } = useQuery<Championship[]>({
+    queryKey: ['championships'],
+    queryFn: async () => (await api.get(API.championships.base)).data,
+  })
+
+  const { data: teams = [] } = useQuery<{ id: string }[]>({
+    queryKey: ['teams'],
+    queryFn: async () => (await api.get(API.teams.base)).data,
+  })
+
+  const { data: payments = [] } = useQuery<Payment[]>({
+    queryKey: ['payments'],
+    queryFn: async () => (await api.get(API.payments.base)).data,
+  })
+
+  const championshipIds = championships.map((c) => c.id)
+
+  const { data: matches = [] } = useQuery<Match[]>({
+    queryKey: ['dashboard-matches', championshipIds],
+    enabled: championshipIds.length > 0,
+    queryFn: async () => {
+      const results = await Promise.all(
+        championships.map(async (c) => {
+          const { data } = await api.get(API.championships.matches(c.id))
+          return (data as Match[]).map((m) => ({ ...m, championshipName: c.name }))
+        }),
+      )
+      return results.flat()
+    },
+  })
+
+  const { data: registrations = [] } = useQuery<Registration[]>({
+    queryKey: ['dashboard-registrations', championshipIds],
+    enabled: championshipIds.length > 0,
+    queryFn: async () => {
+      const results = await Promise.all(
+        championships.map(async (c) => {
+          const { data } = await api.get(`${API.registrations.base}?championshipId=${c.id}`)
+          return data as Registration[]
+        }),
+      )
+      return results.flat()
+    },
+  })
+
+  const activeChampionships = championships.filter((c) => c.status === 'active').length
+  const finishedMatches = matches.filter((m) => m.status === 'finished').length
+  const pendingRegistrations = registrations.filter((r) => r.status === 'pending').length
+  const pendingPayments = payments.filter((p) => p.status === 'pending' || p.status === 'processing').length
+
+  const stats = [
+    { label: 'Campeonatos Ativos', value: activeChampionships, icon: Trophy, highlight: true },
+    { label: 'Times Inscritos', value: teams.length, icon: Shield },
+    { label: 'Partidas Realizadas', value: finishedMatches, icon: CalendarDays },
+    { label: 'Inscrições Pendentes', value: pendingRegistrations, icon: ClipboardList },
+  ]
+
+  const recentMatches = [...matches]
+    .sort((a, b) => (b.scheduledAt ?? '').localeCompare(a.scheduledAt ?? ''))
+    .slice(0, 5)
+
+  const pendingActions = [
+    pendingRegistrations > 0 && {
+      id: 'registration',
+      label: `${pendingRegistrations} inscriç${pendingRegistrations === 1 ? 'ão aguardando' : 'ões aguardando'} aprovação`,
+      icon: AlertCircle,
+      urgent: true,
+    },
+    pendingPayments > 0 && {
+      id: 'payment',
+      label: `${pendingPayments} pagamento${pendingPayments === 1 ? ' pendente' : 's pendentes'} de confirmação`,
+      icon: TrendingUp,
+      urgent: false,
+    },
+  ].filter(Boolean) as { id: string; label: string; icon: typeof AlertCircle; urgent: boolean }[]
+
   return (
     <div className="space-y-6">
       <div>
@@ -41,7 +134,7 @@ export default function DashboardPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <StatsCard key={stat.label} {...stat} />
         ))}
       </div>
@@ -56,44 +149,51 @@ export default function DashboardPage() {
               </CardTitle>
               <Badge variant="outline" className="text-[10px]">
                 <BarChart3 className="mr-1 size-3" />
-                Últimas 7 dias
+                Mais recentes
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Confronto</TableHead>
-                  <TableHead>Campeonato</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead className="text-right">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {RECENT_MATCHES.map((m) => {
-                  const st = STATUS_MAP[m.status]
-                  return (
-                    <TableRow key={m.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="font-medium">{m.home}</span>
-                          <span className="font-display text-xs font-bold text-muted-foreground">{m.score}</span>
-                          <span className="font-medium">{m.away}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{m.championship}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {formatDateTime(m.date)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant={st.variant}>{st.label}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+            {recentMatches.length === 0 ? (
+              <p className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhuma partida registrada.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Confronto</TableHead>
+                    <TableHead>Campeonato</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentMatches.map((m) => {
+                    const st = STATUS_MAP[m.status] ?? STATUS_MAP.scheduled
+                    const hasScore = m.status === 'live' || m.status === 'finished'
+                    return (
+                      <TableRow key={m.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="font-medium">{teamLabel(m.homeTeamName, m.homeTeamAcronym)}</span>
+                            <span className="font-display text-xs font-bold text-muted-foreground">
+                              {hasScore ? `${m.homeScore} – ${m.awayScore}` : '—'}
+                            </span>
+                            <span className="font-medium">{teamLabel(m.awayTeamName, m.awayTeamAcronym)}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">{m.championshipName ?? '—'}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {m.scheduledAt ? formatDateTime(m.scheduledAt) : '—'}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant={st.variant}>{st.label}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
 
@@ -105,7 +205,7 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {PENDING_ACTIONS.map((action) => {
+            {pendingActions.map((action) => {
               const Icon = action.icon
               return (
                 <div
@@ -120,7 +220,9 @@ export default function DashboardPage() {
               )
             })}
             <div className="pt-2 text-center">
-              <p className="text-xs text-muted-foreground">Todas as ações pendentes exibidas</p>
+              <p className="text-xs text-muted-foreground">
+                {pendingActions.length === 0 ? 'Nenhuma ação pendente' : 'Todas as ações pendentes exibidas'}
+              </p>
             </div>
           </CardContent>
         </Card>

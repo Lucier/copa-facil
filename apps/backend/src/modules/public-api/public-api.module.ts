@@ -9,6 +9,7 @@ import { PublicPlayersController } from './presentation/controllers/public-playe
 import { PublicMatchesController } from './presentation/controllers/public-matches.controller'
 import { PublicStandingsController } from './presentation/controllers/public-standings.controller'
 import { PublicStatisticsController } from './presentation/controllers/public-statistics.controller'
+import { PublicArticlesController } from './presentation/controllers/public-articles.controller'
 
 @Module({
   imports: [DrizzleModule],
@@ -19,6 +20,7 @@ import { PublicStatisticsController } from './presentation/controllers/public-st
     PublicMatchesController,
     PublicStandingsController,
     PublicStatisticsController,
+    PublicArticlesController,
   ],
   providers: [
     { provide: API_KEY_REPOSITORY, useClass: DrizzleApiKeyRepository },

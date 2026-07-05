@@ -1,28 +1,51 @@
+'use client'
+import { useQuery } from '@tanstack/react-query'
 import { Plus, FileText, Image, Video, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Separator } from '@/components/ui/separator'
 import { formatDate } from '@/lib/utils'
+import api from '@/services/api'
+import { API } from '@/services/endpoints'
 
-const ARTICLES = [
-  { id: '1', title: 'Rápidos FC vence por 3×1 e avança às semifinais', slug: 'rapidos-fc-vence-semifinais', status: 'published', publishedAt: '2026-06-08', author: 'Admin' },
-  { id: '2', title: 'Tabela de jogos da Copa Cidade atualizada', slug: 'tabela-copa-cidade-atualizada', status: 'published', publishedAt: '2026-06-07', author: 'Admin' },
-  { id: '3', title: 'Inscrições abertas para o Liga Municipal 2026', slug: 'inscricoes-liga-municipal-2026', status: 'draft', publishedAt: null, author: 'Admin' },
-]
+interface Article {
+  id: string
+  title: string
+  slug: string
+  status: string
+  publishedAt: string | null
+}
 
-const GALLERIES = [
-  { id: '1', title: 'Regional 2024 — Rodada 8', assets: 24, createdAt: '2026-06-08' },
-  { id: '2', title: 'Copa Cidade — Gols Imperdíveis', assets: 12, createdAt: '2026-06-07' },
-]
+interface Gallery {
+  id: string
+  title: string
+  createdAt: string
+}
 
-const VIDEOS = [
-  { id: '1', title: 'Melhores momentos — QF Rápidos x Unidos', provider: 'youtube', views: 1204, createdAt: '2026-06-08' },
-  { id: '2', title: 'Gols da Rodada 8 — Regional 2024', provider: 'youtube', views: 876, createdAt: '2026-06-07' },
-]
+interface VideoItem {
+  id: string
+  title: string
+  provider: string
+  createdAt: string
+}
 
 export default function CmsPage() {
+  const { data: articles = [] } = useQuery<Article[]>({
+    queryKey: ['cms-articles'],
+    queryFn: async () => (await api.get(API.cms.articles)).data,
+  })
+
+  const { data: galleries = [] } = useQuery<Gallery[]>({
+    queryKey: ['cms-galleries'],
+    queryFn: async () => (await api.get(API.cms.galleries)).data,
+  })
+
+  const { data: videos = [] } = useQuery<VideoItem[]>({
+    queryKey: ['cms-videos'],
+    queryFn: async () => (await api.get(API.cms.videos)).data,
+  })
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -38,9 +61,9 @@ export default function CmsPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: 'Artigos Publicados', value: ARTICLES.filter((a) => a.status === 'published').length, icon: FileText },
-          { label: 'Galerias', value: GALLERIES.length, icon: Image },
-          { label: 'Vídeos', value: VIDEOS.length, icon: Video },
+          { label: 'Artigos Publicados', value: articles.filter((a) => a.status === 'published').length, icon: FileText },
+          { label: 'Galerias', value: galleries.length, icon: Image },
+          { label: 'Vídeos', value: videos.length, icon: Video },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="flex items-center gap-4 p-4">
@@ -62,38 +85,42 @@ export default function CmsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Título</TableHead>
-                <TableHead>Slug</TableHead>
-                <TableHead>Publicado em</TableHead>
-                <TableHead className="text-right">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ARTICLES.map((a) => (
-                <TableRow key={a.id} className="cursor-pointer">
-                  <TableCell className="font-medium text-sm">{a.title}</TableCell>
-                  <TableCell className="max-w-[180px] truncate text-xs text-muted-foreground font-mono">{a.slug}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
-                    {a.publishedAt ? formatDate(a.publishedAt) : '—'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {a.status === 'published' ? (
-                      <Badge variant="success" className="gap-1">
-                        <Eye className="size-3" />Publicado
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="gap-1">
-                        <EyeOff className="size-3" />Rascunho
-                      </Badge>
-                    )}
-                  </TableCell>
+          {articles.length === 0 ? (
+            <p className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhum artigo cadastrado.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Título</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Publicado em</TableHead>
+                  <TableHead className="text-right">Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {articles.map((a) => (
+                  <TableRow key={a.id} className="cursor-pointer">
+                    <TableCell className="font-medium text-sm">{a.title}</TableCell>
+                    <TableCell className="max-w-[180px] truncate text-xs text-muted-foreground font-mono">{a.slug}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {a.publishedAt ? formatDate(a.publishedAt) : '—'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {a.status === 'published' ? (
+                        <Badge variant="success" className="gap-1">
+                          <Eye className="size-3" />Publicado
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="gap-1">
+                          <EyeOff className="size-3" />Rascunho
+                        </Badge>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
@@ -109,17 +136,21 @@ export default function CmsPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {GALLERIES.map((g) => (
-              <div key={g.id} className="flex items-center justify-between rounded-lg border border-border p-3 hover:border-primary/30 cursor-pointer transition-colors">
-                <div className="flex items-center gap-3">
-                  <Image className="size-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">{g.title}</p>
-                    <p className="text-xs text-muted-foreground">{g.assets} arquivos · {formatDate(g.createdAt)}</p>
+            {galleries.length === 0 ? (
+              <p className="py-4 text-center text-xs text-muted-foreground">Nenhuma galeria cadastrada.</p>
+            ) : (
+              galleries.map((g) => (
+                <div key={g.id} className="flex items-center justify-between rounded-lg border border-border p-3 hover:border-primary/30 cursor-pointer transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Image className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{g.title}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(g.createdAt)}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -134,18 +165,22 @@ export default function CmsPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {VIDEOS.map((v) => (
-              <div key={v.id} className="flex items-center justify-between rounded-lg border border-border p-3 hover:border-primary/30 cursor-pointer transition-colors">
-                <div className="flex items-center gap-3">
-                  <Video className="size-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">{v.title}</p>
-                    <p className="text-xs text-muted-foreground">{v.views.toLocaleString('pt-BR')} views · {formatDate(v.createdAt)}</p>
+            {videos.length === 0 ? (
+              <p className="py-4 text-center text-xs text-muted-foreground">Nenhum vídeo cadastrado.</p>
+            ) : (
+              videos.map((v) => (
+                <div key={v.id} className="flex items-center justify-between rounded-lg border border-border p-3 hover:border-primary/30 cursor-pointer transition-colors">
+                  <div className="flex items-center gap-3">
+                    <Video className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">{v.title}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(v.createdAt)}</p>
+                    </div>
                   </div>
+                  <Badge variant="outline" className="text-[10px] capitalize">{v.provider}</Badge>
                 </div>
-                <Badge variant="outline" className="text-[10px] capitalize">{v.provider}</Badge>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
