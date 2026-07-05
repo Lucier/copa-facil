@@ -8,6 +8,8 @@
     "start": "node dist/main",
     "lint": "eslint src --ext .ts",
     "test": "vitest run",
+    "test:unit": "vitest run --exclude '**/*.integration.spec.ts' --exclude '**/tenant-isolation.spec.ts'",
+    "test:integration": "vitest run integration.spec tenant-isolation.spec",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",

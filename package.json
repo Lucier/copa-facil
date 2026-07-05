@@ -7,7 +7,12 @@
     "dev:frontend": "pnpm --filter frontend dev",
     "build": "pnpm --filter '*' build",
     "lint": "pnpm --filter '*' lint",
-    "test": "pnpm --filter '*' test"
+    "test": "pnpm --filter '*' test",
+    "test:unit": "pnpm --filter backend test:unit && pnpm --filter frontend test:unit",
+    "test:integration": "pnpm --filter backend test:integration",
+    "test:e2e": "pnpm --filter frontend test:e2e",
+    "test:coverage": "pnpm --filter backend test:coverage && pnpm --filter frontend test:coverage",
+    "test:all": "pnpm test:unit && pnpm test:integration && pnpm test:e2e"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

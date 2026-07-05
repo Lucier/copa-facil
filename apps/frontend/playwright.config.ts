@@ -27,7 +27,9 @@ export default defineConfig({
   webServer: {
     command: 'pnpm dev',
     url: `http://localhost:${PORT}`,
-    reuseExistingServer: false,
+    // Locally, reuse whatever is on :3000 (e.g. the docker frontend) — the tests
+    // mock the API, but the server must share the JWT_SECRET below for auth specs
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
       JWT_SECRET: 'dev-secret-change-me-in-production-32c',
