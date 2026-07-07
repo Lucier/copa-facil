@@ -6,7 +6,8 @@ import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { MatchStatus } from '../../../championships/domain/enums'
 import { MatchEntity } from '../../domain/entities/match.entity'
 import { MatchConcludedDomainEvent } from '../../domain/events/match-concluded.event'
-import { IMatchRepository, MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
+import { IMatchRepository} from '../../domain/repositories/i-match.repository'
+import { MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
 import { ConcludeMatchDto } from '../dtos/conclude-match.dto'
 
 @Injectable()

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, type MockInstance } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { describe, it, expect, vi, beforeEach, MockInstance } from 'vitest'
+import { Test, TestingModule } from '@nestjs/testing'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { GenerateFixturesUseCase } from '../application/use-cases/generate-fixtures.use-case'
 import { CHAMPIONSHIP_REPOSITORY } from '../domain/repositories/i-championship.repository'

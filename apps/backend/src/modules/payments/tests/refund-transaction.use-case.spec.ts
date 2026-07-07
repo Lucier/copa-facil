@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { RefundTransactionUseCase } from '../application/use-cases/refund-transaction.use-case'
 import { TRANSACTION_REPOSITORY } from '../domain/repositories/i-transaction.repository'
 import { PAYMENT_GATEWAY } from '../domain/gateways/i-payment-gateway'
 import { AUDIT_REPOSITORY } from '../../auth/domain/repositories/i-audit.repository'
 import { TransactionStatus } from '../domain/enums'
-import { NotFoundError, AppError } from '../../../shared/errors'
+import { AppError } from '../../../shared/errors'
+import { NotFoundError } from '../../../shared/errors'
 
 const PAID_TX = { id: 'tx-1', status: TransactionStatus.PAID, gatewayTransactionId: 'gw-1' }
 const PENDING_TX = { id: 'tx-2', status: TransactionStatus.PENDING, gatewayTransactionId: 'gw-2' }

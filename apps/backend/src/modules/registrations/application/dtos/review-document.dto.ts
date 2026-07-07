@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsOptional, IsString, ValidateIf } from 'class-validator'
+import { IsEnum, IsString, ValidateIf } from 'class-validator'
 import { DocumentStatus } from '../../domain/enums'
 
 export class ReviewDocumentDto {

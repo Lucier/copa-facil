@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { PlayerStatisticEntity } from '../../domain/entities/player-statistic.entity'
 import {
-  IStatisticRepository,
+  IStatisticRepository} from '../../domain/repositories/i-statistic.repository'
+import {
   STATISTIC_REPOSITORY,
 } from '../../domain/repositories/i-statistic.repository'
 

@@ -1,13 +1,13 @@
 import postgres from 'postgres'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { TenantContext } from '../../infrastructure/tenant/tenant-context'
 import { DrizzleService } from '../drizzle.service'
 import { MigrationRunnerService } from '../migration-runner.service'
 import { TenantRegistryService } from '../tenant-registry.service'
 
 const DATABASE_URL =
-  process.env.DATABASE_URL ?? 'postgresql://copafacil:copafacil@localhost:5434/copafacil'
+  process.env.DATABASE_URL ?? 'postgresql://cerradosesportes:cerradosesportes@localhost:5434/cerradosesportes'
 
 const TENANT_A = 'test_iso_tenant_a'
 const TENANT_B = 'test_iso_tenant_b'

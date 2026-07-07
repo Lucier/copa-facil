@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { Test } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { INestApplication} from '@nestjs/common'
+import { ValidationPipe } from '@nestjs/common'
 import request from 'supertest'
 import { SumulaController } from '../presentation/controllers/sumula.controller'
 import { OpenSumulaUseCase } from '../application/use-cases/open-sumula.use-case'

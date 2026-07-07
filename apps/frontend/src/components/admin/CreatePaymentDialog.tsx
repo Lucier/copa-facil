@@ -138,7 +138,6 @@ export function CreatePaymentDialog({
                   <div className="flex flex-col items-center gap-3">
                     <p className="text-sm font-medium text-muted-foreground">Escaneie o QR Code PIX</p>
                     {String(result.gatewayPayload.qrCode).startsWith('data:image/') ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={String(result.gatewayPayload.qrCode)}
                         alt="QR Code PIX"

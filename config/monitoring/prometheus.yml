@@ -4,7 +4,7 @@ global:
   scrape_timeout:      10s
   external_labels:
     environment: production
-    app:         copa-facil
+    app:         cerrados-esportes
 
 alerting:
   alertmanagers: []

@@ -8,7 +8,8 @@ import {
 import { JwtPayload } from '../../../auth/application/jwt-payload.interface'
 import { UserRole } from '../../../auth/domain/roles.enum'
 import {
-  IMemberMgmtRepository,
+  IMemberMgmtRepository} from '../../domain/repositories/i-member-mgmt.repository'
+import {
   MEMBER_MGMT_REPOSITORY,
 } from '../../domain/repositories/i-member-mgmt.repository'
 import { UpdateMemberRoleDto } from '../dtos/update-member-role.dto'

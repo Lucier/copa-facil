@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { AppError } from '../../../../shared/errors/app-error'
 import { NotFoundError } from '../../../../shared/errors'
-import { ISumulaRepository, SUMULA_REPOSITORY } from '../../domain/repositories/i-sumula.repository'
+import { ISumulaRepository} from '../../domain/repositories/i-sumula.repository'
+import { SUMULA_REPOSITORY } from '../../domain/repositories/i-sumula.repository'
 import { SumulaEntity } from '../../domain/entities/sumula.entity'
 import { UpdateObservationsDto } from '../dtos/update-observations.dto'
 

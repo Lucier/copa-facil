@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { AutoSuspensionHandler } from '../application/handlers/auto-suspension.handler'
 import { MATCH_EVENT_REPOSITORY } from '../../match-engine/domain/repositories/i-match-event.repository'
 import { SUSPENSION_REPOSITORY } from '../domain/repositories/i-suspension.repository'

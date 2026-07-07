@@ -22,7 +22,7 @@ processors:
   resource:
     attributes:
       - key: service.name
-        value: copa-facil-backend
+        value: cerrados-esportes-backend
         action: upsert
       - key: deployment.environment
         from_attribute: DEPLOYMENT_ENV
@@ -40,7 +40,7 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
     const_labels:
-      app: copa-facil
+      app: cerrados-esportes
     send_timestamps: true
     metric_expiration: 5m
     enable_open_metrics: true

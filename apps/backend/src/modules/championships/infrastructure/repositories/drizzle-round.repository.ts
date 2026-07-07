@@ -38,7 +38,7 @@ export class DrizzleRoundRepository implements IRoundRepository {
   async saveFixtures(
     championshipId: string,
     roundInputs: RoundInput[],
-    groupMap?: Map<number, string>,
+    _groupMap?: Map<number, string>,
   ): Promise<RoundWithMatches[]> {
     return this.drizzle.runInTenantContext(async (tx) => {
       const result: RoundWithMatches[] = []

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { JudgeEntity } from '../../domain/entities/judge.entity'
-import { IJudgeRepository, JUDGE_REPOSITORY } from '../../domain/repositories/i-judge.repository'
+import { IJudgeRepository} from '../../domain/repositories/i-judge.repository'
+import { JUDGE_REPOSITORY } from '../../domain/repositories/i-judge.repository'
 import { CreateJudgeDto } from '../dtos/create-judge.dto'
 
 @Injectable()

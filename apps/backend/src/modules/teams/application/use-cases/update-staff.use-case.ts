@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { StaffMemberEntity } from '../../domain/entities/staff-member.entity'
-import { IStaffRepository, STAFF_REPOSITORY } from '../../domain/repositories/i-staff.repository'
+import { IStaffRepository} from '../../domain/repositories/i-staff.repository'
+import { STAFF_REPOSITORY } from '../../domain/repositories/i-staff.repository'
 import { UpdateStaffDto } from '../dtos/update-staff.dto'
 
 @Injectable()

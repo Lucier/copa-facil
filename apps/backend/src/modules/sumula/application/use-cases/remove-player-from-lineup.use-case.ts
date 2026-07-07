@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { AppError } from '../../../../shared/errors/app-error'
 import { NotFoundError } from '../../../../shared/errors'
-import { ISumulaRepository, SUMULA_REPOSITORY } from '../../domain/repositories/i-sumula.repository'
-import { ILineupRepository, LINEUP_REPOSITORY } from '../../domain/repositories/i-lineup.repository'
+import { ISumulaRepository} from '../../domain/repositories/i-sumula.repository'
+import { SUMULA_REPOSITORY } from '../../domain/repositories/i-sumula.repository'
+import { ILineupRepository} from '../../domain/repositories/i-lineup.repository'
+import { LINEUP_REPOSITORY } from '../../domain/repositories/i-lineup.repository'
 
 @Injectable()
 export class RemovePlayerFromLineupUseCase {

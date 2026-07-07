@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { DrizzleService } from '../../../../database/drizzle.service'
-import { API_KEY_REPOSITORY, ApiKeyLookup, IApiKeyRepository } from '../../domain/repositories/i-api-key.repository'
+import { ApiKeyLookup, IApiKeyRepository } from '../../domain/repositories/i-api-key.repository'
+import { API_KEY_REPOSITORY } from '../../domain/repositories/i-api-key.repository'
 
 interface ApiKeyRow {
   id: string

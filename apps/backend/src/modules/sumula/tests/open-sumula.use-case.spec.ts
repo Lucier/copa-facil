@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { OpenSumulaUseCase } from '../application/use-cases/open-sumula.use-case'
 import { MATCH_REPOSITORY } from '../../match-engine/domain/repositories/i-match.repository'
 import { SUMULA_REPOSITORY } from '../domain/repositories/i-sumula.repository'
@@ -7,7 +7,7 @@ import { MatchEntity } from '../../match-engine/domain/entities/match.entity'
 import { SumulaEntity } from '../domain/entities/sumula.entity'
 import { SumulaStatus } from '../domain/enums'
 import { MatchStatus } from '../../championships/domain/enums'
-import { NotFoundError, AppError } from '../../../shared/errors'
+import { NotFoundError } from '../../../shared/errors'
 
 const MOCK_MATCH = new MatchEntity('m1', 'c1', 'r1', 'h', 'a', null, null, MatchStatus.SCHEDULED, 0, 0, null, null, null, new Date())
 const MOCK_SUMULA = new SumulaEntity('s1', 'm1', 'c1', 'Estádio X', null, SumulaStatus.ABERTA, null, null, null, new Date(), new Date())

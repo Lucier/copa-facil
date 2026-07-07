@@ -3,7 +3,8 @@ import { AppError, NotFoundError } from '../../../../shared/errors'
 import { RegistrationRequestEntity } from '../../domain/entities/registration-request.entity'
 import { RegistrationStatus } from '../../domain/enums'
 import {
-  IRegistrationRepository,
+  IRegistrationRepository} from '../../domain/repositories/i-registration.repository'
+import {
   REGISTRATION_REPOSITORY,
 } from '../../domain/repositories/i-registration.repository'
 import { ReviewTeamDto } from '../dtos/review-team.dto'

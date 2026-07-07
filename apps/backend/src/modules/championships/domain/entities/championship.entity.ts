@@ -1,5 +1,6 @@
 import { BaseEntity } from '../../../../shared/domain/base-entity'
-import { ChampionshipStatus, TournamentFormat } from '../enums'
+import { TournamentFormat } from '../enums'
+import { ChampionshipStatus } from '../enums'
 
 export class ChampionshipEntity extends BaseEntity {
   constructor(

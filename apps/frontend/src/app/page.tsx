@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import {
   Trophy, Zap, Users, BarChart3, CalendarDays, Shield,
-  CheckCircle2, ChevronRight, ArrowRight, Star, Menu,
+  CheckCircle2, ChevronRight, ArrowRight, Star,
 } from 'lucide-react'
+import { PricingSection } from '@/components/landing/pricing-section'
 
 export const metadata: Metadata = {
-  title: 'Copa Fácil — Gestão de Campeonatos Esportivos',
+  title: 'Cerrados Esportes — Gestão de Campeonatos Esportivos',
   description: 'A plataforma mais simples para gerenciar campeonatos de futebol e futsal. Tabelas, partidas, estatísticas e muito mais.',
 }
 
@@ -54,39 +55,6 @@ const CHECKLIST = [
   'Interface responsiva para celular',
 ]
 
-const PLANS = [
-  {
-    name: 'Starter',
-    price: 'Grátis',
-    period: '',
-    description: 'Para testar e conhecer a plataforma.',
-    features: ['1 campeonato ativo', 'Até 8 times', '30 jogadores', 'Portal público'],
-    cta: 'Começar grátis',
-    href: '/register',
-    highlight: false,
-  },
-  {
-    name: 'Profissional',
-    price: 'R$ 49',
-    period: '/mês',
-    description: 'Para organizadores sérios e torneios recorrentes.',
-    features: ['Campeonatos ilimitados', 'Times ilimitados', 'Jogadores ilimitados', 'Estatísticas avançadas', 'Suporte prioritário'],
-    cta: 'Assinar agora',
-    href: '/register',
-    highlight: true,
-  },
-  {
-    name: 'Liga',
-    price: 'R$ 99',
-    period: '/mês',
-    description: 'Para ligas profissionais e federações.',
-    features: ['Tudo do Profissional', 'Múltiplas organizações', 'API de integração', 'Relatórios exportáveis', 'Onboarding dedicado'],
-    cta: 'Falar com vendas',
-    href: '/register',
-    highlight: false,
-  },
-]
-
 const TESTIMONIALS = [
   {
     name: 'Carlos Mendes',
@@ -118,7 +86,7 @@ export default function LandingPage() {
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
               <Trophy className="size-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-lg font-bold tracking-tight">Copa Fácil</span>
+            <span className="font-display text-lg font-bold tracking-tight">Cerrados Esportes</span>
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -275,64 +243,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Plans ── */}
-      <section id="plans" className="border-b border-border/40 py-20">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="mb-12 text-center">
-            <h2 className="font-display text-3xl font-bold tracking-tight">Planos para todo tipo de campeonato</h2>
-            <p className="mt-3 text-muted-foreground">Comece grátis e cresça conforme sua liga evolui.</p>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            {PLANS.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative flex flex-col rounded-2xl border p-6 ${
-                  plan.highlight
-                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10'
-                    : 'border-border bg-card'
-                }`}
-              >
-                {plan.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-primary-foreground">
-                      MAIS POPULAR
-                    </span>
-                  </div>
-                )}
-
-                <div className="mb-4">
-                  <p className="font-display text-sm font-semibold uppercase tracking-widest text-muted-foreground">{plan.name}</p>
-                  <div className="mt-2 flex items-end gap-1">
-                    <span className="font-display text-4xl font-bold">{plan.price}</span>
-                    {plan.period && <span className="mb-1 text-sm text-muted-foreground">{plan.period}</span>}
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
-                </div>
-
-                <ul className="mb-6 flex-1 space-y-2">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm">
-                      <CheckCircle2 className="size-4 shrink-0 text-primary" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href={plan.href}
-                  className={`inline-flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
-                    plan.highlight
-                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:opacity-90'
-                      : 'border border-border bg-background hover:bg-accent/50'
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* ── Testimonials ── */}
       <section className="border-b border-border/40 py-20">
@@ -406,7 +317,7 @@ export default function LandingPage() {
               <div className="flex size-7 items-center justify-center rounded-md bg-primary">
                 <Trophy className="size-3.5 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold">Copa Fácil</span>
+              <span className="font-display font-bold">Cerrados Esportes</span>
             </Link>
 
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
@@ -417,7 +328,7 @@ export default function LandingPage() {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Copa Fácil. Todos os direitos reservados.
+              © {new Date().getFullYear()} Cerrados Esportes. Todos os direitos reservados.
             </p>
           </div>
         </div>

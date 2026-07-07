@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { MediaAssetEntity } from '../../domain/entities/media-asset.entity'
-import { GALLERY_REPOSITORY, IGalleryRepository } from '../../domain/repositories/i-gallery.repository'
+import { IGalleryRepository } from '../../domain/repositories/i-gallery.repository'
+import { GALLERY_REPOSITORY } from '../../domain/repositories/i-gallery.repository'
 import { AddMediaAssetDto } from '../dtos/add-media-asset.dto'
 
 @Injectable()

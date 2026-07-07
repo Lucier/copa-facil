@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Copa Fácil",
-    "slug": "copa-facil",
+    "name": "Cerrados Esportes",
+    "slug": "cerrados-esportes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "copafacil",
+    "scheme": "cerradosesportes",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -14,13 +14,13 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.copafacil.mobile"
+      "bundleIdentifier": "app.cerradosesportes.mobile"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#060a13"
       },
-      "package": "app.copafacil.mobile"
+      "package": "app.cerradosesportes.mobile"
     },
     "web": {
       "bundler": "metro",

@@ -171,7 +171,6 @@ export default async function PublicHomePage({ params }: Props) {
             <div className="grid gap-3 sm:grid-cols-3">
               {upcomingMatches.map((m) => {
                 const champ = champMap[m.championship_id]
-                const time = m.scheduled_at ? m.scheduled_at.split('T')[1]?.slice(0, 5) : null
                 return (
                   <Link key={m.id} href={`/${tenant}/matches/${m.id}`}>
                     <Card className="group cursor-pointer transition-all hover:border-primary/30 hover:shadow-md hover:shadow-primary/5">

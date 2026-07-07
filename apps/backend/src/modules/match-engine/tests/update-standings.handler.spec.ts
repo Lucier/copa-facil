@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { UpdateStandingsHandler } from '../application/handlers/update-standings.handler'
 import { MATCH_REPOSITORY } from '../domain/repositories/i-match.repository'
 import { MATCH_EVENT_REPOSITORY } from '../domain/repositories/i-match-event.repository'

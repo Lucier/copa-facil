@@ -1,6 +1,7 @@
 import {
   CanActivate,
-  ExecutionContext,
+  ExecutionContext} from '@nestjs/common'
+import {
   HttpException,
   HttpStatus,
   Inject,
@@ -9,10 +10,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { createHash } from 'crypto'
-import type { Redis } from 'ioredis'
+import { Redis } from 'ioredis'
 import type { Request } from 'express'
 import { REDIS_CLIENT } from '../../../../infrastructure/redis/redis.constants'
-import { API_KEY_REPOSITORY, IApiKeyRepository } from '../../domain/repositories/i-api-key.repository'
+import { IApiKeyRepository } from '../../domain/repositories/i-api-key.repository'
+import { API_KEY_REPOSITORY } from '../../domain/repositories/i-api-key.repository'
 
 const RATE_LIMIT = 60
 const WINDOW_SECONDS = 60

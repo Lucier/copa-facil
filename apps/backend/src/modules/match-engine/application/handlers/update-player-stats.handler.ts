@@ -3,13 +3,15 @@ import { OnEvent } from '@nestjs/event-emitter'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { MatchEventRegisteredDomainEvent } from '../../domain/events/match-event-registered.event'
 import {
-  IMatchEventRepository,
+  IMatchEventRepository} from '../../domain/repositories/i-match-event.repository'
+import {
   MATCH_EVENT_REPOSITORY,
 } from '../../domain/repositories/i-match-event.repository'
 import {
   IStatisticRepository,
-  STATISTIC_REPOSITORY,
-  UpsertPlayerStatisticData,
+  UpsertPlayerStatisticData} from '../../domain/repositories/i-statistic.repository'
+import {
+  STATISTIC_REPOSITORY
 } from '../../domain/repositories/i-statistic.repository'
 import { CardColor, GoalType, MatchEventType } from '../../domain/enums'
 

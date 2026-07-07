@@ -8,7 +8,8 @@ import {
   IPlayerRepository,
   UpdatePlayerData,
 } from '../../domain/repositories/i-player.repository'
-import { PlayerHistoryRow, PlayerMapper, PlayerRow } from '../../application/mappers/player.mapper'
+import { PlayerHistoryRow, PlayerRow } from '../../application/mappers/player.mapper'
+import { PlayerMapper } from '../../application/mappers/player.mapper'
 
 @Injectable()
 export class DrizzlePlayerRepository implements IPlayerRepository {

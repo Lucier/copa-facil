@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'next/navigation'
 import {
   Printer, CreditCard, Users, CheckSquare, Square,
-  Loader2, UserX, ChevronDown, X, Shirt,
+  Loader2, UserX, X, Shirt,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -84,7 +84,7 @@ function PlayerIdCard({
         background: '#ffffff',
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: '\'DM Sans\', sans-serif',
         flexShrink: 0,
       }}
     >
@@ -251,7 +251,7 @@ function PlayerIdCard({
               <span
                 style={{ fontSize: '9px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px' }}
               >
-                Copa Fácil
+                Cerrados Esportes
               </span>
             </div>
           </div>
@@ -324,7 +324,7 @@ function buildCardHTML(player: Player, team: Team, orgName: string): string {
             <span class="org">${orgName}</span>
             <div class="brand">
               <div class="brand-dot" style="background:${primary}"></div>
-              <span>COPA FÁCIL</span>
+              <span>CERRADOS ESPORTES</span>
             </div>
           </div>
         </div>
@@ -391,7 +391,7 @@ function openPrintWindow(players: Player[], team: Team, orgName: string) {
     </div>
   </div>
   <div class="grid">${cardsHTML}</div>
-  <script>window.addEventListener('load', () => { window.print() })<\/script>
+  <script>window.addEventListener('load', () => { window.print() })</script>
 </body>
 </html>`)
   win.document.close()
@@ -489,7 +489,8 @@ export default function IdCardsPage() {
   function togglePlayer(id: string) {
     setSelectedIds((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
       return next
     })
   }

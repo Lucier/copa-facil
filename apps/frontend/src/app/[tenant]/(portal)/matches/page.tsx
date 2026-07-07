@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { CalendarDays, Clock } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { formatDateTime } from '@/lib/utils'
 import { publicFetch, type Paginated } from '@/lib/server-api'
 
 export const dynamic = 'force-dynamic'

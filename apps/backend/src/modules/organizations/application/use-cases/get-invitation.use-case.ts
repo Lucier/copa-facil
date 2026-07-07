@@ -1,7 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { InvitationEntity } from '../../domain/entities/invitation.entity'
 import {
-  IInvitationRepository,
+  IInvitationRepository} from '../../domain/repositories/i-invitation.repository'
+import {
   INVITATION_REPOSITORY,
 } from '../../domain/repositories/i-invitation.repository'
 

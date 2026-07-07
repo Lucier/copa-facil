@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { LogoutUseCase } from '../application/use-cases/logout.use-case'
 import { RedisTokenStoreService } from '../infrastructure/services/redis-token-store.service'
 import { AUDIT_REPOSITORY } from '../domain/repositories/i-audit.repository'
-import type { JwtPayload } from '../application/jwt-payload.interface'
+import { JwtPayload } from '../application/jwt-payload.interface'
 
 describe('LogoutUseCase', () => {
   let useCase: LogoutUseCase

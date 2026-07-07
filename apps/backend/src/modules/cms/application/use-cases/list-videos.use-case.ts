@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { VideoEntity } from '../../domain/entities/video.entity'
-import { VIDEO_REPOSITORY, IVideoRepository } from '../../domain/repositories/i-video.repository'
+import { IVideoRepository } from '../../domain/repositories/i-video.repository'
+import { VIDEO_REPOSITORY } from '../../domain/repositories/i-video.repository'
 
 @Injectable()
 export class ListVideosUseCase {

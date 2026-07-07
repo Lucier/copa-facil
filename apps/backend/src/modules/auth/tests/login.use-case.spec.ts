@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, type MockInstance } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { describe, it, expect, vi, beforeEach, MockInstance } from 'vitest'
+import { Test, TestingModule } from '@nestjs/testing'
 import { UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'

@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IsArray, IsString, IsUUID, ArrayMinSize, IsOptional, ArrayMaxSize } from 'class-validator'
+import { IsArray, IsString, IsUUID, ArrayMinSize, ArrayMaxSize } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { AppError, NotFoundError } from '../../../../shared/errors'
 import { PollStatus } from '../../domain/enums'
 import { PollEntity, PollOptionEntity } from '../../domain/entities/poll.entity'
-import { IPollRepository, POLL_REPOSITORY } from '../../domain/repositories/i-poll.repository'
+import { IPollRepository} from '../../domain/repositories/i-poll.repository'
+import { POLL_REPOSITORY } from '../../domain/repositories/i-poll.repository'
 
 /* ─── DTOs ─── */
 

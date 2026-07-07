@@ -3,11 +3,13 @@ import { AppError } from '../../../../shared/errors'
 import { TransactionEntity } from '../../domain/entities/transaction.entity'
 import { PaymentMethodType, TransactionStatus } from '../../domain/enums'
 import {
-  IPaymentGateway,
+  IPaymentGateway} from '../../domain/gateways/i-payment-gateway'
+import {
   PAYMENT_GATEWAY,
 } from '../../domain/gateways/i-payment-gateway'
 import {
-  ITransactionRepository,
+  ITransactionRepository} from '../../domain/repositories/i-transaction.repository'
+import {
   TRANSACTION_REPOSITORY,
 } from '../../domain/repositories/i-transaction.repository'
 import { CreatePaymentOrderDto } from '../dtos/create-payment-order.dto'

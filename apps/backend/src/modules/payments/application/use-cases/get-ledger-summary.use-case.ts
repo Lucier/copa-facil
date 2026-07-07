@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
   ILedgerRepository,
-  LEDGER_REPOSITORY,
-  LedgerSummary,
+  LedgerSummary} from '../../domain/repositories/i-ledger.repository'
+import {
+  LEDGER_REPOSITORY
 } from '../../domain/repositories/i-ledger.repository'
 
 @Injectable()

@@ -1,17 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { AppError, NotFoundError } from '../../../../shared/errors'
 import {
-  AUDIT_REPOSITORY,
-  IAuditRepository,
+  IAuditRepository} from '../../../auth/domain/repositories/i-audit.repository'
+import {
+  AUDIT_REPOSITORY
 } from '../../../auth/domain/repositories/i-audit.repository'
 import { TransactionEntity } from '../../domain/entities/transaction.entity'
 import { TransactionStatus } from '../../domain/enums'
 import {
-  IPaymentGateway,
+  IPaymentGateway} from '../../domain/gateways/i-payment-gateway'
+import {
   PAYMENT_GATEWAY,
 } from '../../domain/gateways/i-payment-gateway'
 import {
-  ITransactionRepository,
+  ITransactionRepository} from '../../domain/repositories/i-transaction.repository'
+import {
   TRANSACTION_REPOSITORY,
 } from '../../domain/repositories/i-transaction.repository'
 import { RefundTransactionDto } from '../dtos/refund-transaction.dto'

@@ -1,8 +1,7 @@
 'use client'
 import * as React from 'react'
 import { usePathname, useParams } from 'next/navigation'
-import { ChevronRight, LogOut, User, Moon, Sun } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { ChevronRight, LogOut, User } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -19,7 +18,6 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { getInitials } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
-import { useRouter } from 'next/navigation'
 
 const SEGMENT_LABELS: Record<string, string> = {
   admin: 'Admin',
@@ -78,12 +76,8 @@ export function AdminHeader() {
   )
 
   const breadcrumbs = useBreadcrumbs(championshipNames)
-  const { theme, setTheme } = useTheme()
   const user = useAuthStore((s) => s.user)
   const clearAuth = useAuthStore((s) => s.clearAuth)
-  const router = useRouter()
-  const params = useParams()
-  const tenant = params.tenant as string
 
   async function handleLogout() {
     try {
@@ -120,16 +114,6 @@ export function AdminHeader() {
 
       {/* Actions */}
       <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          aria-label="Toggle theme"
-        >
-          <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        </Button>
-
         <NotificationBell />
 
         <DropdownMenu>

@@ -1,4 +1,4 @@
-import type { Migration } from '../types'
+import { Migration } from '../types'
 
 // Runs with search_path set to the tenant schema — table names are unqualified.
 // IF NOT EXISTS is kept intentionally: tenants provisioned before the

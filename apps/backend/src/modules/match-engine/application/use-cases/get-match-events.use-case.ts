@@ -2,10 +2,12 @@ import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { MatchEventEntity } from '../../domain/entities/match-event.entity'
 import {
-  IMatchEventRepository,
+  IMatchEventRepository} from '../../domain/repositories/i-match-event.repository'
+import {
   MATCH_EVENT_REPOSITORY,
 } from '../../domain/repositories/i-match-event.repository'
-import { IMatchRepository, MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
+import { IMatchRepository} from '../../domain/repositories/i-match.repository'
+import { MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
 
 @Injectable()
 export class GetMatchEventsUseCase {

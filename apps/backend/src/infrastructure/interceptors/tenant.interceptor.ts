@@ -1,8 +1,8 @@
-import { Injectable, type NestInterceptor, type ExecutionContext, type CallHandler } from '@nestjs/common'
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import type { Request } from 'express'
 import { TenantContext } from '../tenant/tenant-context'
-import type { JwtPayload } from '../../modules/auth/application/jwt-payload.interface'
+import { JwtPayload } from '../../modules/auth/application/jwt-payload.interface'
 
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {

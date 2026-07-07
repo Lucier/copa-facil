@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import {
   IMemberMgmtRepository,
-  MEMBER_MGMT_REPOSITORY,
-  MemberWithUser,
+  MemberWithUser} from '../../domain/repositories/i-member-mgmt.repository'
+import {
+  MEMBER_MGMT_REPOSITORY
 } from '../../domain/repositories/i-member-mgmt.repository'
 
 @Injectable()

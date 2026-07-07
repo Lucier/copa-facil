@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { RegisterMatchEventUseCase } from '../application/use-cases/register-match-event.use-case'
 import { MATCH_REPOSITORY } from '../domain/repositories/i-match.repository'
@@ -7,7 +7,7 @@ import { MATCH_EVENT_REPOSITORY } from '../domain/repositories/i-match-event.rep
 import { MatchEventType, GoalType, CardColor } from '../domain/enums'
 import { MatchStatus } from '../../championships/domain/enums'
 import { MatchEntity } from '../domain/entities/match.entity'
-import { NotFoundError, AppError } from '../../../shared/errors'
+import { NotFoundError } from '../../../shared/errors'
 
 function makeMatch(homeScore = 0, awayScore = 0, status = MatchStatus.LIVE): MatchEntity {
   return new MatchEntity('m1', 'c1', 'r1', 'home-team', 'away-team', null, null, status, homeScore, awayScore, null, null, null, new Date())

@@ -1,4 +1,5 @@
-import { SuspensionSource, SuspensionStatus } from '../enums'
+import { SuspensionSource} from '../enums'
+import { SuspensionStatus } from '../enums'
 
 export class SuspensionEntity {
   constructor(

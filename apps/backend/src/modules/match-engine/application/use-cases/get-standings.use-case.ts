@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { StandingEntity } from '../../domain/entities/standing.entity'
-import { IStandingRepository, STANDING_REPOSITORY } from '../../domain/repositories/i-standing.repository'
+import { IStandingRepository} from '../../domain/repositories/i-standing.repository'
+import { STANDING_REPOSITORY } from '../../domain/repositories/i-standing.repository'
 
 @Injectable()
 export class GetStandingsUseCase {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { BadRequestException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ResetPasswordUseCase } from '../application/use-cases/reset-password.use-case'

@@ -10,7 +10,7 @@ concurrency:
 
 env:
   REGISTRY:      ghcr.io
-  IMAGE_PREFIX:  ${{ github.repository_owner }}/copa-facil
+  IMAGE_PREFIX:  ${{ github.repository_owner }}/cerrados-esportes
 
 jobs:
   build-backend:
@@ -105,7 +105,7 @@ jobs:
     needs: [build-backend, build-frontend]
     environment:
       name: production
-      url: https://copa-facil.com.br
+      url: https://cerrados-esportes.com.br
     steps:
       - uses: actions/checkout@v4
 
@@ -123,7 +123,7 @@ jobs:
           envs:     IMAGE_TAG,REGISTRY,COMMIT_SHA
           script: |
             set -e
-            cd /opt/copa-facil
+            cd /opt/cerrados-esportes
 
             git fetch origin main
             git reset --hard origin/main

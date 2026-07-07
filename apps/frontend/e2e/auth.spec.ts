@@ -9,8 +9,8 @@ test.describe('Login Page', () => {
     await page.goto(`/${TENANT}/login`)
   })
 
-  test('renders login form with Copa Fácil branding', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Copa Fácil' })).toBeVisible()
+  test('renders login form with Cerrados Esportes branding', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Cerrados Esportes' })).toBeVisible()
     await expect(page.getByText(TENANT)).toBeVisible()
     await expect(page.getByLabel('E-mail')).toBeVisible()
     await expect(page.getByLabel('Senha')).toBeVisible()
@@ -75,9 +75,9 @@ test.describe('Register Page', () => {
     await page.goto('/register')
   })
 
-  // "Copa Fácil" is a <span> in a logo link, not a <h1>, on the register page
+  // "Cerrados Esportes" is a <span> in a logo link, not a <h1>, on the register page
   test('renders step 1 with user info form', async ({ page }) => {
-    await expect(page.getByText('Copa Fácil')).toBeVisible()
+    await expect(page.getByText('Cerrados Esportes')).toBeVisible()
     await expect(page.getByLabel('Nome completo')).toBeVisible()
     await expect(page.getByLabel('E-mail')).toBeVisible()
     await expect(page.getByLabel('Senha', { exact: true })).toBeVisible()

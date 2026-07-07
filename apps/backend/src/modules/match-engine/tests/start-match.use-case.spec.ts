@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { StartMatchUseCase } from '../application/use-cases/start-match.use-case'
 import { MATCH_REPOSITORY } from '../domain/repositories/i-match.repository'
 import { MatchEntity } from '../domain/entities/match.entity'
 import { MatchStatus } from '../../championships/domain/enums'
-import { NotFoundError, AppError } from '../../../shared/errors'
+import { NotFoundError } from '../../../shared/errors'
 
 function makeMatch(status: MatchStatus): MatchEntity {
   return new MatchEntity('m1', 'c1', 'r1', 'home', 'away', null, null, status, 0, 0, null, null, null, new Date())

@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { AppError } from '../../../../shared/errors/app-error'
 import { NotFoundError } from '../../../../shared/errors'
-import { IMatchRepository, MATCH_REPOSITORY } from '../../../match-engine/domain/repositories/i-match.repository'
-import { ISumulaRepository, SUMULA_REPOSITORY } from '../../domain/repositories/i-sumula.repository'
+import { IMatchRepository} from '../../../match-engine/domain/repositories/i-match.repository'
+import { MATCH_REPOSITORY } from '../../../match-engine/domain/repositories/i-match.repository'
+import { ISumulaRepository} from '../../domain/repositories/i-sumula.repository'
+import { SUMULA_REPOSITORY } from '../../domain/repositories/i-sumula.repository'
 import { SumulaEntity } from '../../domain/entities/sumula.entity'
 import { OpenSumulaDto } from '../dtos/open-sumula.dto'
 

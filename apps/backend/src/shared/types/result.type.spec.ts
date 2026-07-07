@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Err, Ok, err, ok, type Result } from './result.type'
+import { Err, Ok, err, ok, Result } from './result.type'
 
 describe('Result type', () => {
   it('ok() wraps a value with ok=true', () => {

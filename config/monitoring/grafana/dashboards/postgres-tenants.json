@@ -101,7 +101,7 @@
       "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
       "title": "Conexões por Estado",
       "type": "timeseries",
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (state) (pg_stat_activity_count{datname=\"copafacil\"})", "legendFormat": "{{state}}", "refId": "A" }]
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum by (state) (pg_stat_activity_count{datname=\"cerradosesportes\"})", "legendFormat": "{{state}}", "refId": "A" }]
     },
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
@@ -117,8 +117,8 @@
       "title": "Transações por Segundo",
       "type": "timeseries",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_xact_commit{datname=\"copafacil\"}[5m]))", "legendFormat": "commits/s", "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_xact_rollback{datname=\"copafacil\"}[5m]))", "legendFormat": "rollbacks/s", "refId": "B" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_xact_commit{datname=\"cerradosesportes\"}[5m]))", "legendFormat": "commits/s", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_xact_rollback{datname=\"cerradosesportes\"}[5m]))", "legendFormat": "rollbacks/s", "refId": "B" }
       ]
     },
     {
@@ -140,10 +140,10 @@
       "title": "Operações em Tuplas/s",
       "type": "timeseries",
       "targets": [
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_fetched{datname=\"copafacil\"}[5m]))", "legendFormat": "fetched", "refId": "A" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_inserted{datname=\"copafacil\"}[5m]))", "legendFormat": "inserted", "refId": "B" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_updated{datname=\"copafacil\"}[5m]))", "legendFormat": "updated", "refId": "C" },
-        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_deleted{datname=\"copafacil\"}[5m]))", "legendFormat": "deleted", "refId": "D" }
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_fetched{datname=\"cerradosesportes\"}[5m]))", "legendFormat": "fetched", "refId": "A" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_inserted{datname=\"cerradosesportes\"}[5m]))", "legendFormat": "inserted", "refId": "B" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_updated{datname=\"cerradosesportes\"}[5m]))", "legendFormat": "updated", "refId": "C" },
+        { "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(rate(pg_stat_database_tup_deleted{datname=\"cerradosesportes\"}[5m]))", "legendFormat": "deleted", "refId": "D" }
       ]
     },
     {
@@ -163,17 +163,17 @@
       "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "value_and_name" },
       "title": "Buffer Cache Hit Ratio",
       "type": "stat",
-      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(pg_stat_database_blks_hit{datname=\"copafacil\"}) / clamp_min(sum(pg_stat_database_blks_hit{datname=\"copafacil\"}) + sum(pg_stat_database_blks_read{datname=\"copafacil\"}), 1)", "legendFormat": "hit ratio", "refId": "A" }]
+      "targets": [{ "datasource": { "type": "prometheus", "uid": "prometheus" }, "expr": "sum(pg_stat_database_blks_hit{datname=\"cerradosesportes\"}) / clamp_min(sum(pg_stat_database_blks_hit{datname=\"cerradosesportes\"}) + sum(pg_stat_database_blks_read{datname=\"cerradosesportes\"}), 1)", "legendFormat": "hit ratio", "refId": "A" }]
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["copa-facil", "postgres", "tenants"],
+  "tags": ["cerrados-esportes", "postgres", "tenants"],
   "templating": { "list": [] },
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Copa Fácil — PostgreSQL & Tenants",
-  "uid": "copa-facil-postgres",
+  "title": "Cerrados Esportes — PostgreSQL & Tenants",
+  "uid": "cerrados-esportes-postgres",
   "version": 1
 }

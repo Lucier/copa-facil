@@ -107,13 +107,12 @@ test.describe('Admin – Dashboard', () => {
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
     await expect(page.getByText('Campeonatos Ativos')).toBeVisible()
     await expect(page.getByText('Times Inscritos')).toBeVisible()
-    await expect(page.getByText('Jogadores Cadastrados')).toBeVisible()
     await expect(page.getByText('Partidas Realizadas')).toBeVisible()
+    await expect(page.getByText('Inscrições Pendentes')).toBeVisible()
   })
 
-  test('renders recent matches table', async ({ page }) => {
+  test('renders recent matches section', async ({ page }) => {
     await expect(page.getByText('Partidas Recentes')).toBeVisible()
-    await expect(page.getByText('Rápidos FC')).toBeVisible()
   })
 
   test('renders pending actions section', async ({ page }) => {

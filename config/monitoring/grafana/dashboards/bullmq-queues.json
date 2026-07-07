@@ -155,12 +155,12 @@
   ],
   "refresh": "15s",
   "schemaVersion": 39,
-  "tags": ["copa-facil", "bullmq", "queues"],
+  "tags": ["cerrados-esportes", "bullmq", "queues"],
   "templating": { "list": [] },
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Copa Fácil — Filas BullMQ",
-  "uid": "copa-facil-bullmq",
+  "title": "Cerrados Esportes — Filas BullMQ",
+  "uid": "cerrados-esportes-bullmq",
   "version": 1
 }

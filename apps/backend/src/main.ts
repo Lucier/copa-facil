@@ -1,5 +1,6 @@
+import { resolve } from 'path'
 import { NestFactory } from '@nestjs/core'
-import type { NestExpressApplication } from '@nestjs/platform-express'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
@@ -26,7 +27,7 @@ async function bootstrap() {
     .split(',')
     .map((o) => o.trim())
 
-  app.useStaticAssets(require('path').resolve(process.cwd(), 'uploads'), { prefix: '/uploads' })
+  app.useStaticAssets(resolve(process.cwd(), 'uploads'), { prefix: '/uploads' })
 
   app.use(cookieParser())
   app.use(helmet())
@@ -43,7 +44,7 @@ async function bootstrap() {
 
   if (isDev) {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('Copa Fácil API')
+      .setTitle('Cerrados Esportes API')
       .setDescription('Multi-tenant sports championship management API')
       .setVersion('1.0')
       .addBearerAuth()

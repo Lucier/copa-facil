@@ -1,12 +1,14 @@
+import { RawBodyRequest} from '@nestjs/common'
 import {
   Body, Controller, Headers, HttpCode, HttpStatus, Inject,
-  Logger, Param, Post, Query, RawBodyRequest, Req,
+  Logger, Param, Post, Query, Req,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
 import { ProcessWebhookDto } from '../../application/dtos/process-webhook.dto'
 import { ProcessWebhookUseCase } from '../../application/use-cases/process-webhook.use-case'
-import { IPaymentGateway, PAYMENT_GATEWAY } from '../../domain/gateways/i-payment-gateway'
+import { IPaymentGateway} from '../../domain/gateways/i-payment-gateway'
+import { PAYMENT_GATEWAY } from '../../domain/gateways/i-payment-gateway'
 
 @ApiTags('Payments — Webhooks')
 @Controller('webhooks/payments')

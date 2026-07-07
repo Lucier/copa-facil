@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { ConflictException } from '@nestjs/common'
 import { RegisterUseCase } from '../application/use-cases/register.use-case'
 import { LoginUseCase } from '../application/use-cases/login.use-case'

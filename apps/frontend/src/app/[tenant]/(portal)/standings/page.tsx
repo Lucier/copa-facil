@@ -161,7 +161,7 @@ export default async function StandingsPage({ params }: Props) {
                     <Card key={gKey}>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-                          {gKey === '__no_group__' ? 'Geral' : `Grupo`}
+                          {gKey === '__no_group__' ? 'Geral' : 'Grupo'}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="p-0 pb-1">

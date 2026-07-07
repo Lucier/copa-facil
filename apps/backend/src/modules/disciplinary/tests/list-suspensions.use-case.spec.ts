@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { DrizzleService } from '../../../database/drizzle.service'
+import { DrizzleService } from '../../../database/drizzle.service'
 import { ListSuspensionsUseCase } from '../application/use-cases/list-suspensions.use-case'
 
 function makeFakeDrizzle(results: unknown[][]) {

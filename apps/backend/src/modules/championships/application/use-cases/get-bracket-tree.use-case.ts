@@ -1,10 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
 import {
-  CHAMPIONSHIP_REPOSITORY,
-  IChampionshipRepository,
+  IChampionshipRepository} from '../../domain/repositories/i-championship.repository'
+import {
+  CHAMPIONSHIP_REPOSITORY
 } from '../../domain/repositories/i-championship.repository'
 import {
-  IRoundRepository,
+  IRoundRepository} from '../../domain/repositories/i-round.repository'
+import {
   ROUND_REPOSITORY,
 } from '../../domain/repositories/i-round.repository'
 import { BracketOutputDto } from '../dtos/bracket-output.dto'

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common'
 import { TenantContext } from '../../../infrastructure/tenant/tenant-context'
 import { UserRole } from '../../auth/domain/roles.enum'
-import type { JwtPayload } from '../../auth/application/jwt-payload.interface'
+import { JwtPayload } from '../../auth/application/jwt-payload.interface'
 import { AcceptInvitationUseCase } from '../application/use-cases/accept-invitation.use-case'
 import { CancelInvitationUseCase } from '../application/use-cases/cancel-invitation.use-case'
 import { GetInvitationUseCase } from '../application/use-cases/get-invitation.use-case'

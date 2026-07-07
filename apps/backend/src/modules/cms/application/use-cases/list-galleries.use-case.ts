@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { GalleryEntity } from '../../domain/entities/gallery.entity'
 import { MediaAssetEntity } from '../../domain/entities/media-asset.entity'
-import { GALLERY_REPOSITORY, IGalleryRepository } from '../../domain/repositories/i-gallery.repository'
+import { IGalleryRepository } from '../../domain/repositories/i-gallery.repository'
+import { GALLERY_REPOSITORY } from '../../domain/repositories/i-gallery.repository'
 
 @Injectable()
 export class ListGalleriesUseCase {

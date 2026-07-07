@@ -3,11 +3,13 @@ import { OnEvent } from '@nestjs/event-emitter'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { MatchEventRegisteredDomainEvent } from '../../domain/events/match-event-registered.event'
 import {
-  IMatchEventRepository,
+  IMatchEventRepository} from '../../domain/repositories/i-match-event.repository'
+import {
   MATCH_EVENT_REPOSITORY,
 } from '../../domain/repositories/i-match-event.repository'
 import {
-  IStandingRepository,
+  IStandingRepository} from '../../domain/repositories/i-standing.repository'
+import {
   STANDING_REPOSITORY,
 } from '../../domain/repositories/i-standing.repository'
 import { CardColor, MatchEventType } from '../../domain/enums'

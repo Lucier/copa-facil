@@ -1,7 +1,9 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common'
+import { CanActivate, ExecutionContext} from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtPayload } from '../../application/jwt-payload.interface'
-import { ROLE_WEIGHT, UserRole } from '../../domain/roles.enum'
+import { UserRole } from '../../domain/roles.enum'
+import { ROLE_WEIGHT } from '../../domain/roles.enum'
 import { ROLES_KEY } from '../decorators/roles.decorator'
 
 @Injectable()

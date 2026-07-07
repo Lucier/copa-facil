@@ -1,6 +1,6 @@
 Act as a Staff Software Architect.
 
-We are starting a new project from scratch: a Multi-Tenant SaaS platform for sports championship management (inspired by platforms like Copa Fácil).
+We are starting a new project from scratch: a Multi-Tenant SaaS platform for sports championship management (inspired by platforms like Cerrados Esportes).
 
 Your task is to bootstrap the architectural documentation of this project. Do NOT write any application code (NestJS, Next.js, etc.) yet. Instead, create a comprehensive documentation structure inside a new directory named `docs/architecture/`.
 

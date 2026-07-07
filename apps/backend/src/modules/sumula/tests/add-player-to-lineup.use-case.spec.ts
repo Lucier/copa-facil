@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { AddPlayerToLineupUseCase } from '../application/use-cases/add-player-to-lineup.use-case'
 import { SUMULA_REPOSITORY } from '../domain/repositories/i-sumula.repository'
 import { LINEUP_REPOSITORY } from '../domain/repositories/i-lineup.repository'
 import { SumulaEntity } from '../domain/entities/sumula.entity'
 import { MatchLineupEntity } from '../domain/entities/match-lineup.entity'
 import { SumulaStatus } from '../domain/enums'
-import { NotFoundError, AppError } from '../../../shared/errors'
+import { NotFoundError } from '../../../shared/errors'
 
 const OPEN_SUMULA = new SumulaEntity('s1', 'm1', 'c1', null, null, SumulaStatus.ABERTA, null, null, null, new Date(), new Date())
 const CLOSED_SUMULA = new SumulaEntity('s1', 'm1', 'c1', null, null, SumulaStatus.FECHADA, new Date(), 'uid', 'hash', new Date(), new Date())

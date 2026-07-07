@@ -8,7 +8,7 @@ import {
   GetFinancialDashboardUseCase,
   ListExpensesUseCase,
 } from '../application/use-cases/expense.use-cases'
-import type { DrizzleService } from '../../../database/drizzle.service'
+import { DrizzleService } from '../../../database/drizzle.service'
 
 // Fake tagged-template tx: records queries and returns queued results in order
 function makeFakeDrizzle(results: unknown[][]) {

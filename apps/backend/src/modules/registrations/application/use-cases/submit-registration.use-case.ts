@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { AppError, ConflictError } from '../../../../shared/errors'
+import { ConflictError } from '../../../../shared/errors'
 import { RegistrationRequestEntity } from '../../domain/entities/registration-request.entity'
 import { RegistrationStatus } from '../../domain/enums'
 import {
-  IRegistrationRepository,
+  IRegistrationRepository} from '../../domain/repositories/i-registration.repository'
+import {
   REGISTRATION_REPOSITORY,
 } from '../../domain/repositories/i-registration.repository'
 import { SubmitRegistrationDto } from '../dtos/submit-registration.dto'

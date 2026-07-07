@@ -3,18 +3,22 @@ import { AppError } from '../../../../shared/errors'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { TransactionStatus } from '../../domain/enums'
 import {
-  IPaymentGateway,
+  IPaymentGateway} from '../../domain/gateways/i-payment-gateway'
+import {
   PAYMENT_GATEWAY,
 } from '../../domain/gateways/i-payment-gateway'
 import {
-  ILedgerRepository,
+  ILedgerRepository} from '../../domain/repositories/i-ledger.repository'
+import {
   LEDGER_REPOSITORY,
 } from '../../domain/repositories/i-ledger.repository'
 import {
-  ITransactionRepository,
+  ITransactionRepository} from '../../domain/repositories/i-transaction.repository'
+import {
   TRANSACTION_REPOSITORY,
 } from '../../domain/repositories/i-transaction.repository'
-import { ProcessWebhookDto, WebhookEventType } from '../dtos/process-webhook.dto'
+import { ProcessWebhookDto} from '../dtos/process-webhook.dto'
+import { WebhookEventType } from '../dtos/process-webhook.dto'
 
 @Injectable()
 export class ProcessWebhookUseCase {

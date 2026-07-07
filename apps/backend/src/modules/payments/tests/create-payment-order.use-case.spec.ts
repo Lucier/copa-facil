@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { CreatePaymentOrderUseCase } from '../application/use-cases/create-payment-order.use-case'
 import { TRANSACTION_REPOSITORY } from '../domain/repositories/i-transaction.repository'
 import { PAYMENT_GATEWAY } from '../domain/gateways/i-payment-gateway'

@@ -3,13 +3,15 @@ import { OnEvent } from '@nestjs/event-emitter'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { MatchEventRegisteredDomainEvent } from '../../../match-engine/domain/events/match-event-registered.event'
 import {
-  IMatchEventRepository,
+  IMatchEventRepository} from '../../../match-engine/domain/repositories/i-match-event.repository'
+import {
   MATCH_EVENT_REPOSITORY,
 } from '../../../match-engine/domain/repositories/i-match-event.repository'
 import { CardColor, MatchEventType } from '../../../match-engine/domain/enums'
 import { SuspensionSource } from '../../domain/enums'
 import {
-  ISuspensionRepository,
+  ISuspensionRepository} from '../../domain/repositories/i-suspension.repository'
+import {
   SUSPENSION_REPOSITORY,
 } from '../../domain/repositories/i-suspension.repository'
 

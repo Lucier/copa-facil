@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { RegistrationRequestEntity } from '../../domain/entities/registration-request.entity'
 import {
-  IRegistrationRepository,
+  IRegistrationRepository} from '../../domain/repositories/i-registration.repository'
+import {
   REGISTRATION_REPOSITORY,
 } from '../../domain/repositories/i-registration.repository'
 

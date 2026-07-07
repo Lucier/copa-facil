@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { ConcludeMatchUseCase } from '../application/use-cases/conclude-match.use-case'
 import { MATCH_REPOSITORY } from '../domain/repositories/i-match.repository'

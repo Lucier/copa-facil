@@ -17,7 +17,6 @@ import { TenantRolesGuard } from '../../../auth/presentation/guards/tenant-roles
 import { Roles } from '../../../auth/presentation/decorators/roles.decorator'
 import { CurrentUser } from '../../../auth/presentation/decorators/current-user.decorator'
 import { UserRole } from '../../../auth/domain/roles.enum'
-import { JwtPayload } from '../../../auth/application/jwt-payload.interface'
 import { OpenSumulaDto } from '../../application/dtos/open-sumula.dto'
 import { AddLineupDto } from '../../application/dtos/add-lineup.dto'
 import { AddOfficialDto } from '../../application/dtos/add-official.dto'

@@ -166,7 +166,7 @@ function MatchCard({
 /* ─── RoundBlock ─────────────────────────────────────────────────────────── */
 
 function RoundBlock({
-  round, teams, champId, phaseId, onRefresh,
+  round, teams, champId, onRefresh,
 }: {
   round: RoundRow; teams: Team[]; champId: string; phaseId: string | null; onRefresh: () => void
 }) {

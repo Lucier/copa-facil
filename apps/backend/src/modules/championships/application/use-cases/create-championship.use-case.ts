@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ChampionshipEntity } from '../../domain/entities/championship.entity'
 import {
-  CHAMPIONSHIP_REPOSITORY,
-  IChampionshipRepository,
+  IChampionshipRepository} from '../../domain/repositories/i-championship.repository'
+import {
+  CHAMPIONSHIP_REPOSITORY
 } from '../../domain/repositories/i-championship.repository'
 import { CreateChampionshipDto } from '../dtos/create-championship.dto'
 

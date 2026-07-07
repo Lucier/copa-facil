@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { PlayerEntity } from '../../domain/entities/player.entity'
-import { IPlayerRepository, PLAYER_REPOSITORY } from '../../domain/repositories/i-player.repository'
+import { IPlayerRepository} from '../../domain/repositories/i-player.repository'
+import { PLAYER_REPOSITORY } from '../../domain/repositories/i-player.repository'
 
 @Injectable()
 export class GetPlayerUseCase {

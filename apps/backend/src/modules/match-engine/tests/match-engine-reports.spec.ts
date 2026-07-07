@@ -1,12 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { DrizzleService } from '../../../database/drizzle.service'
+import { DrizzleService } from '../../../database/drizzle.service'
 import { NotFoundError } from '../../../shared/errors'
+import {
+  RankingWeightsDto} from '../application/use-cases/custom-rankings.use-case'
 import {
   ComputeCustomRankingUseCase,
   CreateCustomRankingUseCase,
   DeleteCustomRankingUseCase,
-  ListCustomRankingsUseCase,
-  RankingWeightsDto,
+  ListCustomRankingsUseCase
 } from '../application/use-cases/custom-rankings.use-case'
 import { GetChampionshipReportUseCase } from '../application/use-cases/get-championship-report.use-case'
 import { ListMatchesForAdminUseCase } from '../application/use-cases/list-matches-for-admin.use-case'

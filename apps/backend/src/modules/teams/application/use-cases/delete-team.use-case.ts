@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
-import { ITeamRepository, TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
+import { ITeamRepository} from '../../domain/repositories/i-team.repository'
+import { TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
 
 @Injectable()
 export class DeleteTeamUseCase {

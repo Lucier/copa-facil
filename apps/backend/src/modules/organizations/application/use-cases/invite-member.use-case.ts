@@ -4,11 +4,13 @@ import { JwtPayload } from '../../../auth/application/jwt-payload.interface'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { InvitationEntity } from '../../domain/entities/invitation.entity'
 import {
-  IInvitationRepository,
+  IInvitationRepository} from '../../domain/repositories/i-invitation.repository'
+import {
   INVITATION_REPOSITORY,
 } from '../../domain/repositories/i-invitation.repository'
 import {
-  IOrganizationMgmtRepository,
+  IOrganizationMgmtRepository} from '../../domain/repositories/i-org-mgmt.repository'
+import {
   ORG_MGMT_REPOSITORY,
 } from '../../domain/repositories/i-org-mgmt.repository'
 import { InviteMemberDto } from '../dtos/invite-member.dto'

@@ -2,8 +2,10 @@ import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { PlayerEntity } from '../../domain/entities/player.entity'
 import { TeamEntity } from '../../domain/entities/team.entity'
-import { IPlayerRepository, PLAYER_REPOSITORY } from '../../domain/repositories/i-player.repository'
-import { ITeamRepository, TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
+import { IPlayerRepository} from '../../domain/repositories/i-player.repository'
+import { PLAYER_REPOSITORY } from '../../domain/repositories/i-player.repository'
+import { ITeamRepository} from '../../domain/repositories/i-team.repository'
+import { TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
 import { RegisterPlayerDto } from '../dtos/register-player.dto'
 
 export interface JoinTeamResult {

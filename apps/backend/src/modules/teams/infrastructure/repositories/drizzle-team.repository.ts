@@ -6,13 +6,14 @@ import {
   ITeamRepository,
   UpdateTeamData,
 } from '../../domain/repositories/i-team.repository'
-import { TeamMapper, TeamRow } from '../../application/mappers/team.mapper'
+import { TeamRow } from '../../application/mappers/team.mapper'
+import { TeamMapper } from '../../application/mappers/team.mapper'
 
 @Injectable()
 export class DrizzleTeamRepository implements ITeamRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  private readonly cols = `id, name, acronym, city, nickname, logo_url, primary_color, secondary_color, seed, invite_token, created_at, updated_at`
+  private readonly cols = 'id, name, acronym, city, nickname, logo_url, primary_color, secondary_color, seed, invite_token, created_at, updated_at'
 
   async findById(id: string): Promise<TeamEntity | null> {
     const rows = await this.drizzle.runInTenantContext(async (tx) => {

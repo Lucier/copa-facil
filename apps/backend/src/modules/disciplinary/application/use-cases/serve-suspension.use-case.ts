@@ -3,7 +3,8 @@ import { AppError, NotFoundError } from '../../../../shared/errors'
 import { SuspensionStatus } from '../../domain/enums'
 import { SuspensionEntity } from '../../domain/entities/suspension.entity'
 import {
-  ISuspensionRepository,
+  ISuspensionRepository} from '../../domain/repositories/i-suspension.repository'
+import {
   SUSPENSION_REPOSITORY,
 } from '../../domain/repositories/i-suspension.repository'
 

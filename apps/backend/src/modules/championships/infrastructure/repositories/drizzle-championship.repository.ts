@@ -6,7 +6,6 @@ import {
   CreateChampionshipData,
   IChampionshipRepository,
 } from '../../domain/repositories/i-championship.repository'
-import { ChampionshipMapper } from '../../application/mappers/championship.mapper'
 
 interface ChampRow {
   id: string

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { HealthCheck } from '../domain/health.entity'
+import { HealthCheck } from '../domain/health.entity'
 
 @Injectable()
 export class GetHealthUseCase {

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Max, Min, MinLength } from 'class-validator'
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min, MinLength } from 'class-validator'
 import { TournamentFormat } from '../../domain/enums'
 
 export class CreateChampionshipDto {

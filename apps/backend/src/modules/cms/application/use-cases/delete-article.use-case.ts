@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
-import { ARTICLE_REPOSITORY, IArticleRepository } from '../../domain/repositories/i-article.repository'
+import { IArticleRepository } from '../../domain/repositories/i-article.repository'
+import { ARTICLE_REPOSITORY } from '../../domain/repositories/i-article.repository'
 
 @Injectable()
 export class DeleteArticleUseCase {

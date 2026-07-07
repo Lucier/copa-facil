@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { HandleFairPlayHandler } from '../application/handlers/handle-fair-play.handler'
 import { MATCH_EVENT_REPOSITORY } from '../domain/repositories/i-match-event.repository'
 import { STANDING_REPOSITORY } from '../domain/repositories/i-standing.repository'

@@ -2,12 +2,15 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import { OnEvent } from '@nestjs/event-emitter'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { MatchConcludedDomainEvent } from '../../domain/events/match-concluded.event'
-import { IMatchEventRepository, MATCH_EVENT_REPOSITORY } from '../../domain/repositories/i-match-event.repository'
-import { IMatchRepository, MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
+import { IMatchEventRepository} from '../../domain/repositories/i-match-event.repository'
+import { MATCH_EVENT_REPOSITORY } from '../../domain/repositories/i-match-event.repository'
+import { IMatchRepository} from '../../domain/repositories/i-match.repository'
+import { MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
 import {
   IStandingRepository,
-  STANDING_REPOSITORY,
-  UpsertStandingData,
+  UpsertStandingData} from '../../domain/repositories/i-standing.repository'
+import {
+  STANDING_REPOSITORY
 } from '../../domain/repositories/i-standing.repository'
 import { CardColor, MatchEventType } from '../../domain/enums'
 

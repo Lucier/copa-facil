@@ -1,4 +1,4 @@
-import type { Migration } from '../types'
+import { Migration } from '../types'
 
 // IF NOT EXISTS is kept intentionally: databases bootstrapped before the
 // versioned-migrations system already contain these tables.

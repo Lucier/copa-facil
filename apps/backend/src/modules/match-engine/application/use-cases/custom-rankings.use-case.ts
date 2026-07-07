@@ -4,7 +4,8 @@ import { ApiProperty } from '@nestjs/swagger'
 import { NotFoundError } from '../../../../shared/errors'
 import { DrizzleService } from '../../../../database/drizzle.service'
 import {
-  IStatisticRepository,
+  IStatisticRepository} from '../../domain/repositories/i-statistic.repository'
+import {
   STATISTIC_REPOSITORY,
 } from '../../domain/repositories/i-statistic.repository'
 

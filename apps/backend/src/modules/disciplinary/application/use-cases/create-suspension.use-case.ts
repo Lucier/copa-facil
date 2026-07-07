@@ -2,7 +2,8 @@ import { Inject, Injectable } from '@nestjs/common'
 import { SuspensionSource } from '../../domain/enums'
 import { SuspensionEntity } from '../../domain/entities/suspension.entity'
 import {
-  ISuspensionRepository,
+  ISuspensionRepository} from '../../domain/repositories/i-suspension.repository'
+import {
   SUSPENSION_REPOSITORY,
 } from '../../domain/repositories/i-suspension.repository'
 import { CreateSuspensionDto } from '../dtos/create-suspension.dto'

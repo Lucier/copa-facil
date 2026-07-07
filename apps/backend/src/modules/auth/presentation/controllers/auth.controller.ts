@@ -9,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common'
 import type { Response } from 'express'
-import { AuthGuard } from '@nestjs/passport'
 import { Throttle } from '@nestjs/throttler'
 import { ApiBearerAuth, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { LoginInputDto } from '../../application/dtos/login-input.dto'

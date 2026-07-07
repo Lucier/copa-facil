@@ -40,9 +40,6 @@ function toEntity(row: JudgeRow): JudgeEntity {
   )
 }
 
-const COLS = `id, full_name, document, license_number, license_category, role,
-              phone, email, photo_url, is_active, created_at, updated_at`
-
 @Injectable()
 export class DrizzleJudgeRepository implements IJudgeRepository {
   constructor(private readonly drizzle: DrizzleService) {}

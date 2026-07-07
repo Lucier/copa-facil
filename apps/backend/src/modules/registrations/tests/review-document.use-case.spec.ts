@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { ReviewDocumentUseCase } from '../application/use-cases/review-document.use-case'
 import { REGISTRATION_DOCUMENT_REPOSITORY } from '../domain/repositories/i-registration-document.repository'
 import { DocumentStatus } from '../domain/enums'

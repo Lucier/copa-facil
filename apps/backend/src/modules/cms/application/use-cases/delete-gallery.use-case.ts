@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
-import { GALLERY_REPOSITORY, IGalleryRepository } from '../../domain/repositories/i-gallery.repository'
+import { IGalleryRepository } from '../../domain/repositories/i-gallery.repository'
+import { GALLERY_REPOSITORY } from '../../domain/repositories/i-gallery.repository'
 
 @Injectable()
 export class DeleteGalleryUseCase {

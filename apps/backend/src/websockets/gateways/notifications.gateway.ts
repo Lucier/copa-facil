@@ -3,12 +3,13 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import {
   OnGatewayConnection,
-  OnGatewayDisconnect,
+  OnGatewayDisconnect} from '@nestjs/websockets'
+import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
-import type { JwtPayload } from '../../modules/auth/application/jwt-payload.interface'
+import { JwtPayload } from '../../modules/auth/application/jwt-payload.interface'
 
 function parseCookies(raw: string): Record<string, string> {
   return Object.fromEntries(

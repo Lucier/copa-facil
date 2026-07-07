@@ -26,7 +26,7 @@ function toEntity(r: RegRow): RegistrationRequestEntity {
   )
 }
 
-const COLS = `id, championship_id, team_id, status, submitted_by, reviewed_by, review_note, submitted_at, reviewed_at`
+const COLS = 'id, championship_id, team_id, status, submitted_by, reviewed_by, review_note, submitted_at, reviewed_at'
 
 @Injectable()
 export class DrizzleRegistrationRepository implements IRegistrationRepository {

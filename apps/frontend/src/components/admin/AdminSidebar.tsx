@@ -68,7 +68,7 @@ export function AdminSidebar({ tenant }: AdminSidebarProps) {
         </div>
         {!collapsed && (
           <span className="font-display text-sm font-bold tracking-tight">
-            Copa<span className="text-primary">Fácil</span>
+            Cerrados<span className="text-primary">Esportes</span>
           </span>
         )}
       </div>

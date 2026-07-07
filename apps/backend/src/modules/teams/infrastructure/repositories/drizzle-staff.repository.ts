@@ -6,7 +6,8 @@ import {
   IStaffRepository,
   UpdateStaffData,
 } from '../../domain/repositories/i-staff.repository'
-import { StaffMapper, StaffRow } from '../../application/mappers/staff.mapper'
+import { StaffRow } from '../../application/mappers/staff.mapper'
+import { StaffMapper } from '../../application/mappers/staff.mapper'
 
 @Injectable()
 export class DrizzleStaffRepository implements IStaffRepository {

@@ -8,10 +8,12 @@ import { MatchEventEntity } from '../../domain/entities/match-event.entity'
 import { MatchEventRegisteredDomainEvent } from '../../domain/events/match-event-registered.event'
 import { GoalType, MatchEventType } from '../../domain/enums'
 import {
-  IMatchEventRepository,
+  IMatchEventRepository} from '../../domain/repositories/i-match-event.repository'
+import {
   MATCH_EVENT_REPOSITORY,
 } from '../../domain/repositories/i-match-event.repository'
-import { IMatchRepository, MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
+import { IMatchRepository} from '../../domain/repositories/i-match.repository'
+import { MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
 import { RegisterMatchEventDto } from '../dtos/register-match-event.dto'
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { CreateChampionshipUseCase } from '../application/use-cases/create-championship.use-case'
 import { CHAMPIONSHIP_REPOSITORY } from '../domain/repositories/i-championship.repository'
 import { TournamentFormat, ChampionshipStatus } from '../domain/enums'

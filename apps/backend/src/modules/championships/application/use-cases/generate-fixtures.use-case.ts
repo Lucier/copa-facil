@@ -1,15 +1,18 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common'
 import { TournamentFormat, ChampionshipStatus } from '../../domain/enums'
 import {
-  CHAMPIONSHIP_REPOSITORY,
-  IChampionshipRepository,
+  IChampionshipRepository} from '../../domain/repositories/i-championship.repository'
+import {
+  CHAMPIONSHIP_REPOSITORY
 } from '../../domain/repositories/i-championship.repository'
 import {
   IRoundRepository,
-  RoundInput,
+  RoundInput} from '../../domain/repositories/i-round.repository'
+import {
   ROUND_REPOSITORY,
 } from '../../domain/repositories/i-round.repository'
-import { TEAM_REPOSITORY, ITeamRepository } from '../../domain/repositories/i-team.repository'
+import { ITeamRepository } from '../../domain/repositories/i-team.repository'
+import { TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
 import { TournamentEngine } from '../../domain/services/tournament-engine'
 import { GenerateFixturesInputDto } from '../dtos/generate-fixtures-input.dto'
 import { BracketOutputDto } from '../dtos/bracket-output.dto'

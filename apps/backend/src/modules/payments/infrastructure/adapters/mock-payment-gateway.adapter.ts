@@ -26,7 +26,7 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     return {
       transactionId,
       qrCode: `data:image/png;base64,MOCK_QR_CODE_${transactionId}`,
-      copyPasteCode: `00020126580014BR.GOV.BCB.PIX0136mock-key-${transactionId}5204000053039865802BR5925Copa Facil Organizacoes6009SAO PAULO62140510${transactionId}63041234`,
+      copyPasteCode: `00020126580014BR.GOV.BCB.PIX0136mock-key-${transactionId}5204000053039865802BR5925Cerrados Esportes Organizacoes6009SAO PAULO62140510${transactionId}63041234`,
       expiresAt,
     }
   }
@@ -43,7 +43,7 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     }
   }
 
-  async chargeCreditCard(req: CreditCardPaymentRequest): Promise<CreditCardPaymentResponse> {
+  async chargeCreditCard(_req: CreditCardPaymentRequest): Promise<CreditCardPaymentResponse> {
     return {
       transactionId: `MOCK-CC-${shortId()}`,
       authorizationCode: `AUTH-${shortId()}`,
@@ -51,7 +51,7 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     }
   }
 
-  async refund(req: RefundRequest): Promise<RefundResponse> {
+  async refund(_req: RefundRequest): Promise<RefundResponse> {
     return {
       refundId: `REFUND-${shortId()}`,
       refundedAt: new Date(),

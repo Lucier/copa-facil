@@ -37,7 +37,7 @@ test.describe('Portal – Home Page', () => {
 })
 
 test.describe('Portal – Public Navbar', () => {
-  test('shows navbar with Copa Fácil logo and tenant name', async ({ page }) => {
+  test('shows navbar with Cerrados Esportes logo and tenant name', async ({ page }) => {
     await page.goto(`/${TENANT}`)
     const nav = page.getByRole('navigation').first()
     await expect(nav).toBeVisible()

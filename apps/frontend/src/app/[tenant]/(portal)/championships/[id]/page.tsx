@@ -1,8 +1,6 @@
-import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CalendarDays, CheckCircle2, Clock } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { publicFetch, type Paginated } from '@/lib/server-api'
 
 export const dynamic = 'force-dynamic'
@@ -22,13 +20,6 @@ interface Standing {
 }
 interface Team { id: string; name: string; acronym: string | null }
 interface Round { id: string; name: string; number: number }
-
-const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'outline' | 'success' | 'live' }> = {
-  scheduled: { label: 'Agendado', variant: 'outline' },
-  live: { label: 'Ao Vivo', variant: 'live' },
-  finished: { label: 'Encerrado', variant: 'default' },
-  cancelled: { label: 'Cancelado', variant: 'destructive' as never },
-}
 
 function formatDatetime(dt: string | null) {
   if (!dt) return '—'

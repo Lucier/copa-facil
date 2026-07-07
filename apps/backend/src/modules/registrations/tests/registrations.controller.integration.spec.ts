@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { Test } from '@nestjs/testing'
-import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { INestApplication} from '@nestjs/common'
+import { ValidationPipe } from '@nestjs/common'
 import request from 'supertest'
 import { RegistrationsController } from '../presentation/controllers/registrations.controller'
 import { SubmitRegistrationUseCase } from '../application/use-cases/submit-registration.use-case'

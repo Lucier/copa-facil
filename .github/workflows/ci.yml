@@ -91,11 +91,11 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: copafacil
-          POSTGRES_PASSWORD: copafacil
-          POSTGRES_DB: copafacil_test
+          POSTGRES_USER: cerradosesportes
+          POSTGRES_PASSWORD: cerradosesportes
+          POSTGRES_DB: cerradosesportes_test
         options: >-
-          --health-cmd "pg_isready -U copafacil -d copafacil_test"
+          --health-cmd "pg_isready -U cerradosesportes -d cerradosesportes_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -129,7 +129,7 @@ jobs:
       - name: Run backend tests with coverage
         working-directory: apps/backend
         env:
-          DATABASE_URL: postgresql://copafacil:copafacil@localhost:5432/copafacil_test
+          DATABASE_URL: postgresql://cerradosesportes:cerradosesportes@localhost:5432/cerradosesportes_test
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: ci-test-secret-32-chars-minimum-0000
           JWT_REFRESH_SECRET: ci-test-refresh-32-chars-minimum-000
@@ -183,11 +183,11 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: copafacil
-          POSTGRES_PASSWORD: copafacil
-          POSTGRES_DB: copafacil_check
+          POSTGRES_USER: cerradosesportes
+          POSTGRES_PASSWORD: cerradosesportes
+          POSTGRES_DB: cerradosesportes_check
         options: >-
-          --health-cmd "pg_isready -U copafacil -d copafacil_check"
+          --health-cmd "pg_isready -U cerradosesportes -d cerradosesportes_check"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -212,5 +212,5 @@ jobs:
       - name: Generate and verify Drizzle schema
         working-directory: apps/backend
         env:
-          DATABASE_URL: postgresql://copafacil:copafacil@localhost:5432/copafacil_check
+          DATABASE_URL: postgresql://cerradosesportes:cerradosesportes@localhost:5432/cerradosesportes_check
         run: pnpm db:generate

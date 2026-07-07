@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { JudgeEntity } from '../../domain/entities/judge.entity'
-import { IJudgeRepository, JUDGE_REPOSITORY } from '../../domain/repositories/i-judge.repository'
+import { IJudgeRepository} from '../../domain/repositories/i-judge.repository'
+import { JUDGE_REPOSITORY } from '../../domain/repositories/i-judge.repository'
 import { UpdateJudgeDto } from '../dtos/update-judge.dto'
 
 @Injectable()

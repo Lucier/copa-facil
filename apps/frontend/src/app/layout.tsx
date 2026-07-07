@@ -16,7 +16,7 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: { default: 'Copa Fácil', template: '%s — Copa Fácil' },
+  title: { default: 'Cerrados Esportes', template: '%s — Cerrados Esportes' },
   description: 'Gestão simplificada de campeonatos esportivos',
 }
 

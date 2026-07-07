@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, ClipboardList, CheckCircle2, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -108,7 +108,6 @@ export default function RegistrationsPage() {
 
   const pendingCount = registrations.filter((r) => r.status === 'pendente' || r.status === 'em_analise').length
   const approvedCount = registrations.filter((r) => r.status === 'aprovado').length
-  const rejectedCount = registrations.filter((r) => r.status === 'rejeitado').length
 
   return (
     <div className="space-y-6">

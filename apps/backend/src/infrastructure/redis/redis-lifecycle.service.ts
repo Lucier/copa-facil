@@ -1,4 +1,5 @@
-import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common'
+import { OnModuleDestroy } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import type Redis from 'ioredis'
 import { REDIS_CLIENT } from './redis.constants'
 

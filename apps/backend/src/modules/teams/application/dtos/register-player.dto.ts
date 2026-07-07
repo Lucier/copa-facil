@@ -7,7 +7,6 @@ import {
   IsOptional,
   IsString,
   Min,
-  IsUrl,
 } from 'class-validator'
 import { DocumentType, PreferredFoot } from '../../domain/enums'
 

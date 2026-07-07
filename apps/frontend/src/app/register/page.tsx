@@ -222,7 +222,7 @@ export default function RegisterPage() {
   const monthlyPrice = step2Data ? (MONTHLY_PRICE[step2Data.plan] ?? 0) : 0
   const period = BILLING_PERIODS.find((p) => p.id === billingPeriod)!
   const totalPrice = monthlyPrice * period.months * (1 - period.discount)
-  const pixCode = `00020126580014br.gov.bcb.pix0136copafacil-${step2Data?.organizationSlug ?? ''}-${billingPeriod}5204000053039865802BR`
+  const pixCode = `00020126580014br.gov.bcb.pix0136cerradosesportes-${step2Data?.organizationSlug ?? ''}-${billingPeriod}5204000053039865802BR`
 
   // Parcelamento: até 12x, com parcela mínima de R$ 25
   const maxInstallments = Math.max(1, Math.min(12, Math.floor(totalPrice / 25)))
@@ -288,7 +288,7 @@ export default function RegisterPage() {
             <div className="flex size-9 items-center justify-center rounded-lg bg-primary">
               <Trophy className="size-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-lg font-bold">Copa Fácil</span>
+            <span className="font-display text-lg font-bold">Cerrados Esportes</span>
           </Link>
           <p className="text-sm text-muted-foreground">Crie sua conta e comece a organizar</p>
         </div>
@@ -369,7 +369,7 @@ export default function RegisterPage() {
                         { label: 'Número', ok: /[0-9]/.test(passwordValue) },
                         { label: 'Caractere especial', ok: /[^A-Za-z0-9]/.test(passwordValue) },
                       ].map(({ label, ok }) => (
-                        <li key={label} className={`flex items-center gap-1.5 ${ok ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                        <li key={label} className={`flex items-center gap-1.5 ${ok ? 'text-green-600' : 'text-muted-foreground'}`}>
                           <CheckCircle2 className="size-3 shrink-0" />
                           {label}
                         </li>
@@ -414,7 +414,7 @@ export default function RegisterPage() {
                         <FormControl>
                           <div className="flex items-center rounded-md border border-input bg-muted/30 focus-within:ring-1 focus-within:ring-ring">
                             <span className="pl-3 text-xs text-muted-foreground select-none whitespace-nowrap">
-                              copafacil.com/
+                              cerradosesportes.com/
                             </span>
                             <input
                               {...field}
@@ -426,7 +426,7 @@ export default function RegisterPage() {
                         </FormControl>
                         <FormMessage />
                         <p className="text-[11px] text-muted-foreground">
-                          Será o endereço público do portal: copafacil.com/{form2.watch('organizationSlug') || 'sua-liga'}
+                          Será o endereço público do portal: cerradosesportes.com/{form2.watch('organizationSlug') || 'sua-liga'}
                         </p>
                       </FormItem>
                     )}
@@ -506,7 +506,7 @@ export default function RegisterPage() {
                   { label: 'Nome', value: step1Data.name },
                   { label: 'E-mail', value: step1Data.email },
                   { label: 'Organização', value: step2Data.organizationName },
-                  { label: 'URL', value: `copafacil.com/${step2Data.organizationSlug}` },
+                  { label: 'URL', value: `cerradosesportes.com/${step2Data.organizationSlug}` },
                   { label: 'Plano', value: PLANS.find((p) => p.id === step2Data.plan)?.name ?? step2Data.plan },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-center justify-between px-4 py-2.5">

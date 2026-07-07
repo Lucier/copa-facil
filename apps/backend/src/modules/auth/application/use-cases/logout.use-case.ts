@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { AUDIT_REPOSITORY, IAuditRepository } from '../../domain/repositories/i-audit.repository'
+import { IAuditRepository } from '../../domain/repositories/i-audit.repository'
+import { AUDIT_REPOSITORY } from '../../domain/repositories/i-audit.repository'
 import { RedisTokenStoreService } from '../../infrastructure/services/redis-token-store.service'
 import { JwtPayload } from '../jwt-payload.interface'
 

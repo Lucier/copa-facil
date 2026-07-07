@@ -80,7 +80,7 @@ describe('ServeSuspensionUseCase', () => {
     const mod = await Test.createTestingModule({
       providers: [ServeSuspensionUseCase, { provide: SUSPENSION_REPOSITORY, useValue: repo }],
     }).compile()
-    const result = await mod.get(ServeSuspensionUseCase).execute('sus-1')
+    await mod.get(ServeSuspensionUseCase).execute('sus-1')
     expect(repo.update).toHaveBeenCalledWith('sus-1', expect.objectContaining({ matchesServed: 1, status: SuspensionStatus.ATIVA }))
   })
 
@@ -89,7 +89,7 @@ describe('ServeSuspensionUseCase', () => {
     const mod = await Test.createTestingModule({
       providers: [ServeSuspensionUseCase, { provide: SUSPENSION_REPOSITORY, useValue: repo }],
     }).compile()
-    const result = await mod.get(ServeSuspensionUseCase).execute('sus-1')
+    await mod.get(ServeSuspensionUseCase).execute('sus-1')
     expect(repo.update).toHaveBeenCalledWith('sus-1', expect.objectContaining({ status: SuspensionStatus.CUMPRIDA }))
   })
 

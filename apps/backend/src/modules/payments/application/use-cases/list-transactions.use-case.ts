@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { TransactionEntity } from '../../domain/entities/transaction.entity'
 import {
-  ITransactionRepository,
+  ITransactionRepository} from '../../domain/repositories/i-transaction.repository'
+import {
   TRANSACTION_REPOSITORY,
 } from '../../domain/repositories/i-transaction.repository'
 

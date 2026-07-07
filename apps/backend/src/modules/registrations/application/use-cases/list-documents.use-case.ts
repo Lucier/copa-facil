@@ -2,11 +2,13 @@ import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { RegistrationDocumentEntity } from '../../domain/entities/registration-document.entity'
 import {
-  IRegistrationDocumentRepository,
+  IRegistrationDocumentRepository} from '../../domain/repositories/i-registration-document.repository'
+import {
   REGISTRATION_DOCUMENT_REPOSITORY,
 } from '../../domain/repositories/i-registration-document.repository'
 import {
-  IRegistrationRepository,
+  IRegistrationRepository} from '../../domain/repositories/i-registration.repository'
+import {
   REGISTRATION_REPOSITORY,
 } from '../../domain/repositories/i-registration.repository'
 

@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { NotFoundError } from '../../../../shared/errors'
 import { TeamEntity } from '../../domain/entities/team.entity'
-import { ITeamRepository, TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
+import { ITeamRepository} from '../../domain/repositories/i-team.repository'
+import { TEAM_REPOSITORY } from '../../domain/repositories/i-team.repository'
 import { UpdateTeamDto } from '../dtos/update-team.dto'
 
 @Injectable()

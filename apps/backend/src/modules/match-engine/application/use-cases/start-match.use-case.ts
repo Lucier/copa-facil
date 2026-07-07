@@ -3,7 +3,8 @@ import { NotFoundError } from '../../../../shared/errors'
 import { AppError } from '../../../../shared/errors/app-error'
 import { MatchStatus } from '../../../championships/domain/enums'
 import { MatchEntity } from '../../domain/entities/match.entity'
-import { IMatchRepository, MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
+import { IMatchRepository} from '../../domain/repositories/i-match.repository'
+import { MATCH_REPOSITORY } from '../../domain/repositories/i-match.repository'
 
 @Injectable()
 export class StartMatchUseCase {

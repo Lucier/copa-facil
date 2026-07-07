@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { describe, it, expect, vi } from 'vitest'
+import { Test } from '@nestjs/testing'
 import { ListTeamsUseCase } from '../application/use-cases/list-teams.use-case'
 import { GetTeamUseCase } from '../application/use-cases/get-team.use-case'
 import { UpdateTeamUseCase } from '../application/use-cases/update-team.use-case'

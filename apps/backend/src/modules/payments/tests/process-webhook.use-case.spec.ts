@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { ProcessWebhookUseCase } from '../application/use-cases/process-webhook.use-case'
 import { TRANSACTION_REPOSITORY } from '../domain/repositories/i-transaction.repository'
 import { LEDGER_REPOSITORY } from '../domain/repositories/i-ledger.repository'

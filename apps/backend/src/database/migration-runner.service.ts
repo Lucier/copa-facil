@@ -1,9 +1,10 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common'
+import { OnModuleInit } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import type postgres from 'postgres'
 import { DrizzleService } from './drizzle.service'
 import { coreMigrations } from './migrations/core'
 import { tenantMigrations } from './migrations/tenant'
-import type { Migration } from './migrations/types'
+import { Migration } from './migrations/types'
 
 // Hyphens are allowed: slugs are kebab-case and the schema identifier is always
 // quoted via tx(schemaName), never interpolated raw.

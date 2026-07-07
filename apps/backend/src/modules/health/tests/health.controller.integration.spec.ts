@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { Test, type TestingModule } from '@nestjs/testing'
+import { Test, TestingModule } from '@nestjs/testing'
 import { HealthController } from '../presentation/health.controller'
 import { GetHealthUseCase } from '../application/get-health.use-case'
 

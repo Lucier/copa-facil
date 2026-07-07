@@ -1,4 +1,4 @@
-import { Settings, Building2, Bell, Shield, Palette } from 'lucide-react'
+import { Settings, Building2, Bell, Shield } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,13 +27,13 @@ export default function SettingsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="org-name">Nome da Organização</Label>
-              <Input id="org-name" defaultValue="Copa Fácil Demo" />
+              <Input id="org-name" defaultValue="Cerrados Esportes Demo" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="org-slug">Slug (URL)</Label>
               <div className="flex">
                 <span className="flex items-center rounded-l-md border border-r-0 border-border bg-secondary px-3 text-xs text-muted-foreground">
-                  copafacil.app/
+                  cerradosesportes.app/
                 </span>
                 <Input id="org-slug" defaultValue="demo" className="rounded-l-none" />
               </div>

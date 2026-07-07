@@ -1,6 +1,6 @@
 {
   "annotations": { "list": [] },
-  "description": "Visão geral da API Copa Fácil — latência, throughput e erros",
+  "description": "Visão geral da API Cerrados Esportes — latência, throughput e erros",
   "editable": true,
   "graphTooltip": 1,
   "id": null,
@@ -152,12 +152,12 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["copa-facil", "api"],
+  "tags": ["cerrados-esportes", "api"],
   "templating": { "list": [] },
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Copa Fácil — API Overview",
-  "uid": "copa-facil-api-overview",
+  "title": "Cerrados Esportes — API Overview",
+  "uid": "cerrados-esportes-api-overview",
   "version": 1
 }
