@@ -4,12 +4,17 @@ global:
   scrape_timeout:      10s
   external_labels:
     environment: production
-    app:         cerrados-esportes
+    app:         copa-facil
 
 alerting:
-  alertmanagers: []
+  alertmanagers:
+    - static_configs:
+        - targets: []
+      # To enable alert delivery, add alertmanager to docker-compose.prod.yml and set:
+      # targets: ['alertmanager:9093']
 
-rule_files: []
+rule_files:
+  - /etc/prometheus/alerts.yml
 
 scrape_configs:
   # ─── OTEL Collector (NestJS app metrics via OpenTelemetry) ───────────────────

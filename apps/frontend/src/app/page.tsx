@@ -6,8 +6,10 @@ import {
 } from 'lucide-react'
 import { PricingSection } from '@/components/landing/pricing-section'
 
+const DEMO_TENANT = process.env.NEXT_PUBLIC_DEMO_TENANT ?? 'demo'
+
 export const metadata: Metadata = {
-  title: 'Cerrados Esportes — Gestão de Campeonatos Esportivos',
+  title: 'Copa Fácil — Gestão de Campeonatos Esportivos',
   description: 'A plataforma mais simples para gerenciar campeonatos de futebol e futsal. Tabelas, partidas, estatísticas e muito mais.',
 }
 
@@ -86,7 +88,7 @@ export default function LandingPage() {
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
               <Trophy className="size-4 text-primary-foreground" />
             </div>
-            <span className="font-display text-lg font-bold tracking-tight">Cerrados Esportes</span>
+            <span className="font-display text-lg font-bold tracking-tight">Copa Fácil</span>
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -97,7 +99,7 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/demo/login"
+              href={`/${DEMO_TENANT}/login`}
               className="hidden rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:block"
             >
               Entrar
@@ -291,14 +293,14 @@ export default function LandingPage() {
 
             <div className="relative mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link
-                href="/demo/login"
+                href={`/${DEMO_TENANT}/login`}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:opacity-90"
               >
                 <Shield className="size-4" />
                 Entrar como Administrador
               </Link>
               <Link
-                href="/demo"
+                href={`/${DEMO_TENANT}`}
                 className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-8 py-3.5 text-sm font-medium transition-colors hover:bg-accent/50"
               >
                 <Trophy className="size-4 text-primary" />
@@ -317,18 +319,18 @@ export default function LandingPage() {
               <div className="flex size-7 items-center justify-center rounded-md bg-primary">
                 <Trophy className="size-3.5 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold">Cerrados Esportes</span>
+              <span className="font-display font-bold">Copa Fácil</span>
             </Link>
 
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
               <a href="#features" className="hover:text-foreground transition-colors">Recursos</a>
               <a href="#plans" className="hover:text-foreground transition-colors">Planos</a>
-              <Link href="/demo" className="hover:text-foreground transition-colors">Demonstração</Link>
-              <Link href="/demo/login" className="hover:text-foreground transition-colors">Entrar</Link>
+              <Link href={`/${DEMO_TENANT}`} className="hover:text-foreground transition-colors">Demonstração</Link>
+              <Link href={`/${DEMO_TENANT}/login`} className="hover:text-foreground transition-colors">Entrar</Link>
             </div>
 
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Cerrados Esportes. Todos os direitos reservados.
+              © {new Date().getFullYear()} Copa Fácil. Todos os direitos reservados.
             </p>
           </div>
         </div>

@@ -1,0 +1,33 @@
+# Secrets — never bake into images
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+
+# Git internals
+.git
+.gitignore
+
+# Node modules — rebuilt inside image
+node_modules
+**/node_modules
+
+# Build artifacts — built inside image
+**/dist
+**/.next
+**/coverage
+**/.turbo
+
+# Dev / test artifacts
+test-results
+**/uploads
+docs
+prompts
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+**/*.log
+.vscode
+.idea

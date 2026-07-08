@@ -14,6 +14,6 @@ export const useUIStore = create<UIState>()(
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
     }),
-    { name: 'cerrados-esportes-ui' },
+    { name: 'copa-facil-ui' },
   ),
 )

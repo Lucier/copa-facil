@@ -1,4 +1,4 @@
-import { Settings, Building2, Bell, Shield } from 'lucide-react'
+import { Settings, Building2, Bell, Shield, Construction } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,6 +14,12 @@ export default function SettingsPage() {
         <p className="mt-1 text-sm text-muted-foreground">Gerencie as configurações da sua organização.</p>
       </div>
 
+      {/* Not implemented banner */}
+      <div className="flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-600 dark:text-amber-400">
+        <Construction className="size-4 shrink-0" />
+        <span>Esta página ainda não está conectada ao backend. As alterações não serão salvas.</span>
+      </div>
+
       {/* Org Info */}
       <Card>
         <CardHeader>
@@ -27,29 +33,29 @@ export default function SettingsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="org-name">Nome da Organização</Label>
-              <Input id="org-name" defaultValue="Cerrados Esportes Demo" />
+              <Input id="org-name" placeholder="Nome da organização" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="org-slug">Slug (URL)</Label>
               <div className="flex">
                 <span className="flex items-center rounded-l-md border border-r-0 border-border bg-secondary px-3 text-xs text-muted-foreground">
-                  cerradosesportes.app/
+                  copafacil.com.br/
                 </span>
-                <Input id="org-slug" defaultValue="demo" className="rounded-l-none" />
+                <Input id="org-slug" placeholder="meu-torneio" className="rounded-l-none" />
               </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="org-email">Email de Contato</Label>
-              <Input id="org-email" type="email" defaultValue="contato@demo.com" />
+              <Input id="org-email" type="email" placeholder="contato@minhaorg.com" />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="org-phone">Telefone</Label>
-              <Input id="org-phone" defaultValue="(11) 99999-0000" />
+              <Input id="org-phone" placeholder="(00) 00000-0000" />
             </div>
           </div>
           <Separator />
           <div className="flex justify-end">
-            <Button size="sm">Salvar Alterações</Button>
+            <Button size="sm" disabled>Salvar Alterações</Button>
           </div>
         </CardContent>
       </Card>

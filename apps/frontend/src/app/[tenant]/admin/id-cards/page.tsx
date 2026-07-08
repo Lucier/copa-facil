@@ -251,7 +251,7 @@ function PlayerIdCard({
               <span
                 style={{ fontSize: '9px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px' }}
               >
-                Cerrados Esportes
+                Copa Fácil
               </span>
             </div>
           </div>
@@ -277,6 +277,19 @@ function Row({ label, value }: { label: string; value: string }) {
 
 // ── Print logic ───────────────────────────────────────────────────────────────
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function escapeAttr(s: string): string {
+  return s.replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 function buildCardHTML(player: Player, team: Team, orgName: string): string {
   const primary = team.primaryColor ?? '#1a7a00'
   const secondary = team.secondaryColor ?? '#ffffff'
@@ -300,36 +313,40 @@ function buildCardHTML(player: Player, team: Team, orgName: string): string {
       : ''
 
   const rows = [
-    player.document ? `<div class="row"><span class="lbl">${player.documentType?.toUpperCase() ?? 'DOC'}</span><span>${player.document}</span></div>` : '',
-    player.birthdate ? `<div class="row"><span class="lbl">Nasc.</span><span>${formatDate(player.birthdate)}</span></div>` : '',
-    foot ? `<div class="row"><span class="lbl">Pé</span><span>${foot}</span></div>` : '',
+    player.document ? `<div class="row"><span class="lbl">${escapeHtml(player.documentType?.toUpperCase() ?? 'DOC')}</span><span>${escapeHtml(player.document)}</span></div>` : '',
+    player.birthdate ? `<div class="row"><span class="lbl">Nasc.</span><span>${escapeHtml(formatDate(player.birthdate))}</span></div>` : '',
+    foot ? `<div class="row"><span class="lbl">Pé</span><span>${escapeHtml(foot)}</span></div>` : '',
   ].join('')
+
+  const avatarHtml = player.photoUrl
+    ? `<img src="${escapeAttr(player.photoUrl)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+    : escapeHtml(initials)
 
   return `
     <div class="card">
-      <div class="top-bar" style="background:${primary}"></div>
+      <div class="top-bar" style="background:${escapeAttr(primary)}"></div>
       <div class="body">
-        <div class="left" style="background:${primary}">
-          <div class="avatar" style="background:${secondary};color:${textOnSecondary}">${player.photoUrl ? `<img src="${player.photoUrl}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">` : initials}</div>
-          ${player.jerseyNumber != null ? `<div class="number" style="background:${secondary};color:${textOnSecondary}">#${player.jerseyNumber}</div>` : ''}
-          <span class="team-name" style="color:${textOnPrimary}">${team.acronym ?? team.name.slice(0, 8)}</span>
+        <div class="left" style="background:${escapeAttr(primary)}">
+          <div class="avatar" style="background:${escapeAttr(secondary)};color:${escapeAttr(textOnSecondary)}">${avatarHtml}</div>
+          ${player.jerseyNumber != null ? `<div class="number" style="background:${escapeAttr(secondary)};color:${escapeAttr(textOnSecondary)}">#${player.jerseyNumber}</div>` : ''}
+          <span class="team-name" style="color:${escapeAttr(textOnPrimary)}">${escapeHtml(team.acronym ?? team.name.slice(0, 8))}</span>
         </div>
         <div class="right">
           <div class="info-top">
-            <div class="player-name">${player.fullName}</div>
-            <div class="position" style="color:${primary}">${player.mainPosition}</div>
+            <div class="player-name">${escapeHtml(player.fullName)}</div>
+            <div class="position" style="color:${escapeAttr(primary)}">${escapeHtml(player.mainPosition)}</div>
           </div>
           <div class="details">${rows}</div>
           <div class="footer">
-            <span class="org">${orgName}</span>
+            <span class="org">${escapeHtml(orgName)}</span>
             <div class="brand">
-              <div class="brand-dot" style="background:${primary}"></div>
-              <span>CERRADOS ESPORTES</span>
+              <div class="brand-dot" style="background:${escapeAttr(primary)}"></div>
+              <span>COPA FÁCIL</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="bottom-bar" style="background:${primary}"></div>
+      <div class="bottom-bar" style="background:${escapeAttr(primary)}"></div>
     </div>
   `
 }
@@ -347,7 +364,7 @@ function openPrintWindow(players: Player[], team: Team, orgName: string) {
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Carteirinhas — ${team.name}</title>
+  <title>Carteirinhas — ${escapeHtml(team.name)}</title>
   <style>
     @page { margin: 10mm; size: A4; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -386,7 +403,7 @@ function openPrintWindow(players: Player[], team: Team, orgName: string) {
 <body>
   <div class="header">
     <div>
-      <h1>Carteirinhas — ${team.name}</h1>
+      <h1>Carteirinhas — ${escapeHtml(team.name)}</h1>
       <p>${players.length} jogador${players.length !== 1 ? 'es' : ''} · Gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
     </div>
   </div>

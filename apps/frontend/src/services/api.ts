@@ -1,5 +1,6 @@
-import axios from 'axios'
+import axios, { InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/store/useAuthStore'
+import { API } from './endpoints'
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001',
@@ -7,7 +8,6 @@ const api = axios.create({
   withCredentials: true,
 })
 
-// Inject tenant header on every request (JWT travels via HTTP-only cookie automatically)
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const tenantSlug = window.location.pathname.split('/')[1]
@@ -18,14 +18,53 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Handle 401 — clear client-side user state (cookie is cleared server-side on logout)
+// Mutex to prevent concurrent refresh calls when multiple requests 401 simultaneously
+let isRefreshing = false
+let refreshQueue: Array<() => void> = []
+
+function drainQueue() {
+  refreshQueue.forEach((resolve) => resolve())
+  refreshQueue = []
+}
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().clearAuth()
+  async (error) => {
+    const original: InternalAxiosRequestConfig & { _retry?: boolean } = error.config
+
+    if (error.response?.status !== 401 || original._retry) {
+      return Promise.reject(error)
     }
-    return Promise.reject(error)
+
+    // Avoid infinite loop on the refresh endpoint itself
+    if (original.url === API.auth.refresh) {
+      useAuthStore.getState().clearAuth()
+      return Promise.reject(error)
+    }
+
+    // If already refreshing, queue this request
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        refreshQueue.push(() => {
+          api(original).then(resolve).catch(reject)
+        })
+      })
+    }
+
+    original._retry = true
+    isRefreshing = true
+
+    try {
+      await api.post(API.auth.refresh)
+      drainQueue()
+      return api(original)
+    } catch {
+      refreshQueue = []
+      useAuthStore.getState().clearAuth()
+      return Promise.reject(error)
+    } finally {
+      isRefreshing = false
+    }
   },
 )
 

@@ -15,8 +15,8 @@
 
 ```sh
 # 1. Clone e entre no diretório
-git clone https://github.com/seu-org/cerrados-esportes.git
-cd cerrados-esportes
+git clone https://github.com/seu-org/copa-facil.git
+cd copa-facil
 
 # 2. Copie o arquivo de ambiente
 cp .env.example .env
@@ -55,7 +55,7 @@ docker compose --profile monitoring up -d
 Em produção, o Nginx extrai o tenant do subdomínio:
 
 ```
-equipe-gaucha.cerrados-esportes.com.br → X-Tenant-ID: equipe-gaucha
+equipe-gaucha.copafacil.com.br → X-Tenant-ID: equipe-gaucha
 ```
 
 Para testar localmente sem DNS wildcard, passe o header manualmente:
@@ -66,7 +66,7 @@ curl http://localhost:3001/api/v1/health \
   -H "x-tenant-id: meu-clube"
 
 # Em produção (com Nginx rodando)
-curl http://meu-clube.cerrados-esportes.com.br/api/v1/health
+curl http://meu-clube.copafacil.com.br/api/v1/health
 ```
 
 Para simular o roteamento Nginx localmente:
@@ -75,8 +75,8 @@ Para simular o roteamento Nginx localmente:
 docker compose -f docker-compose.prod.yml up -d nginx
 
 # Adicione uma entrada no /etc/hosts para testar:
-echo "127.0.0.1 meu-clube.cerrados-esportes.local" | sudo tee -a /etc/hosts
-curl http://meu-clube.cerrados-esportes.local/api/v1/health
+echo "127.0.0.1 meu-clube.copafacil.local" | sudo tee -a /etc/hosts
+curl http://meu-clube.copafacil.local/api/v1/health
 ```
 
 ---
@@ -114,17 +114,17 @@ PostgreSQL DDL:
 
 ```sh
 # Liste todos os schemas criados
-docker compose exec postgres psql -U cerradosesportes -c "\dn" cerradosesportes
+docker compose exec postgres psql -U copafacil -c "\dn" copafacil
 
 # Verifique as tabelas do novo tenant
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT table_name
   FROM information_schema.tables
   WHERE table_schema = 'tenant_clube_gaucho'
   ORDER BY table_name;"
 
 # Verifique o registro na tabela organizations
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT id, name, slug, schema_name, created_at
   FROM public.organizations
   WHERE slug = 'clube-gaucho';"
@@ -136,7 +136,7 @@ docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
 |---------------|------------------|
 | PostgreSQL    | ~50 novas tabelas, ~500 KB overhead inicial |
 | Redis         | Prefixo `auth:<tenantId>:*`, overhead < 1 MB |
-| MinIO         | Pasta `/cerrados-esportes-assets/<slug>/` criada on-demand |
+| MinIO         | Pasta `/copa-facil-assets/<slug>/` criada on-demand |
 | Nginx         | Nenhum — extração é dinâmica via `map $http_host` |
 
 **Capacidade:** Com `max_connections=200` e connection pooling via postgres-js (pool de 10 por instância backend), o sistema suporta ~100 tenants com uso concorrente moderado.
@@ -155,7 +155,7 @@ docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
 # 1. Identifique a rota mais lenta (painel "Top Rotas por p95" no Grafana)
 
 # 2. Verifique queries lentas no PostgreSQL
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT query, round(mean_exec_time::numeric, 2) AS mean_ms,
          calls, round(total_exec_time::numeric, 2) AS total_ms
   FROM pg_stat_statements
@@ -163,10 +163,10 @@ docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
   LIMIT 10;"
 
 # 3. Verifique uso de recursos do container
-docker stats cerrados_esportes_backend --no-stream
+docker stats copa_facil_backend --no-stream
 
 # 4. Verifique logs de erro recentes
-docker compose logs cerrados_esportes_backend --tail=200 | grep -E "ERROR|WARN|error"
+docker compose logs copa_facil_backend --tail=200 | grep -E "ERROR|WARN|error"
 ```
 
 **Ações corretivas:**
@@ -188,14 +188,14 @@ docker compose logs cerrados_esportes_backend --tail=200 | grep -E "ERROR|WARN|e
 
 ```sh
 # Conexões abertas por estado e usuário
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT state, usename, count(*)
   FROM pg_stat_activity
   GROUP BY state, usename
   ORDER BY count DESC;"
 
 # Conexões idle há mais de 5 minutos (vazamento de conexão)
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT pid, state, state_change,
          left(query, 80) AS query_snippet
   FROM pg_stat_activity
@@ -204,7 +204,7 @@ docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
   ORDER BY state_change;"
 
 # Conexões bloqueadas por locks
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT pid, wait_event_type, wait_event, left(query, 80) AS query
   FROM pg_stat_activity
   WHERE wait_event IS NOT NULL;"
@@ -217,14 +217,14 @@ docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
 docker compose -f docker-compose.prod.yml restart backend
 
 # Encerrar conexões idle travadas (substituir <pid> pelo valor real)
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   SELECT pg_terminate_backend(pid)
   FROM pg_stat_activity
   WHERE state = 'idle'
     AND state_change < NOW() - INTERVAL '10 minutes';"
 
 # Configurar timeout de sessão idle (persistente)
-docker compose exec postgres psql -U cerradosesportes cerradosesportes -c "
+docker compose exec postgres psql -U copafacil copafacil -c "
   ALTER SYSTEM SET idle_in_transaction_session_timeout = '30s';
   SELECT pg_reload_conf();"
 ```
@@ -245,7 +245,7 @@ docker compose exec redis redis-cli KEYS "bull:*:failed" 2>/dev/null | head -10
 docker compose exec redis redis-cli LRANGE "bull:nome-da-fila:failed" 0 5
 
 # Logs do worker
-docker compose logs cerrados_esportes_backend --tail=200 | grep -iE "bullmq|job|failed|error"
+docker compose logs copa_facil_backend --tail=200 | grep -iE "bullmq|job|failed|error"
 ```
 
 **Ações corretivas:**
@@ -312,11 +312,11 @@ docker compose -f docker-compose.prod.yml ps
 
 # 3. Rollback para a imagem anterior
 export IMAGE_TAG=sha-<commit-anterior>
-export REGISTRY=ghcr.io/seu-org/cerrados-esportes
+export REGISTRY=ghcr.io/seu-org/copa-facil
 docker compose -f docker-compose.prod.yml up -d --no-deps backend
 
 # 4. Verifique o histórico de imagens disponíveis
-docker images ghcr.io/seu-org/cerrados-esportes-backend \
+docker images ghcr.io/seu-org/copa-facil-backend \
   --format "table {{.Tag}}\t{{.CreatedAt}}" | head -10
 ```
 
@@ -329,7 +329,7 @@ docker images ghcr.io/seu-org/cerrados-esportes-backend \
 curl -sf http://localhost:3001/api/v1/health | jq .
 
 # PostgreSQL
-docker compose exec postgres pg_isready -U cerradosesportes -d cerradosesportes
+docker compose exec postgres pg_isready -U copafacil -d copafacil
 
 # Redis
 docker compose exec redis redis-cli ping

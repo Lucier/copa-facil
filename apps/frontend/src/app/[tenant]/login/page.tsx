@@ -17,7 +17,7 @@ import { API } from '@/services/endpoints'
 interface TokenResponse {
   accessToken: string
   refreshToken: string
-  user: { id: string; email: string; name: string }
+  user: { id: string; email: string; name: string; role: string }
 }
 
 export default function LoginPage() {
@@ -38,7 +38,7 @@ export default function LoginPage() {
     setServerError(null)
     try {
       const { data } = await api.post<TokenResponse>(API.auth.login, values)
-      setAuth({ id: data.user.id, name: data.user.name, email: data.user.email, role: 'organizador' })
+      setAuth({ id: data.user.id, name: data.user.name, email: data.user.email, role: data.user.role })
       router.push(`/${tenant}/admin`)
     } catch {
       setServerError('E-mail ou senha incorretos.')
@@ -52,7 +52,7 @@ export default function LoginPage() {
           <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
             <Trophy className="size-5 text-primary-foreground" />
           </div>
-          <h1 className="font-display text-xl font-bold">Cerrados Esportes</h1>
+          <h1 className="font-display text-xl font-bold">Copa Fácil</h1>
           <p className="text-sm text-muted-foreground">
             Acesse o painel da organização <span className="font-medium text-foreground">{tenant}</span>
           </p>

@@ -284,7 +284,7 @@ export default function JoinTeamPage() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">Cerrados Esportes — Gestão de Campeonatos</p>
+        <p className="text-center text-xs text-muted-foreground">Copa Fácil — Gestão de Campeonatos</p>
       </div>
     </div>
   )

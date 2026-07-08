@@ -60,19 +60,8 @@ export function NewChampionshipDialog({ children, onCreated }: NewChampionshipDi
   async function uploadFile(file: File): Promise<string> {
     const fd = new FormData()
     fd.append('file', file)
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1'
-    const tenantId = window.location.pathname.split('/')[1] ?? ''
-    const res = await fetch(`${baseUrl}/upload`, {
-      method: 'POST',
-      body: fd,
-      credentials: 'include',
-      headers: tenantId ? { 'x-tenant-id': tenantId } : {},
-    })
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({})) as { message?: string }
-      throw new Error(err.message ?? 'Erro ao enviar arquivo')
-    }
-    return ((await res.json()) as { url: string }).url
+    const { data } = await api.post<{ url: string }>('/upload', fd)
+    return data.url
   }
 
   async function onSubmit(values: CreateChampionshipInput) {

@@ -5,8 +5,11 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+        # Restrict CORS to backend service — collector is internal-only
         cors:
-          allowed_origins: ["*"]
+          allowed_origins:
+            - "http://backend:3001"
+            - "http://localhost:3001"
 
 processors:
   memory_limiter:
@@ -22,13 +25,13 @@ processors:
   resource:
     attributes:
       - key: service.name
-        value: cerrados-esportes-backend
+        value: copa-facil-backend
         action: upsert
       - key: deployment.environment
         from_attribute: DEPLOYMENT_ENV
         action: insert
 
-  # Drop noisy health-check spans
+  # Drop noisy health-check spans to reduce storage volume
   filter/health:
     error_mode: ignore
     traces:
@@ -40,16 +43,10 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
     const_labels:
-      app: cerrados-esportes
+      app: copa-facil
     send_timestamps: true
     metric_expiration: 5m
     enable_open_metrics: true
-
-  # Debug output (dev/staging only — remove in production if verbose)
-  debug:
-    verbosity: normal
-    sampling_initial: 5
-    sampling_thereafter: 200
 
 service:
   telemetry:
@@ -60,7 +57,7 @@ service:
     traces:
       receivers:  [otlp]
       processors: [memory_limiter, filter/health, batch]
-      exporters:  [debug]
+      exporters:  [prometheus]
 
     metrics:
       receivers:  [otlp]
@@ -70,4 +67,4 @@ service:
     logs:
       receivers:  [otlp]
       processors: [memory_limiter, batch]
-      exporters:  [debug]
+      exporters:  [prometheus]

@@ -40,7 +40,7 @@ export const useAuthStore = create<AuthState>()(
       _setHasHydrated: (v) => set({ _hasHydrated: v }),
     }),
     {
-      name: 'cerrados-esportes-auth',
+      name: 'copa-facil-auth',
       onRehydrateStorage: () => (state) => {
         if (state?.expiresAt && state.expiresAt < Date.now()) {
           state.clearAuth()

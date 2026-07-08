@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { createHmac, timingSafeEqual } from 'crypto'
 import {
   BoletoPaymentRequest,
@@ -18,6 +18,7 @@ function shortId(): string {
 
 @Injectable()
 export class MockPaymentGatewayAdapter implements IPaymentGateway {
+  private readonly logger = new Logger(MockPaymentGatewayAdapter.name)
   async createPix(req: PixPaymentRequest): Promise<PixPaymentResponse> {
     const transactionId = `MOCK-PIX-${shortId()}`
     const ttl = req.ttlMinutes ?? 30
@@ -26,7 +27,7 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     return {
       transactionId,
       qrCode: `data:image/png;base64,MOCK_QR_CODE_${transactionId}`,
-      copyPasteCode: `00020126580014BR.GOV.BCB.PIX0136mock-key-${transactionId}5204000053039865802BR5925Cerrados Esportes Organizacoes6009SAO PAULO62140510${transactionId}63041234`,
+      copyPasteCode: `00020126580014BR.GOV.BCB.PIX0136mock-key-${transactionId}5204000053039865802BR5913Copa Facil SAS6009SAO PAULO62140510${transactionId}63041234`,
       expiresAt,
     }
   }
@@ -82,8 +83,7 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
 
     if (!secret) {
       if (process.env.NODE_ENV === 'production') return false
-      // Dev mode without secret configured — allow but warn
-      console.warn('[MockPaymentGateway] MP_WEBHOOK_SECRET not set — skipping signature check (dev only)')
+      this.logger.warn('MP_WEBHOOK_SECRET not set — skipping signature check (dev only)')
       return true
     }
 
@@ -101,12 +101,8 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
 
     if (!ts || !v1) return false
 
-    // Build canonical manifest
-    const components: string[] = []
-    if (dataId) components.push(`id:${dataId}`)
-    if (xRequestId) components.push(`request-id:${xRequestId}`)
-    components.push(`ts:${ts}`)
-    const manifest = components.join(';')
+    // Canonical manifest — matches MercadoPagoPaymentGatewayAdapter exactly
+    const manifest = `id:${dataId ?? ''};request-id:${xRequestId ?? ''};ts:${ts};`
 
     const expected = createHmac('sha256', secret).update(manifest).digest('hex')
 

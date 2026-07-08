@@ -12,15 +12,14 @@ import { CorsIoAdapter } from './infrastructure/websockets/cors-io.adapter'
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true, rawBody: true })
 
-  // Limit request body size to 1 MB to prevent DoS via large payloads
   app.useBodyParser('json', { limit: '1mb' })
   app.useBodyParser('urlencoded', { extended: true, limit: '1mb' })
 
-  // Use pino as the NestJS logger (covers framework internals + bootstrap logs)
   app.useLogger(app.get(Logger))
 
   const config = app.get(ConfigService)
-  const isDev = config.get<string>('NODE_ENV') !== 'production'
+  const isProd = config.get<string>('NODE_ENV') === 'production'
+  const isDev = !isProd
   const corsOrigins = config
     .getOrThrow<string>('CORS_ORIGINS')
     .split(',')
@@ -36,12 +35,19 @@ async function bootstrap() {
   })
 
   app.useWebSocketAdapter(new CorsIoAdapter(app, corsOrigins))
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      disableErrorMessages: isProd,
+    }),
+  )
   app.setGlobalPrefix('api/v1')
 
   if (isDev) {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('Cerrados Esportes API')
+      .setTitle('Copa Fácil API')
       .setDescription('Multi-tenant sports championship management API')
       .setVersion('1.0')
       .addBearerAuth()
@@ -53,17 +59,14 @@ async function bootstrap() {
   }
 
   const port = config.get<number>('PORT') ?? 3001
-  await app.listen(port)
+  await app.listen(port, '0.0.0.0')
 
   const logger = app.get(Logger)
   logger.log(`Application running on port ${port}`, 'Bootstrap')
 
-  // Graceful shutdown: stop accepting connections, drain in-flight requests,
-  // then trigger onModuleDestroy hooks (DB + Redis cleanup).
   const shutdown = async (signal: string) => {
     logger.log(`Received ${signal}, shutting down gracefully...`, 'Bootstrap')
 
-    // Force-exit if cleanup hangs beyond 10 seconds
     const forceExit = setTimeout(() => {
       logger.error('Graceful shutdown timed out — forcing exit', undefined, 'Bootstrap')
       process.exit(1)
@@ -82,6 +85,15 @@ async function bootstrap() {
 
   process.on('SIGTERM', () => void shutdown('SIGTERM'))
   process.on('SIGINT', () => void shutdown('SIGINT'))
+
+  process.on('unhandledRejection', (reason) => {
+    logger.error(`Unhandled promise rejection: ${String(reason)}`, undefined, 'Bootstrap')
+  })
+
+  process.on('uncaughtException', (err) => {
+    logger.error(`Uncaught exception: ${err.message}`, err.stack, 'Bootstrap')
+    process.exit(1)
+  })
 }
 
 bootstrap()

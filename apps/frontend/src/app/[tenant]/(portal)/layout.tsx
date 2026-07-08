@@ -20,15 +20,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: {
-      default: `${orgName} — Cerrados Esportes`,
+      default: `${orgName} — Copa Fácil`,
       template: `%s | ${orgName}`,
     },
     description: `Acompanhe campeonatos, resultados, tabela e notícias de ${orgName} em tempo real.`,
     openGraph: {
       type: 'website',
       locale: 'pt_BR',
-      siteName: 'Cerrados Esportes',
-      title: `${orgName} — Cerrados Esportes`,
+      siteName: 'Copa Fácil',
+      title: `${orgName} — Copa Fácil`,
       description: `Campeonatos, resultados e notícias de ${orgName}.`,
     },
     twitter: {
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     robots: { index: true, follow: true },
     alternates: {
-      canonical: `https://cerradosesportes.app/${tenant}`,
+      canonical: `https://copafacil.com.br/${tenant}`,
     },
   }
 }

@@ -71,7 +71,7 @@ export function PublicFooter({ tenant, orgName }: { tenant: string; orgName: str
           </p>
           <p className="text-xs text-muted-foreground">
             Powered by{' '}
-            <span className="text-primary font-semibold">Cerrados Esportes</span>
+            <span className="text-primary font-semibold">Copa Fácil</span>
           </p>
         </div>
       </div>

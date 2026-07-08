@@ -21,7 +21,7 @@ export class MailService implements OnModuleInit {
         port: 587,
         auth: { user: testAccount.user, pass: testAccount.pass },
       })
-      this.fromAddress = `Cerrados Esportes <${testAccount.user}>`
+      this.fromAddress = `Copa Fácil <${testAccount.user}>`
       this.logger.log(`[DEV] Mail transporter ready (ethereal). Preview at https://ethereal.email`)
     } else {
       this.transporter = nodemailer.createTransport({
@@ -34,7 +34,7 @@ export class MailService implements OnModuleInit {
         },
       })
       this.fromAddress =
-        this.config.get<string>('MAIL_FROM') ?? 'Cerrados Esportes <noreply@cerradosesportes.com.br>'
+        this.config.get<string>('MAIL_FROM') ?? 'Copa Fácil <noreply@copafacil.com.br>'
     }
   }
 
@@ -42,7 +42,7 @@ export class MailService implements OnModuleInit {
     const info = await this.transporter.sendMail({
       from: this.fromAddress,
       to,
-      subject: 'Redefinição de senha — Cerrados Esportes',
+      subject: 'Redefinição de senha — Copa Fácil',
       text: `Olá, ${name}!\n\nClique no link abaixo para redefinir sua senha (válido por 1 hora):\n\n${resetUrl}\n\nSe você não solicitou isso, ignore este e-mail.`,
       html: `<p>Olá, <strong>${name}</strong>!</p>
 <p>Clique no botão abaixo para redefinir sua senha (válido por 1 hora):</p>
@@ -59,9 +59,9 @@ export class MailService implements OnModuleInit {
     const info = await this.transporter.sendMail({
       from: this.fromAddress,
       to,
-      subject: `Convite para ${orgName} — Cerrados Esportes`,
-      text: `Você foi convidado para fazer parte de ${orgName} no Cerrados Esportes.\n\nAcesse o link abaixo para aceitar (válido por 7 dias):\n\n${inviteUrl}`,
-      html: `<p>Você foi convidado para fazer parte de <strong>${orgName}</strong> no Cerrados Esportes.</p>
+      subject: `Convite para ${orgName} — Copa Fácil`,
+      text: `Você foi convidado para fazer parte de ${orgName} no Copa Fácil.\n\nAcesse o link abaixo para aceitar (válido por 7 dias):\n\n${inviteUrl}`,
+      html: `<p>Você foi convidado para fazer parte de <strong>${orgName}</strong> no Copa Fácil.</p>
 <p><a href="${inviteUrl}" style="background:#2563eb;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none">Aceitar convite</a></p>
 <p>Este convite expira em 7 dias.</p>`,
     })
