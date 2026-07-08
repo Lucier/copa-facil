@@ -8,7 +8,7 @@ import { memoryStorage } from 'multer'
 import { JwtAuthGuard } from '../auth/presentation/guards/jwt-auth.guard'
 import { StorageService } from '../../infrastructure/storage/storage.service'
 
-const ALLOWED_MIME = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
+const ALLOWED_MIME = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
 
 @ApiTags('Upload')

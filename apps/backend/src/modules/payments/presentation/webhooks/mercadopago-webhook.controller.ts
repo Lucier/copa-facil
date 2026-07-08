@@ -1,6 +1,7 @@
 import {
   RawBodyRequest} from '@nestjs/common'
 import {
+  BadRequestException,
   Controller,
   Headers,
   HttpCode,
@@ -10,6 +11,7 @@ import {
   Post,
   Query,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
@@ -46,13 +48,17 @@ export class MercadoPagoWebhookController {
     @Headers('x-request-id') xRequestId: string,
     @Req() req: RawBodyRequest<Request>,
   ): Promise<void> {
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(tenantId ?? '')) {
+      throw new BadRequestException('Invalid tenantId')
+    }
+
     const body = req.body as MpWebhookBody
     const dataId = String(body?.data?.id ?? '')
     const rawPayload = req.rawBody ?? Buffer.from(JSON.stringify(body))
 
     if (!this.gateway.verifyWebhookSignature(rawPayload, xSignature ?? '', xRequestId, dataId)) {
-      this.logger.warn({ dataId, xRequestId }, 'MP webhook signature invalid — ignoring')
-      return
+      this.logger.warn({ dataId, xRequestId }, 'MP webhook signature invalid')
+      throw new UnauthorizedException('Invalid webhook signature')
     }
 
     if (body?.type !== 'payment' || !dataId) {

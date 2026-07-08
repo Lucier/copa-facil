@@ -1,6 +1,6 @@
 import { RawBodyRequest} from '@nestjs/common'
 import {
-  Body, Controller, Headers, HttpCode, HttpStatus, Inject,
+  BadRequestException, Body, Controller, Headers, HttpCode, HttpStatus, Inject,
   Logger, Param, Post, Query, Req,
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
@@ -32,6 +32,10 @@ export class PaymentWebhooksController {
     @Headers('x-payment-signature') signature: string | undefined,
     @Req() req: RawBodyRequest<Request>,
   ): Promise<void> {
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(tenantId ?? '')) {
+      throw new BadRequestException('Invalid tenantId')
+    }
+
     const rawPayload = req.rawBody ?? Buffer.from(JSON.stringify(dto))
     const sig = signature ?? ''
 

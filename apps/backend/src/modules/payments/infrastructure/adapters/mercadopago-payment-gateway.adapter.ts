@@ -1,4 +1,4 @@
-import { createHmac } from 'crypto'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { BadRequestException } from '@nestjs/common'
 import { MercadoPagoConfig} from 'mercadopago'
 import { Payment, PaymentRefund } from 'mercadopago'
@@ -132,17 +132,26 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
   ): boolean {
     if (!this.webhookSecret || !xSignature) return false
 
-    // X-Signature format: "ts=<timestamp>&v1=<hmac>"
-    const parts = Object.fromEntries(
-      xSignature.split('&').map((p) => p.split('=')),
-    ) as Record<string, string>
-    const ts = parts['ts']
-    const v1 = parts['v1']
+    // X-Signature format: "ts=<timestamp>,v1=<hmac>"
+    const parts = new Map(
+      xSignature.split(',').map((part) => {
+        const idx = part.indexOf('=')
+        return [part.slice(0, idx), part.slice(idx + 1)] as [string, string]
+      }),
+    )
+    const ts = parts.get('ts')
+    const v1 = parts.get('v1')
     if (!ts || !v1) return false
+
+    // Reject events older than 5 minutes to prevent replay attacks
+    const ageSeconds = Math.floor(Date.now() / 1000) - parseInt(ts, 10)
+    if (isNaN(ageSeconds) || ageSeconds < 0 || ageSeconds > 300) return false
 
     const manifest = `id:${dataId ?? ''};request-id:${xRequestId ?? ''};ts:${ts};`
     const computed = createHmac('sha256', this.webhookSecret).update(manifest).digest('hex')
-    return computed === v1
+    const computedBuf = Buffer.from(computed)
+    const v1Buf = Buffer.from(v1)
+    return computedBuf.length === v1Buf.length && timingSafeEqual(computedBuf, v1Buf)
   }
 
   private normalizeStatus(status: string): string {

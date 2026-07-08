@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { ResetPasswordUseCase } from '../application/use-cases/reset-password.use-case'
 import { RedisTokenStoreService } from '../infrastructure/services/redis-token-store.service'
 import { CryptService } from '../../../infrastructure/crypt/crypt.service'
+import { MailService } from '../../../infrastructure/mail/mail.service'
 import { USER_REPOSITORY } from '../domain/repositories/i-user.repository'
 import { AUDIT_REPOSITORY } from '../domain/repositories/i-audit.repository'
 import { UserEntity } from '../domain/entities/user.entity'
@@ -21,6 +22,7 @@ describe('ResetPasswordUseCase', () => {
   }
   let crypt: { hash: ReturnType<typeof vi.fn> }
   let audit: { log: ReturnType<typeof vi.fn> }
+  let mail: { sendPasswordReset: ReturnType<typeof vi.fn> }
 
   beforeEach(async () => {
     userRepo = {
@@ -35,6 +37,7 @@ describe('ResetPasswordUseCase', () => {
     }
     crypt = { hash: vi.fn().mockResolvedValue('new-hash') }
     audit = { log: vi.fn().mockResolvedValue(undefined) }
+    mail = { sendPasswordReset: vi.fn().mockResolvedValue(undefined) }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -43,6 +46,7 @@ describe('ResetPasswordUseCase', () => {
         { provide: AUDIT_REPOSITORY, useValue: audit },
         { provide: RedisTokenStoreService, useValue: tokenStore },
         { provide: CryptService, useValue: crypt },
+        { provide: MailService, useValue: mail },
         {
           provide: ConfigService,
           useValue: { get: vi.fn().mockReturnValue('http://localhost:3000') },
@@ -63,10 +67,20 @@ describe('ResetPasswordUseCase', () => {
       expect(userId).toBe('uid-1')
     })
 
+    it('sends a password reset email when user exists', async () => {
+      await useCase.requestReset({ email: 'u@u.com' })
+      expect(mail.sendPasswordReset).toHaveBeenCalledOnce()
+      const [to, name, resetUrl] = mail.sendPasswordReset.mock.calls[0]
+      expect(to).toBe('u@u.com')
+      expect(name).toBe('User')
+      expect(resetUrl).toContain('/auth/reset-password/confirm?token=')
+    })
+
     it('still succeeds (no leak) when user does not exist', async () => {
       userRepo.findByEmail.mockResolvedValue(null)
       await expect(useCase.requestReset({ email: 'nobody@x.com' })).resolves.not.toThrow()
       expect(tokenStore.storeResetToken).not.toHaveBeenCalled()
+      expect(mail.sendPasswordReset).not.toHaveBeenCalled()
     })
 
     it('runs bcrypt dummy hash even when user is not found (constant time)', async () => {

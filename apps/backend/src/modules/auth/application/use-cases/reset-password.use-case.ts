@@ -1,7 +1,8 @@
-import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { randomBytes } from 'crypto'
 import { CryptService } from '../../../../infrastructure/crypt/crypt.service'
+import { MailService } from '../../../../infrastructure/mail/mail.service'
 import { IAuditRepository } from '../../domain/repositories/i-audit.repository'
 import { AUDIT_REPOSITORY } from '../../domain/repositories/i-audit.repository'
 import { IUserRepository} from '../../domain/repositories/i-user.repository'
@@ -13,14 +14,13 @@ import { ResetPasswordRequestDto } from '../dtos/reset-password-request.dto'
 
 @Injectable()
 export class ResetPasswordUseCase {
-  private readonly logger = new Logger(ResetPasswordUseCase.name)
-
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepo: IUserRepository,
     @Inject(AUDIT_REPOSITORY) private readonly audit: IAuditRepository,
     private readonly tokenStore: RedisTokenStoreService,
     private readonly crypt: CryptService,
     private readonly config: ConfigService,
+    private readonly mail: MailService,
   ) {}
 
   // Always returns success and runs the same work to prevent:
@@ -41,12 +41,7 @@ export class ResetPasswordUseCase {
       const appUrl = this.config.get<string>('APP_URL') ?? 'http://localhost:3000'
       const resetUrl = `${appUrl}/auth/reset-password/confirm?token=${token}`
 
-      if (this.config.get<string>('NODE_ENV') !== 'production') {
-        this.logger.log(`[DEV] Password reset link for ${dto.email}: ${resetUrl}`)
-      } else {
-        // TODO: replace with real email dispatch via NotificationsModule / SES / SendGrid
-        this.logger.warn(`Password reset requested for user ${user.id} — email delivery not yet configured`)
-      }
+      await this.mail.sendPasswordReset(user.email, user.name, resetUrl)
     }
   }
 

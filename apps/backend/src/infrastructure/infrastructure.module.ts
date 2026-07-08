@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common'
 import { HttpModule } from '@nestjs/axios'
 import { CryptService } from './crypt/crypt.service'
 import { AppLoggerService } from './logging/app-logger.service'
+import { MailService } from './mail/mail.service'
 import { redisProvider } from './redis/redis.provider'
 import { RedisLifecycleService } from './redis/redis-lifecycle.service'
 import { REDIS_CLIENT } from './redis/redis.constants'
@@ -14,6 +15,7 @@ import { TenantInterceptor } from './interceptors/tenant.interceptor'
   providers: [
     CryptService,
     AppLoggerService,
+    MailService,
     StorageService,
     TenantInterceptor,
     redisProvider,
@@ -22,6 +24,7 @@ import { TenantInterceptor } from './interceptors/tenant.interceptor'
   exports: [
     CryptService,
     AppLoggerService,
+    MailService,
     StorageService,
     HttpModule,
     REDIS_CLIENT,

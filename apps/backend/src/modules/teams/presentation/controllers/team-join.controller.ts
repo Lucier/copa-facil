@@ -7,6 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common'
+import { Throttle } from '@nestjs/throttler'
 import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { RegisterPlayerDto } from '../../application/dtos/register-player.dto'
 import { JoinTeamUseCase } from '../../application/use-cases/join-team.use-case'
@@ -35,6 +36,7 @@ export class TeamJoinController {
 
   @Post(':token')
   @HttpCode(HttpStatus.CREATED)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Self-register as a player in a team via invite token (public)' })
   async join(@Param('token') token: string, @Body() dto: RegisterPlayerDto) {
     const { team, player } = await this.joinTeam.execute(token, dto)

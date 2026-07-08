@@ -1,5 +1,7 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { randomBytes } from 'crypto'
+import { MailService } from '../../../../infrastructure/mail/mail.service'
 import { JwtPayload } from '../../../auth/application/jwt-payload.interface'
 import { TenantContext } from '../../../../infrastructure/tenant/tenant-context'
 import { InvitationEntity } from '../../domain/entities/invitation.entity'
@@ -24,6 +26,8 @@ export class InviteMemberUseCase {
     private readonly orgRepo: IOrganizationMgmtRepository,
     @Inject(INVITATION_REPOSITORY)
     private readonly invitationRepo: IInvitationRepository,
+    private readonly mail: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   async execute(dto: InviteMemberDto, currentUser: JwtPayload): Promise<InvitationEntity> {
@@ -40,8 +44,7 @@ export class InviteMemberUseCase {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + INVITE_TTL_DAYS)
 
-    // TODO: dispatch invitation email via NotificationsModule
-    return this.invitationRepo.create({
+    const invitation = await this.invitationRepo.create({
       orgId: org.id,
       email: dto.email,
       role: dto.role,
@@ -49,5 +52,11 @@ export class InviteMemberUseCase {
       invitedBy: currentUser.sub,
       expiresAt,
     })
+
+    const appUrl = this.config.get<string>('APP_URL') ?? 'http://localhost:3000'
+    const inviteUrl = `${appUrl}/convite?token=${token}`
+    await this.mail.sendInvitation(dto.email, org.name, inviteUrl)
+
+    return invitation
   }
 }

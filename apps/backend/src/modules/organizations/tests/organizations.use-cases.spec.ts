@@ -5,7 +5,9 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { TenantContext } from '../../../infrastructure/tenant/tenant-context'
+import { MailService } from '../../../infrastructure/mail/mail.service'
 import { UserRole } from '../../auth/domain/roles.enum'
 import { JwtPayload } from '../../auth/application/jwt-payload.interface'
 import { AcceptInvitationUseCase } from '../application/use-cases/accept-invitation.use-case'
@@ -21,6 +23,9 @@ import { UpdateOrganizationUseCase } from '../application/use-cases/update-organ
 import { InvitationEntity } from '../domain/entities/invitation.entity'
 import { OrganizationEntity } from '../domain/entities/organization.entity'
 import { InvitationStatus } from '../domain/enums/invitation-status.enum'
+
+const mailMock = { sendInvitation: vi.fn().mockResolvedValue(undefined) } as unknown as MailService
+const configMock = { get: vi.fn().mockReturnValue('http://localhost:3000') } as unknown as ConfigService
 
 const currentUser: JwtPayload = { sub: 'user-1', email: 'user@test.com', jti: 'jti-1' }
 
@@ -140,7 +145,13 @@ describe('InviteMemberUseCase', () => {
 
   beforeEach(() => {
     repos = makeRepos()
-    useCase = new InviteMemberUseCase(repos.orgRepo as never, repos.invitationRepo as never)
+    vi.mocked(mailMock.sendInvitation).mockClear()
+    useCase = new InviteMemberUseCase(
+      repos.orgRepo as never,
+      repos.invitationRepo as never,
+      mailMock,
+      configMock,
+    )
   })
 
   it('creates an invitation with token and 7-day expiry', async () => {
@@ -157,6 +168,22 @@ describe('InviteMemberUseCase', () => {
     const days = (result.expiresAt.getTime() - Date.now()) / 86_400_000
     expect(days).toBeGreaterThan(6.9)
     expect(days).toBeLessThanOrEqual(7)
+  })
+
+  it('sends invitation email after creating the invitation', async () => {
+    repos.orgRepo.findBySchemaName.mockResolvedValue(org)
+    repos.invitationRepo.findActiveByEmail.mockResolvedValue(null)
+    repos.invitationRepo.create.mockImplementation((data) => Promise.resolve(data))
+
+    await inTenant(() =>
+      useCase.execute({ email: 'novo@test.com', role: UserRole.ARBITRO }, currentUser),
+    )
+
+    expect(mailMock.sendInvitation).toHaveBeenCalledOnce()
+    const [to, orgName, inviteUrl] = (mailMock.sendInvitation as ReturnType<typeof vi.fn>).mock.calls[0]
+    expect(to).toBe('novo@test.com')
+    expect(orgName).toBe('Liga')
+    expect(inviteUrl).toContain('/convite?token=')
   })
 
   it('rejects duplicate active invitation', async () => {

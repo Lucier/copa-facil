@@ -134,10 +134,13 @@ jobs:
             # Pull new images
             docker compose -f docker-compose.prod.yml pull backend frontend
 
-            # Run pending DB migrations before taking traffic
-            docker compose -f docker-compose.prod.yml run --rm --no-deps \
-              -e RUN_MIGRATIONS=true backend \
-              node apps/backend/dist/main.js 2>&1 | tail -20 || true
+            # Ensure postgres is up (idempotent — no-op if already healthy)
+            docker compose -f docker-compose.prod.yml up -d --wait postgres
+
+            # Run pending DB migrations before taking traffic.
+            # The migrator service respects postgres healthcheck via depends_on.
+            # Exits non-zero on failure, aborting the deploy.
+            docker compose -f docker-compose.prod.yml --profile migrate run --rm migrator
 
             # Rolling restart — backend first, then frontend
             docker compose -f docker-compose.prod.yml up -d --no-deps --remove-orphans backend

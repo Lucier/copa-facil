@@ -12,6 +12,19 @@ export const envSchema = z.object({
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
   MP_ACCESS_TOKEN: z.string().optional(),
   MP_WEBHOOK_SECRET: z.string().optional(),
+  ENCRYPTION_KEY: z.string().regex(/^[0-9a-f]{64}$/i).optional(),
+}).superRefine((env, ctx) => {
+  if (env.NODE_ENV === 'production') {
+    if (!env.MP_ACCESS_TOKEN) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['MP_ACCESS_TOKEN'], message: 'Required in production' })
+    }
+    if (!env.MP_WEBHOOK_SECRET) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['MP_WEBHOOK_SECRET'], message: 'Required in production' })
+    }
+    if (!env.ENCRYPTION_KEY) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['ENCRYPTION_KEY'], message: 'Required in production' })
+    }
+  }
 })
 
 export type Env = z.infer<typeof envSchema>

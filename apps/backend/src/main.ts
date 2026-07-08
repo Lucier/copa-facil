@@ -1,4 +1,3 @@
-import { resolve } from 'path'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { ValidationPipe } from '@nestjs/common'
@@ -26,8 +25,6 @@ async function bootstrap() {
     .getOrThrow<string>('CORS_ORIGINS')
     .split(',')
     .map((o) => o.trim())
-
-  app.useStaticAssets(resolve(process.cwd(), 'uploads'), { prefix: '/uploads' })
 
   app.use(cookieParser())
   app.use(helmet())

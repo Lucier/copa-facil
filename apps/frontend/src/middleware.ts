@@ -17,8 +17,14 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL(`/${tenant}/login`, req.url))
   }
 
+  const jwtSecret = process.env.JWT_SECRET
+  if (!jwtSecret) {
+    console.error('JWT_SECRET is not set — refusing to serve protected route', pathname)
+    return new NextResponse('Internal Server Error', { status: 500 })
+  }
+
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const secret = new TextEncoder().encode(jwtSecret)
     await jwtVerify(token, secret)
     return NextResponse.next()
   } catch {

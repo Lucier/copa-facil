@@ -107,6 +107,20 @@ services:
     networks:
       - copa_internal
 
+  migrator:
+    image: ${REGISTRY}-backend:${IMAGE_TAG:-latest}
+    container_name: cerrados_esportes_migrator
+    env_file: .env.production
+    command: node apps/backend/dist/migrate.js
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    profiles:
+      - migrate
+    networks:
+      - copa_internal
+
   backend:
     image: ${REGISTRY}-backend:${IMAGE_TAG:-latest}
     container_name: cerrados_esportes_backend
@@ -233,8 +247,8 @@ services:
       - grafana_data:/var/lib/grafana
       - ./config/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - ./config/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    ports:
-      - '3002:3000'
+    # No host port — access via: docker exec + grafana-cli, or ssh tunnel
+    # ssh -L 3002:localhost:3000 user@server, then open localhost:3002
     restart: unless-stopped
     deploy:
       resources:

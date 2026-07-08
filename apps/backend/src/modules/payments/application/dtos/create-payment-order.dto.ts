@@ -28,9 +28,10 @@ export class CreatePaymentOrderDto {
   @IsString()
   referenceType?: string
 
-  @ApiProperty({ description: 'Amount in cents (e.g., 10000 = R$100,00)' })
+  @ApiProperty({ description: 'Amount in cents (e.g., 10000 = R$100,00). Max: R$1.000.000,00' })
   @IsInt()
   @Min(1)
+  @Max(100_000_000)
   amount!: number
 
   @ApiProperty({ enum: PaymentMethodType })

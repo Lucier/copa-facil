@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common'
 import { DrizzleService } from './drizzle.service'
 import { MigrationRunnerService } from './migration-runner.service'
 
+const SCHEMA_NAME_PATTERN = /^[a-z_][a-z0-9_-]*$/
+
 @Injectable()
 export class TenantRegistryService {
   private readonly logger = new Logger(TenantRegistryService.name)
@@ -23,6 +25,9 @@ export class TenantRegistryService {
   }
 
   async dropTenant(schemaName: string): Promise<void> {
+    if (!SCHEMA_NAME_PATTERN.test(schemaName)) {
+      throw new Error(`Invalid tenant schema name: ${schemaName}`)
+    }
     this.logger.warn(`Dropping tenant schema: ${schemaName}`)
     await this.drizzle.runRaw(async (sql) => {
       await sql`DROP SCHEMA IF EXISTS ${sql(schemaName)} CASCADE`

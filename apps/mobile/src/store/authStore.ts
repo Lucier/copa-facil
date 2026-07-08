@@ -1,7 +1,14 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from 'expo-secure-store'
 import type { AuthUser } from '@/types'
+
+// SecureStore adapter: uses iOS Keychain / Android Keystore — not readable without auth
+const secureStorage = {
+  getItem: (key: string) => SecureStore.getItemAsync(key),
+  setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+}
 
 interface AuthState {
   user: AuthUser | null
@@ -31,7 +38,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'cerrados-esportes-auth',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => secureStorage),
     },
   ),
 )

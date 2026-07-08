@@ -89,10 +89,12 @@ services:
       JWT_REFRESH_EXPIRES_IN: 7d
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
+      MINIO_USE_SSL: 'false'
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin123
       MINIO_BUCKET_ASSETS: cerrados-esportes-assets
       MINIO_BUCKET_DOCS: cerrados-esportes-documents
+      MINIO_PUBLIC_URL: http://localhost:9000
     ports:
       - '3001:3001'
     volumes:
@@ -123,6 +125,23 @@ services:
     depends_on:
       - backend
     command: pnpm --filter frontend dev
+    networks:
+      - copa_network
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: cerrados_esportes_nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certs:/etc/nginx/certs:ro
+      - certbot_webroot:/var/www/certbot:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
     networks:
       - copa_network
 
@@ -224,3 +243,4 @@ volumes:
   minio_data:
   prometheus_data:
   grafana_data:
+  certbot_webroot:
