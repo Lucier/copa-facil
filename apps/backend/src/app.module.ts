@@ -5,7 +5,10 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { LoggerModule } from 'nestjs-pino'
 import type { IncomingMessage } from 'http'
 import { randomUUID } from 'crypto'
+import type Redis from 'ioredis'
 import { databaseConfig, jwtConfig, redisConfig, validateEnv } from './config'
+import { REDIS_CLIENT } from './infrastructure/redis/redis.constants'
+import { RedisThrottlerStorage } from './infrastructure/throttler/redis-throttler.storage'
 import { DrizzleModule } from './database/drizzle.module'
 import { EventsModule } from './events/events.module'
 import { InfrastructureModule } from './infrastructure/infrastructure.module'
@@ -36,9 +39,13 @@ import { PollsModule } from './modules/polls/polls.module'
       validate: validateEnv,
       load: [databaseConfig, redisConfig, jwtConfig],
     }),
-    ThrottlerModule.forRoot([
-      { name: 'global', ttl: 60_000, limit: 120 },
-    ]),
+    ThrottlerModule.forRootAsync({
+      inject: [REDIS_CLIENT],
+      useFactory: (redis: Redis) => ({
+        throttlers: [{ name: 'global', ttl: 60_000, limit: 120 }],
+        storage: new RedisThrottlerStorage(redis),
+      }),
+    }),
     LoggerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {

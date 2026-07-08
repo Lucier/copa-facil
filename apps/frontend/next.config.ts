@@ -38,6 +38,13 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   eslint: { ignoreDuringBuilds: false },
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '**.copafacil.com.br' },
+      { protocol: 'http', hostname: 'localhost', port: '9000' },
+      { protocol: 'http', hostname: 'minio', port: '9000' },
+    ],
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }]
   },

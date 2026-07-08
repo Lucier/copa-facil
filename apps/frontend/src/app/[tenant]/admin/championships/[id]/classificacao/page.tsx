@@ -1,5 +1,6 @@
 'use client'
 import * as React from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -150,7 +151,7 @@ function StandingsTable({
             <TableCell>
               <div className="flex items-center gap-2">
                 {row.team_logo_url
-                  ? <img src={row.team_logo_url} alt={row.team_name} className="size-6 rounded object-cover" />
+                  ? <div className="relative size-6 shrink-0"><Image src={row.team_logo_url} alt={row.team_name} fill className="rounded object-cover" sizes="24px" /></div>
                   : <div className="size-6 rounded bg-muted flex items-center justify-center shrink-0">
                       <Trophy className="size-3 text-muted-foreground" />
                     </div>

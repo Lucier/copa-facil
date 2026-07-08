@@ -168,12 +168,12 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["cerrados-esportes", "postgres", "tenants"],
+  "tags": ["copa-facil", "postgres", "tenants"],
   "templating": { "list": [] },
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Cerrados Esportes — PostgreSQL & Tenants",
+  "title": "Copa Fácil — PostgreSQL & Tenants",
   "uid": "cerrados-esportes-postgres",
   "version": 1
 }

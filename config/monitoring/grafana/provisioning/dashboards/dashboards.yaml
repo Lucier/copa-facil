@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name:                Cerrados Esportes
+  - name:                Copa Fácil
     orgId:               1
-    folder:              Cerrados Esportes
+    folder:              Copa Fácil
     type:                file
     disableDeletion:     false
     updateIntervalSeconds: 30

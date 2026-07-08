@@ -42,6 +42,11 @@ import { PaymentWebhooksController } from './presentation/webhooks/payment-webho
             config.get<string>('MP_WEBHOOK_SECRET'),
           )
         }
+        if (config.get<string>('NODE_ENV') === 'production') {
+          throw new Error(
+            'MP_ACCESS_TOKEN is required in production — refusing to start with mock payment gateway',
+          )
+        }
         return new MockPaymentGatewayAdapter()
       },
       inject: [ConfigService],

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { Trophy } from 'lucide-react'
 import { publicFetch } from '@/lib/server-api'
 import { Badge } from '@/components/ui/badge'
@@ -56,9 +57,9 @@ export default async function ChampionshipDetailLayout({ children, params }: Pro
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-6">
       {/* Championship header */}
       <div className="flex items-start gap-4">
-        <div className="flex size-14 items-center justify-center rounded-xl border border-border bg-primary/10 overflow-hidden shrink-0">
+        <div className="relative flex size-14 items-center justify-center rounded-xl border border-border bg-primary/10 overflow-hidden shrink-0">
           {championship.logo_url
-            ? <img src={championship.logo_url} alt={championship.name} className="size-full object-cover" />
+            ? <Image src={championship.logo_url} alt={championship.name} fill className="object-cover" sizes="56px" />
             : <Trophy className="size-7 text-primary" />}
         </div>
         <div className="flex-1 min-w-0">

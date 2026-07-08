@@ -1,5 +1,6 @@
 'use client'
 import * as React from 'react'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Trophy, Calendar, Users, Loader2, Zap, ImageIcon } from 'lucide-react'
@@ -148,9 +149,9 @@ export default function ChampionshipsPage() {
                   return (
                     <TableRow key={c.id}>
                       <TableCell>
-                        <div className="flex size-9 items-center justify-center overflow-hidden rounded-md border border-border bg-muted">
+                        <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-md border border-border bg-muted">
                           {c.logoUrl
-                            ? <img src={c.logoUrl} alt={c.name} className="size-full object-cover" />
+                            ? <Image src={c.logoUrl} alt={c.name} fill className="object-cover" sizes="36px" />
                             : <ImageIcon className="size-4 text-muted-foreground" />}
                         </div>
                       </TableCell>

@@ -48,6 +48,6 @@ export async function loginAs(context: BrowserContext, role = 'organizador'): Pr
   })
 
   await context.addInitScript((state) => {
-    window.localStorage.setItem('cerrados-esportes-auth', state)
+    window.sessionStorage.setItem('copa-facil-auth', state)
   }, authState)
 }

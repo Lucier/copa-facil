@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// zustand/persist expects localStorage; provide a stub for the node environment
+// zustand/persist now uses sessionStorage; provide a stub for the node environment
 const storage = new Map<string, string>()
-vi.stubGlobal('localStorage', {
+const storageMock = {
   getItem: (k: string) => storage.get(k) ?? null,
   setItem: (k: string, v: string) => void storage.set(k, v),
   removeItem: (k: string) => void storage.delete(k),
-})
+}
+vi.stubGlobal('sessionStorage', storageMock)
 
 const { useAuthStore } = await import('./useAuthStore')
 

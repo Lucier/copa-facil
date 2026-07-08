@@ -1,3 +1,6 @@
+if (!process.env.BACKEND_URL && process.env.NODE_ENV === 'production') {
+  throw new Error('BACKEND_URL is required in production')
+}
 const BACKEND = process.env.BACKEND_URL ?? 'http://localhost:3001/api/v1'
 
 function apiKey(tenant: string): string {

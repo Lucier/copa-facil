@@ -112,6 +112,7 @@ export function NewChampionshipDialog({ children, onCreated }: NewChampionshipDi
                 className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-input bg-muted transition-colors hover:border-primary hover:bg-muted/80"
               >
                 {logoPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={logoPreview} alt="Logo" className="h-full w-full object-cover" />
                 ) : (
                   <ImagePlus className="size-8 text-muted-foreground" />

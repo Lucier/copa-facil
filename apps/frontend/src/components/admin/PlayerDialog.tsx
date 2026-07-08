@@ -161,6 +161,7 @@ export function PlayerDialog({ children, teamId, player, onSuccess }: PlayerDial
                 className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-input bg-muted transition-colors hover:border-primary hover:bg-muted/80"
               >
                 {photoPreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={photoPreview} alt="Foto" className="h-full w-full object-cover" />
                 ) : (
                   <UserRound className="size-8 text-muted-foreground" />

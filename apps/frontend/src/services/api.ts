@@ -2,6 +2,10 @@ import axios, { InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/store/useAuthStore'
 import { API } from './endpoints'
 
+if (!process.env.NEXT_PUBLIC_API_URL && process.env.NODE_ENV === 'production') {
+  throw new Error('NEXT_PUBLIC_API_URL is required in production')
+}
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001',
   headers: { 'Content-Type': 'application/json' },

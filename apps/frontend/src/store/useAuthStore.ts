@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 export interface AuthOrganization {
   slug: string
@@ -41,6 +41,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'copa-facil-auth',
+      storage: createJSONStorage(() => sessionStorage),
       onRehydrateStorage: () => (state) => {
         if (state?.expiresAt && state.expiresAt < Date.now()) {
           state.clearAuth()

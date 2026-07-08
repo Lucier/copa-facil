@@ -128,6 +128,7 @@ function PlayerIdCard({
             }}
           >
             {player.photoUrl
+              // eslint-disable-next-line @next/next/no-img-element
               ? <img src={player.photoUrl} alt={player.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : getInitials(player.fullName)
             }
@@ -688,6 +689,7 @@ export default function IdCardsPage() {
                             style={{ backgroundColor: selectedTeam.primaryColor ?? '#1a7a00' }}
                           >
                             {player.photoUrl
+                              // eslint-disable-next-line @next/next/no-img-element
                               ? <img src={player.photoUrl} alt={player.fullName} className="size-full object-cover" />
                               : getInitials(player.fullName)
                             }

@@ -52,6 +52,11 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
 
   async createBoleto(req: BoletoPaymentRequest): Promise<BoletoPaymentResponse> {
     if (!req.payerEmail) throw new BadRequestException('payerEmail is required for Boleto payments')
+    if (!req.payerZipCode || !req.payerStreetName || !req.payerCity || !req.payerState) {
+      throw new BadRequestException(
+        'payerZipCode, payerStreetName, payerCity and payerState are required for Boleto payments',
+      )
+    }
     const nameParts = req.payerName.split(' ')
     const response = await this.paymentClient.create({
       body: {
@@ -68,10 +73,10 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
             number: req.payerDocument.replace(/\D/g, ''),
           },
           address: {
-            zip_code: req.payerZipCode ?? '01310100',
-            street_name: req.payerStreetName ?? 'Avenida Paulista',
-            city: req.payerCity ?? 'São Paulo',
-            federal_unit: req.payerState ?? 'SP',
+            zip_code: req.payerZipCode,
+            street_name: req.payerStreetName,
+            city: req.payerCity,
+            federal_unit: req.payerState,
           },
         },
       },
