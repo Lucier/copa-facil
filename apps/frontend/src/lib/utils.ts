@@ -38,3 +38,14 @@ export function getInitials(name: string): string {
     .join('')
     .toUpperCase()
 }
+
+// Allows only http/https URLs in src attributes — blocks javascript: and data: URIs
+export function safeImageSrc(url: string | null | undefined): string | undefined {
+  if (!url) return undefined
+  try {
+    const { protocol } = new URL(url)
+    return protocol === 'https:' || protocol === 'http:' ? url : undefined
+  } catch {
+    return undefined
+  }
+}

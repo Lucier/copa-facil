@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import Link from 'next/link'
 import { NewChampionshipDialog } from '@/components/admin/NewChampionshipDialog'
 import { GenerateFixturesDialog } from '@/components/admin/GenerateFixturesDialog'
-import { formatDate } from '@/lib/utils'
+import { formatDate, safeImageSrc } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
 
@@ -150,8 +150,8 @@ export default function ChampionshipsPage() {
                     <TableRow key={c.id}>
                       <TableCell>
                         <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-md border border-border bg-muted">
-                          {c.logoUrl
-                            ? <Image src={c.logoUrl} alt={c.name} fill className="object-cover" sizes="36px" />
+                          {c.logoUrl && safeImageSrc(c.logoUrl)
+                            ? <Image src={safeImageSrc(c.logoUrl)!} alt={c.name} fill className="object-cover" sizes="36px" />
                             : <ImageIcon className="size-4 text-muted-foreground" />}
                         </div>
                       </TableCell>
