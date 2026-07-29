@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { DrizzleService } from '../../../../database/drizzle.service'
+import { EncryptionService } from '../../../../infrastructure/encryption/encryption.service'
 import { PlayerEntity } from '../../domain/entities/player.entity'
 import { PlayerHistoryEntity } from '../../domain/entities/player-history.entity'
 import {
@@ -13,7 +14,20 @@ import { PlayerMapper } from '../../application/mappers/player.mapper'
 
 @Injectable()
 export class DrizzlePlayerRepository implements IPlayerRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    private readonly encryption: EncryptionService,
+  ) {}
+
+  private encryptDoc(value: string | null | undefined): string | null {
+    return value ? this.encryption.encryptString(value) : null
+  }
+
+  private decryptDoc(row: PlayerRow): PlayerRow {
+    return row.document
+      ? { ...row, document: this.encryption.maybeDecryptString(row.document) }
+      : row
+  }
 
   private readonly selectCols = `
     id, team_id, full_name, photo_url, birthdate, document, document_type, jersey_number,
@@ -30,7 +44,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
         LIMIT 1
       `
     })
-    return rows[0] ? PlayerMapper.toEntity(rows[0]) : null
+    return rows[0] ? PlayerMapper.toEntity(this.decryptDoc(rows[0])) : null
   }
 
   async findByTeamId(teamId: string): Promise<PlayerEntity[]> {
@@ -44,7 +58,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
         ORDER BY full_name ASC
       `
     })
-    return rows.map(PlayerMapper.toEntity)
+    return rows.map((r) => PlayerMapper.toEntity(this.decryptDoc(r)))
   }
 
   async create(data: CreatePlayerData): Promise<PlayerEntity> {
@@ -59,7 +73,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
           ${data.fullName},
           ${data.photoUrl ?? null},
           ${data.birthdate ? data.birthdate.toISOString().split('T')[0] : null},
-          ${data.document ?? null},
+          ${this.encryptDoc(data.document)},
           ${data.documentType ?? 'cpf'},
           ${data.jerseyNumber ?? null},
           ${data.preferredFoot ?? 'direito'},
@@ -71,7 +85,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
                   created_at, updated_at
       `
     })
-    return PlayerMapper.toEntity(rows[0])
+    return PlayerMapper.toEntity(this.decryptDoc(rows[0]))
   }
 
   async update(id: string, data: UpdatePlayerData): Promise<PlayerEntity> {
@@ -81,7 +95,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
           full_name      = COALESCE(${data.fullName ?? null}, full_name),
           photo_url      = CASE WHEN ${data.photoUrl !== undefined} THEN ${data.photoUrl ?? null} ELSE photo_url END,
           birthdate      = CASE WHEN ${data.birthdate !== undefined} THEN ${data.birthdate ? data.birthdate.toISOString().split('T')[0] : null} ELSE birthdate END,
-          document       = CASE WHEN ${data.document !== undefined} THEN ${data.document ?? null} ELSE document END,
+          document       = CASE WHEN ${data.document !== undefined} THEN ${this.encryptDoc(data.document)} ELSE document END,
           document_type  = COALESCE(${data.documentType ?? null}, document_type),
           jersey_number  = CASE WHEN ${data.jerseyNumber !== undefined} THEN ${data.jerseyNumber ?? null} ELSE jersey_number END,
           preferred_foot = COALESCE(${data.preferredFoot ?? null}, preferred_foot),
@@ -94,7 +108,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
                   created_at, updated_at
       `
     })
-    return PlayerMapper.toEntity(rows[0])
+    return PlayerMapper.toEntity(this.decryptDoc(rows[0]))
   }
 
   async delete(id: string): Promise<void> {
@@ -114,7 +128,7 @@ export class DrizzlePlayerRepository implements IPlayerRepository {
                   created_at, updated_at
       `
     })
-    return PlayerMapper.toEntity(rows[0])
+    return PlayerMapper.toEntity(this.decryptDoc(rows[0]))
   }
 
   async findHistoryByPlayerId(playerId: string): Promise<PlayerHistoryEntity[]> {

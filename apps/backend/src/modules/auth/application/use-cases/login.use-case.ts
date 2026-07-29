@@ -98,8 +98,11 @@ export class LoginUseCase {
 
     const output = new TokenOutputDto()
     output.accessToken = accessToken
-    output.refreshToken = refreshToken
     output.expiresIn = this.parseTtlToSeconds(accessExpiresIn)
+    output.refreshExpiresIn = refreshTtl
+    // Store refresh token as non-enumerable so JSON.stringify excludes it from the response body.
+    // The controller reads it to set an httpOnly cookie.
+    Object.defineProperty(output, '_refreshToken', { value: refreshToken, enumerable: false, writable: true })
     return output
   }
 

@@ -5,14 +5,15 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common'
-import type { Response } from 'express'
+import type { Request, Response } from 'express'
 import { Throttle } from '@nestjs/throttler'
 import { ApiBearerAuth, ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { LoginInputDto } from '../../application/dtos/login-input.dto'
-import { RefreshTokenInputDto } from '../../application/dtos/refresh-token-input.dto'
 import { RegisterInputDto } from '../../application/dtos/register-input.dto'
 import { ResetPasswordConfirmDto } from '../../application/dtos/reset-password-confirm.dto'
 import { ResetPasswordRequestDto } from '../../application/dtos/reset-password-request.dto'
@@ -26,14 +27,35 @@ import { ResetPasswordUseCase } from '../../application/use-cases/reset-password
 import { CurrentUser } from '../decorators/current-user.decorator'
 import { JwtAuthGuard } from '../guards/jwt-auth.guard'
 
-const COOKIE_NAME = 'access_token'
-const COOKIE_OPTIONS = (expiresInSeconds: number) => ({
+const ACCESS_COOKIE = 'access_token'
+const REFRESH_COOKIE = 'refresh_token'
+
+const isProd = () => process.env.NODE_ENV === 'production'
+
+const ACCESS_COOKIE_OPTIONS = (ttlSeconds: number) => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: (process.env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
-  maxAge: expiresInSeconds * 1000,
+  secure: isProd(),
+  sameSite: (isProd() ? 'strict' : 'lax') as 'strict' | 'lax',
+  maxAge: ttlSeconds * 1000,
   path: '/',
 })
+
+// Restrict refresh cookie to the refresh endpoint — minimises exposure
+const REFRESH_COOKIE_OPTIONS = (ttlSeconds: number) => ({
+  httpOnly: true,
+  secure: isProd(),
+  sameSite: (isProd() ? 'strict' : 'lax') as 'strict' | 'lax',
+  maxAge: ttlSeconds * 1000,
+  path: '/api/v1/auth/refresh',
+})
+
+function setTokenCookies(res: Response, tokens: TokenOutputDto): void {
+  const raw = (tokens as TokenOutputDto & { _refreshToken?: string })._refreshToken
+  res.cookie(ACCESS_COOKIE, tokens.accessToken, ACCESS_COOKIE_OPTIONS(tokens.expiresIn))
+  if (raw) {
+    res.cookie(REFRESH_COOKIE, raw, REFRESH_COOKIE_OPTIONS(tokens.refreshExpiresIn))
+  }
+}
 
 @ApiTags('Auth')
 @ApiSecurity('x-tenant-id')
@@ -56,7 +78,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<TokenOutputDto> {
     const tokens = await this.loginUseCase.execute(dto)
-    res.cookie(COOKIE_NAME, tokens.accessToken, COOKIE_OPTIONS(tokens.expiresIn))
+    setTokenCookies(res, tokens)
     return tokens
   }
 
@@ -69,7 +91,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<TokenOutputDto> {
     const tokens = await this.registerUseCase.execute(dto)
-    res.cookie(COOKIE_NAME, tokens.accessToken, COOKIE_OPTIONS(tokens.expiresIn))
+    setTokenCookies(res, tokens)
     return tokens
   }
 
@@ -77,11 +99,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Exchange a valid refresh token for a new token pair' })
   async refresh(
-    @Body() dto: RefreshTokenInputDto,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<TokenOutputDto> {
-    const tokens = await this.refreshTokenUseCase.execute(dto.refreshToken)
-    res.cookie(COOKIE_NAME, tokens.accessToken, COOKIE_OPTIONS(tokens.expiresIn))
+    const refreshToken = req.cookies?.[REFRESH_COOKIE] as string | undefined
+    if (!refreshToken) throw new UnauthorizedException('Refresh token not found')
+    const tokens = await this.refreshTokenUseCase.execute(refreshToken)
+    setTokenCookies(res, tokens)
     return tokens
   }
 
@@ -104,7 +128,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     await this.logoutUseCase.execute(user)
-    res.clearCookie(COOKIE_NAME, { httpOnly: true, path: '/' })
+    res.clearCookie(ACCESS_COOKIE, { httpOnly: true, path: '/' })
+    res.clearCookie(REFRESH_COOKIE, { httpOnly: true, path: '/api/v1/auth/refresh' })
   }
 
   @Post('reset-password/request')

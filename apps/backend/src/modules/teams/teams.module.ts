@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { DrizzleModule } from '../../database/drizzle.module'
 import { AuthModule } from '../auth/auth.module'
+import { EncryptionService } from '../../infrastructure/encryption/encryption.service'
 import { PLAYER_REPOSITORY } from './domain/repositories/i-player.repository'
 import { STAFF_REPOSITORY } from './domain/repositories/i-staff.repository'
 import { TEAM_REPOSITORY } from './domain/repositories/i-team.repository'
@@ -32,6 +33,7 @@ import { TeamJoinController } from './presentation/controllers/team-join.control
 @Module({
   imports: [DrizzleModule, AuthModule],
   providers: [
+    EncryptionService,
     { provide: TEAM_REPOSITORY, useClass: DrizzleTeamRepository },
     { provide: PLAYER_REPOSITORY, useClass: DrizzlePlayerRepository },
     { provide: STAFF_REPOSITORY, useClass: DrizzleStaffRepository },

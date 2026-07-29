@@ -64,6 +64,30 @@ export class EncryptionService {
     return isEncryptedEnvelope(value) ? this.decryptJson(value) : value
   }
 
+  // Encrypt a plain string value — stores the envelope serialized as a JSON string
+  encryptString(value: string): string {
+    const envelope = this.encryptJson({ s: value })
+    return JSON.stringify(envelope)
+  }
+
+  // Decrypt a string previously encrypted with encryptString
+  decryptString(stored: string): string {
+    const envelope = JSON.parse(stored) as EncryptedEnvelope
+    const payload = this.decryptJson(envelope)
+    return payload.s as string
+  }
+
+  // Backward-compatible: returns plaintext unchanged if not an encrypted envelope
+  maybeDecryptString(stored: string): string {
+    try {
+      const parsed: unknown = JSON.parse(stored)
+      if (isEncryptedEnvelope(parsed)) return this.decryptJson(parsed).s as string
+    } catch {
+      // not JSON — plaintext from before encryption was added
+    }
+    return stored
+  }
+
   static isEncrypted(value: unknown): value is EncryptedEnvelope {
     return isEncryptedEnvelope(value)
   }

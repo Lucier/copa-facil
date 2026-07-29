@@ -129,7 +129,6 @@ function StepIndicator({ current, steps }: { current: number; steps: typeof STEP
 
 interface TokenResponse {
   accessToken: string
-  refreshToken: string
   user: { id: string; email: string; name: string }
 }
 

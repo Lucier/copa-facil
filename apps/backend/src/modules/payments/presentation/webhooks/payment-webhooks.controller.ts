@@ -42,7 +42,10 @@ export class PaymentWebhooksController {
     // Validate signature at the entry point before any business logic runs.
     // Returning 200 on invalid sigs prevents infinite retries from providers.
     if (!this.gateway.verifyWebhookSignature(rawPayload, sig)) {
-      this.logger.warn({ provider, tenantId }, 'Webhook rejected — invalid signature')
+      this.logger.warn(
+        { provider, tenantId, ip: req.ip ?? req.socket?.remoteAddress, sigPresent: !!signature },
+        'Webhook rejected — invalid signature',
+      )
       return
     }
 

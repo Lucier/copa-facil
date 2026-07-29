@@ -16,7 +16,6 @@ import { API } from '@/services/endpoints'
 
 interface TokenResponse {
   accessToken: string
-  refreshToken: string
   user: { id: string; email: string; name: string; role: string }
 }
 
