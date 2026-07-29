@@ -2,28 +2,9 @@ import type { NextConfig } from 'next'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
-function buildCsp(): string {
-  const apiOrigin = process.env.NEXT_PUBLIC_API_URL
-    ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-    : 'http://localhost:3001'
-
-  return [
-    "default-src 'self'",
-    // Dev: needs 'unsafe-eval' for webpack eval-source-map; prod: omit it
-    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
-    "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: https: ${apiOrigin}`,
-    "font-src 'self' https://fonts.gstatic.com",
-    // Allow fetch/XHR to the backend origin (http in dev, https in prod)
-    `connect-src 'self' ${apiOrigin}${isDev ? ' ws://localhost:* wss://localhost:*' : ''}`,
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-  ].join('; ')
-}
-
+// Content-Security-Policy with script nonces is set dynamically per-request in middleware.ts.
+// Only static, non-nonce headers are configured here.
 const securityHeaders = [
-  { key: 'Content-Security-Policy', value: buildCsp() },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

@@ -20,6 +20,7 @@ export const envSchema = z.object({
   MAIL_USER: z.string().optional(),
   MAIL_PASS: z.string().optional(),
   MAIL_FROM: z.string().optional(),
+  SWAGGER_ENABLED: z.enum(['true', 'false']).optional(),
 }).superRefine((env, ctx) => {
   if (env.NODE_ENV === 'production') {
     if (!env.MP_ACCESS_TOKEN) {

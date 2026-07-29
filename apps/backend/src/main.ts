@@ -45,7 +45,8 @@ async function bootstrap() {
   )
   app.setGlobalPrefix('api/v1')
 
-  if (isDev) {
+  const swaggerEnabled = config.get<string>('SWAGGER_ENABLED') !== 'false' && isDev
+  if (swaggerEnabled) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Copa Fácil API')
       .setDescription('Multi-tenant sports championship management API')
