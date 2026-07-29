@@ -12,7 +12,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog'
 import { TeamDialog } from '@/components/admin/TeamDialog'
-import { getInitials } from '@/lib/utils'
+import { getInitials, safeImageSrc } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
 
@@ -151,7 +151,7 @@ export default function TeamsPage() {
                   <TableRow key={team.id}>
                     <TableCell>
                       <Avatar className="size-9 rounded-md">
-                        {team.logoUrl && <AvatarImage src={team.logoUrl} alt={team.name} className="object-contain p-0.5" />}
+                        {team.logoUrl && <AvatarImage src={safeImageSrc(team.logoUrl)} alt={team.name} className="object-contain p-0.5" />}
                         {!team.logoUrl && team.primaryColor
                           ? <div className="flex size-full items-center justify-center rounded-md text-[10px] font-bold text-white" style={{ backgroundColor: team.primaryColor }}>{getInitials(team.name)}</div>
                           : <AvatarFallback className="rounded-md text-[10px]">{getInitials(team.name)}</AvatarFallback>}

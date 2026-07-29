@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getInitials } from '@/lib/utils'
+import { getInitials, safeImageSrc } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
 
@@ -129,7 +129,7 @@ function PlayerIdCard({
           >
             {player.photoUrl
               // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={player.photoUrl} alt={player.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ? <img src={safeImageSrc(player.photoUrl)} alt={player.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : getInitials(player.fullName)
             }
           </div>
@@ -690,7 +690,7 @@ export default function IdCardsPage() {
                           >
                             {player.photoUrl
                               // eslint-disable-next-line @next/next/no-img-element
-                              ? <img src={player.photoUrl} alt={player.fullName} className="size-full object-cover" />
+                              ? <img src={safeImageSrc(player.photoUrl)} alt={player.fullName} className="size-full object-cover" />
                               : getInitials(player.fullName)
                             }
                           </div>

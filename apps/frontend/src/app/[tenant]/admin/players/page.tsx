@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { PlayerDialog } from '@/components/admin/PlayerDialog'
-import { getInitials } from '@/lib/utils'
+import { getInitials, safeImageSrc } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
 
@@ -176,7 +176,7 @@ export default function PlayersPage() {
                   <TableRow key={player.id}>
                     <TableCell>
                       <Avatar className="size-8">
-                        {player.photoUrl && <AvatarImage src={player.photoUrl} alt={player.fullName} className="object-cover" />}
+                        {player.photoUrl && <AvatarImage src={safeImageSrc(player.photoUrl)} alt={player.fullName} className="object-cover" />}
                         {!player.photoUrl && selectedTeam?.primaryColor
                           ? <div className="flex size-full items-center justify-center text-[9px] font-bold text-white" style={{ backgroundColor: selectedTeam.primaryColor }}>{getInitials(player.fullName)}</div>
                           : <AvatarFallback className="text-[9px]">{getInitials(player.fullName)}</AvatarFallback>}

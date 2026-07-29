@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { JudgeDialog } from '@/components/admin/JudgeDialog'
-import { getInitials } from '@/lib/utils'
+import { getInitials, safeImageSrc } from '@/lib/utils'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
 
@@ -213,7 +213,7 @@ export default function JudgesPage() {
                     <TableCell>
                       <Avatar className="size-9">
                         {judge.photoUrl && (
-                          <AvatarImage src={judge.photoUrl} alt={judge.fullName} className="object-cover" />
+                          <AvatarImage src={safeImageSrc(judge.photoUrl)} alt={judge.fullName} className="object-cover" />
                         )}
                         <AvatarFallback className="text-[11px]">{getInitials(judge.fullName)}</AvatarFallback>
                       </Avatar>
