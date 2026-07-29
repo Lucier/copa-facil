@@ -114,8 +114,8 @@ export class AuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Return the authenticated user from the current session' })
-  me(@CurrentUser() user: JwtPayload): Pick<JwtPayload, 'sub' | 'email' | 'role' | 'tenantSchema'> {
-    return { sub: user.sub, email: user.email, role: user.role, tenantSchema: user.tenantSchema }
+  me(@CurrentUser() user: JwtPayload): Pick<JwtPayload, 'sub' | 'email' | 'role'> {
+    return { sub: user.sub, email: user.email, role: user.role }
   }
 
   @Post('logout')
