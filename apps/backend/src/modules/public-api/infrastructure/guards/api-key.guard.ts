@@ -53,7 +53,12 @@ export class ApiKeyGuard implements CanActivate {
 
     await this.enforceRateLimit(hash)
 
-    // Set tenant header so the global TenantInterceptor can pick it up
+    // Set tenant header so the global TenantInterceptor can pick it up.
+    // Validate the slug from DB as a defense-in-depth measure.
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(lookup.organizationSlug)) {
+      this.logger.error(`Invalid organizationSlug in DB for key ${lookup.id}: "${lookup.organizationSlug}"`)
+      throw new UnauthorizedException('Invalid API key configuration')
+    }
     req.headers['x-tenant-id'] = lookup.organizationSlug
     req['apiKeyId'] = lookup.id
 

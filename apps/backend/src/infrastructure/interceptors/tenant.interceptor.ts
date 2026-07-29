@@ -1,8 +1,10 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
+import { BadRequestException, Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
 import { Observable } from 'rxjs'
 import type { Request } from 'express'
 import { TenantContext } from '../tenant/tenant-context'
 import { JwtPayload } from '../../modules/auth/application/jwt-payload.interface'
+
+const SLUG_PATTERN = /^[a-z0-9][a-z0-9-]*$/
 
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {
@@ -18,6 +20,9 @@ export class TenantInterceptor implements NestInterceptor {
       schema = req.user.tenantSchema
     } else {
       const tenantHeader = req.headers['x-tenant-id'] as string | undefined
+      if (tenantHeader && !SLUG_PATTERN.test(tenantHeader)) {
+        throw new BadRequestException('Invalid tenant identifier')
+      }
       schema = tenantHeader ? `tenant_${tenantHeader}` : 'public'
     }
 
