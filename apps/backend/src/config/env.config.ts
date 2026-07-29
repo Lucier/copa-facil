@@ -21,6 +21,15 @@ export const envSchema = z.object({
   MAIL_PASS: z.string().optional(),
   MAIL_FROM: z.string().optional(),
   SWAGGER_ENABLED: z.enum(['true', 'false']).optional(),
+  MINIO_ENDPOINT: z.string().default('localhost'),
+  MINIO_PORT: z.coerce.number().default(9000),
+  MINIO_USE_SSL: z.string().default('false'),
+  MINIO_ACCESS_KEY: z.string().default('minioadmin'),
+  MINIO_SECRET_KEY: z.string().default('minioadmin'),
+  MINIO_BUCKET_ASSETS: z.string().default('copa-facil-assets'),
+  MINIO_BUCKET_DOCS: z.string().default('copa-facil-documents'),
+  MINIO_PUBLIC_URL: z.string().default('http://localhost:9000'),
+  APP_URL: z.string().optional(),
 }).superRefine((env, ctx) => {
   if (env.NODE_ENV === 'production') {
     if (!env.MP_ACCESS_TOKEN) {

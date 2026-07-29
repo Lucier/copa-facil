@@ -1,9 +1,15 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
-import { randomBytes } from 'crypto'
 
 const COOKIE_NAME = 'access_token'
+
+// Edge Runtime uses Web Crypto — not Node.js crypto
+function generateNonce(): string {
+  const array = new Uint8Array(16)
+  globalThis.crypto.getRandomValues(array)
+  return btoa(String.fromCharCode(...array))
+}
 
 function buildCsp(nonce: string, isDev: boolean): string {
   const apiOrigin = process.env.NEXT_PUBLIC_API_URL
@@ -32,8 +38,8 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
   const { pathname } = req.nextUrl
   const isDev = process.env.NODE_ENV !== 'production'
 
-  // Generate a fresh nonce for every request
-  const nonce = randomBytes(16).toString('base64')
+  // Generate a fresh nonce for every request (Web Crypto — Edge Runtime compatible)
+  const nonce = generateNonce()
   const csp = buildCsp(nonce, isDev)
 
   // Propagate nonce to Server Components via request header

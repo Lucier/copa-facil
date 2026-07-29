@@ -1,4 +1,5 @@
-import type { ThrottlerStorage, ThrottlerStorageRecord } from '@nestjs/throttler'
+import type { ThrottlerStorage } from '@nestjs/throttler'
+import type { ThrottlerStorageRecord } from '@nestjs/throttler/dist/throttler-storage-record.interface'
 import type Redis from 'ioredis'
 
 export class RedisThrottlerStorage implements ThrottlerStorage {
