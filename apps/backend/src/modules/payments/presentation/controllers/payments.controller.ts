@@ -64,8 +64,8 @@ export class PaymentsController {
   @Throttle({ global: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'List transactions, optionally filtered by championship' })
   @ApiQuery({ name: 'championshipId', required: false })
-  listAll(@Query('championshipId') championshipId?: string) {
-    return this.listTx.execute(championshipId || undefined)
+  listAll(@Query('championshipId', new ParseUUIDPipe({ optional: true })) championshipId?: string) {
+    return this.listTx.execute(championshipId)
   }
 
   @Get('ledger/:championshipId')
@@ -89,8 +89,8 @@ export class PaymentsController {
   @Roles(UserRole.ORGANIZADOR)
   @ApiOperation({ summary: 'List expense entries, optionally filtered by championship' })
   @ApiQuery({ name: 'championshipId', required: false })
-  getExpenses(@Query('championshipId') championshipId?: string) {
-    return this.listExpenses.execute(championshipId || undefined)
+  getExpenses(@Query('championshipId', new ParseUUIDPipe({ optional: true })) championshipId?: string) {
+    return this.listExpenses.execute(championshipId)
   }
 
   @Delete('expenses/:id')

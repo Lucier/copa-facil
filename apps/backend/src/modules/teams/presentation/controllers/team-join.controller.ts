@@ -20,6 +20,7 @@ export class TeamJoinController {
 
   @Get(':token')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
   @ApiOperation({ summary: 'Get team info by invite token (public)' })
   async getTeam(@Param('token') token: string) {
     const team = await this.joinTeam.getTeamByToken(token)
