@@ -61,14 +61,14 @@ export class DrizzleTransactionRepository implements ITransactionRepository {
 
   async findAll(): Promise<TransactionEntity[]> {
     const rows = await this.drizzle.runInTenantContext((tx) =>
-      tx<TxRow[]>`SELECT id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at FROM transactions ORDER BY created_at DESC`,
+      tx<TxRow[]>`SELECT id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at FROM transactions ORDER BY created_at DESC LIMIT 1000`,
     )
     return rows.map((r) => toEntity(r, this.encryption))
   }
 
   async findByChampionshipId(championshipId: string): Promise<TransactionEntity[]> {
     const rows = await this.drizzle.runInTenantContext((tx) =>
-      tx<TxRow[]>`SELECT id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at FROM transactions WHERE championship_id = ${championshipId} ORDER BY created_at DESC`,
+      tx<TxRow[]>`SELECT id, championship_id, reference_id, reference_type, amount, currency, method, category, status, gateway_transaction_id, gateway_payload, payer_id, paid_at, expires_at, created_at, updated_at FROM transactions WHERE championship_id = ${championshipId} ORDER BY created_at DESC LIMIT 1000`,
     )
     return rows.map((r) => toEntity(r, this.encryption))
   }

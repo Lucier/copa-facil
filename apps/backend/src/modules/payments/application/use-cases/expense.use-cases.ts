@@ -91,10 +91,10 @@ export class ListExpensesUseCase {
     const rows = await this.drizzle.runInTenantContext((tx) => {
       if (championshipId) {
         return tx<ExpenseRow[]>`
-          SELECT * FROM expense_entries WHERE championship_id = ${championshipId} ORDER BY expense_date DESC, created_at DESC
+          SELECT * FROM expense_entries WHERE championship_id = ${championshipId} ORDER BY expense_date DESC, created_at DESC LIMIT 1000
         `
       }
-      return tx<ExpenseRow[]>`SELECT * FROM expense_entries ORDER BY expense_date DESC, created_at DESC`
+      return tx<ExpenseRow[]>`SELECT * FROM expense_entries ORDER BY expense_date DESC, created_at DESC LIMIT 1000`
     })
     return rows.map(toDto)
   }

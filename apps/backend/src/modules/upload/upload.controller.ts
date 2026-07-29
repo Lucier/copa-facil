@@ -55,7 +55,6 @@ export class UploadController {
     }
 
     const url = await this.storage.upload({
-      key: file.originalname,
       buffer: file.buffer,
       mimeType: detectedMime,
     })
