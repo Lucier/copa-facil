@@ -4,7 +4,6 @@ import { Client } from 'minio'
 import { randomUUID } from 'crypto'
 
 export interface StorageUploadOptions {
-  key: string
   buffer: Buffer
   mimeType: string
   bucket?: 'assets' | 'documents'
