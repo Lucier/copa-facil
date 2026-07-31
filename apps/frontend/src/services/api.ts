@@ -13,7 +13,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && !config.headers['x-tenant-id']) {
     const tenantSlug = window.location.pathname.split('/')[1]
     if (tenantSlug) {
       config.headers['x-tenant-id'] = tenantSlug

@@ -44,7 +44,20 @@ export class ProcessWebhookUseCase {
 
     await TenantContext.run(tenantSchema, async () => {
       try {
-        const tx = await this.txRepo.findByGatewayId(dto.gatewayTransactionId)
+        let tx = await this.txRepo.findByGatewayId(dto.gatewayTransactionId)
+
+        // Checkout Pro: webhook sends payment_id, but we stored preference_id.
+        // Recover via external_reference (= our transaction UUID).
+        if (!tx && dto.externalReference) {
+          tx = await this.txRepo.findById(dto.externalReference)
+          if (tx) {
+            await this.txRepo.updateGatewayData(tx.id, dto.gatewayTransactionId, {
+              ...((tx.gatewayPayload as Record<string, unknown>) ?? {}),
+              paymentId: dto.gatewayTransactionId,
+            })
+          }
+        }
+
         if (!tx) {
           this.logger.warn(`Webhook for unknown gateway tx: ${dto.gatewayTransactionId}`)
           return

@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Wallet, TrendingUp, RotateCcw, TrendingDown, DollarSign, Trash2 } from 'lucide-react'
+import { Plus, ShoppingCart, Wallet, TrendingUp, RotateCcw, TrendingDown, DollarSign, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog'
+import { CheckoutProDialog } from '@/components/admin/CheckoutProDialog'
 import { CreatePaymentDialog } from '@/components/admin/CreatePaymentDialog'
 import { RefundDialog } from '@/components/admin/RefundDialog'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
@@ -32,6 +33,7 @@ const METHOD_LABELS: Record<string, string> = {
   pix: 'PIX',
   boleto: 'Boleto',
   cartao_credito: 'Cartão',
+  checkout_pro: 'Checkout Pro',
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -281,6 +283,16 @@ export default function PaymentsPage() {
             defaultChampionshipId={selectedChampId || undefined}
             onSuccess={handleSuccess}
           />
+          <CheckoutProDialog
+            championships={championships}
+            defaultChampionshipId={selectedChampId || undefined}
+            onSuccess={handleSuccess}
+          >
+            <Button size="sm" variant="outline" className="gap-2">
+              <ShoppingCart className="size-4" />
+              Checkout Pro
+            </Button>
+          </CheckoutProDialog>
           <CreatePaymentDialog
             championships={championships}
             defaultChampionshipId={selectedChampId || undefined}

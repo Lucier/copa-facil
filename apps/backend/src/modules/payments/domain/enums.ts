@@ -10,6 +10,7 @@ export enum PaymentMethodType {
   PIX = 'pix',
   BOLETO = 'boleto',
   CARTAO_CREDITO = 'cartao_credito',
+  CHECKOUT_PRO = 'checkout_pro',
 }
 
 export enum IncomeCategory {

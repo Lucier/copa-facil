@@ -1,6 +1,5 @@
 import {
-  RawBodyRequest} from '@nestjs/common'
-import {
+  RawBodyRequest,
   BadRequestException,
   Controller,
   Headers,
@@ -15,11 +14,9 @@ import {
 } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import type { Request } from 'express'
-import { ProcessWebhookDto} from '../../application/dtos/process-webhook.dto'
-import { WebhookEventType } from '../../application/dtos/process-webhook.dto'
+import { ProcessWebhookDto, WebhookEventType } from '../../application/dtos/process-webhook.dto'
 import { ProcessWebhookUseCase } from '../../application/use-cases/process-webhook.use-case'
-import { IPaymentGateway} from '../../domain/gateways/i-payment-gateway'
-import { PAYMENT_GATEWAY } from '../../domain/gateways/i-payment-gateway'
+import { IPaymentGateway, PAYMENT_GATEWAY } from '../../domain/gateways/i-payment-gateway'
 
 interface MpWebhookBody {
   type?: string
@@ -61,22 +58,32 @@ export class MercadoPagoWebhookController {
       throw new UnauthorizedException('Invalid webhook signature')
     }
 
+    // Checkout Pro also emits merchant_order events — acknowledge and skip
+    if (body?.type === 'merchant_order') {
+      this.logger.log({ dataId, xRequestId }, 'MP merchant_order notification received')
+      return
+    }
+
     if (body?.type !== 'payment' || !dataId) {
       return
     }
 
-    let status: string
+    let details: { status: string; externalReference?: string }
     try {
-      status = await this.gateway.fetchPaymentStatus(dataId)
+      details = await this.gateway.fetchPaymentDetails(dataId)
     } catch (err) {
-      this.logger.error({ dataId }, `Failed to fetch payment status: ${String(err)}`)
+      this.logger.error({ dataId }, `Failed to fetch payment details: ${String(err)}`)
       return
     }
 
-    const event = this.mapStatus(status)
+    const event = this.mapStatus(details.status)
     if (!event) return
 
-    const dto: ProcessWebhookDto = { gatewayTransactionId: dataId, event }
+    const dto: ProcessWebhookDto = {
+      gatewayTransactionId: dataId,
+      event,
+      externalReference: details.externalReference,
+    }
     const tenantSchema = `tenant_${tenantId}`
 
     try {

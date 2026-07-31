@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Trophy, Loader2, CheckCircle2, ArrowLeft, ArrowRight,
-  User, Building2, Zap, Check, CreditCard, QrCode, Copy,
+  User, Building2, Zap, Check, ShoppingCart,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,6 +19,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore'
 import api from '@/services/api'
 import { API } from '@/services/endpoints'
+import type { AxiosError } from 'axios'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,7 +77,6 @@ const BILLING_PERIODS = [
 ]
 
 type BillingPeriodId = (typeof BILLING_PERIODS)[number]['id']
-type PaymentMethod = 'cartao' | 'pix'
 
 function formatBRL(value: number) {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -88,7 +88,7 @@ const STEPS = [
   { label: 'Sua conta', icon: User },
   { label: 'Organização', icon: Building2 },
   { label: 'Confirmação', icon: CheckCircle2 },
-  { label: 'Pagamento', icon: CreditCard },
+  { label: 'Pagamento', icon: ShoppingCart },
 ]
 
 function StepIndicator({ current, steps }: { current: number; steps: typeof STEPS }) {
@@ -145,10 +145,6 @@ export default function RegisterPage() {
   const [createdSlug, setCreatedSlug] = React.useState('')
 
   const [billingPeriod, setBillingPeriod] = React.useState<BillingPeriodId>('mensal')
-  const [paymentMethod, setPaymentMethod] = React.useState<PaymentMethod>('cartao')
-  const [pixCopied, setPixCopied] = React.useState(false)
-  const [card, setCard] = React.useState({ number: '', name: '', expiry: '', cvv: '' })
-  const [installments, setInstallments] = React.useState(1)
 
   const isPaidPlan = step2Data ? step2Data.plan !== 'starter' : false
 
@@ -187,10 +183,8 @@ export default function RegisterPage() {
   }
 
   // ── Registration submit ──────────────────────────────────────────────────
-  async function handleRegister() {
-    if (!step1Data || !step2Data) return
-    setServerError(null)
-    setSubmitting(true)
+  async function createAccount(): Promise<string | null> {
+    if (!step1Data || !step2Data) return null
     try {
       const { data } = await api.post<TokenResponse>(API.auth.register, {
         name: step1Data.name,
@@ -200,17 +194,23 @@ export default function RegisterPage() {
         organizationSlug: step2Data.organizationSlug,
       })
       setAuth({ id: data.user.id, name: data.user.name, email: data.user.email, role: 'organizador' })
-      setCreatedSlug(step2Data.organizationSlug)
-      setDone(true)
+      return step2Data.organizationSlug
     } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string | string[] } } })?.response?.data?.message
-      setServerError(
-        Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Erro ao criar conta. Tente novamente.'),
-      )
-    } finally {
-      setSubmitting(false)
+      const msg = (err as AxiosError<{ message?: string | string[] }>)?.response?.data?.message
+      setServerError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Erro ao criar conta. Tente novamente.'))
+      return null
     }
+  }
+
+  async function handleRegister() {
+    setServerError(null)
+    setSubmitting(true)
+    const slug = await createAccount()
+    if (slug) {
+      setCreatedSlug(slug)
+      setDone(true)
+    }
+    setSubmitting(false)
   }
 
   function onConfirm() {
@@ -221,32 +221,54 @@ export default function RegisterPage() {
   const monthlyPrice = step2Data ? (MONTHLY_PRICE[step2Data.plan] ?? 0) : 0
   const period = BILLING_PERIODS.find((p) => p.id === billingPeriod)!
   const totalPrice = monthlyPrice * period.months * (1 - period.discount)
-  const pixCode = `00020126580014br.gov.bcb.pix0136copafacil-${step2Data?.organizationSlug ?? ''}-${billingPeriod}5204000053039865802BR`
-
-  // Parcelamento: até 12x, com parcela mínima de R$ 25
   const maxInstallments = Math.max(1, Math.min(12, Math.floor(totalPrice / 25)))
-  const installmentOptions = Array.from({ length: maxInstallments }, (_, i) => i + 1)
-  const installmentValue = totalPrice / installments
-
-  const cardValid =
-    card.number.replace(/\D/g, '').length >= 13 &&
-    card.name.trim().length >= 3 &&
-    /^\d{2}\/\d{2}$/.test(card.expiry) &&
-    /^\d{3,4}$/.test(card.cvv)
 
   async function handlePay() {
+    if (!step2Data) return
     setServerError(null)
     setSubmitting(true)
-    // Pagamento simulado — integração real com gateway virá depois
-    await new Promise((r) => setTimeout(r, 1500))
-    setSubmitting(false)
-    await handleRegister()
-  }
 
-  function copyPix() {
-    void navigator.clipboard.writeText(pixCode)
-    setPixCopied(true)
-    setTimeout(() => setPixCopied(false), 2000)
+    const slug = await createAccount()
+    if (!slug) { setSubmitting(false); return }
+
+    const planName = PLANS.find((p) => p.id === step2Data.plan)?.name ?? step2Data.plan
+    const origin = window.location.origin
+
+    try {
+      const { data: tx } = await api.post(
+        API.payments.checkoutPro,
+        {
+          items: [{
+            id: `sub-${step2Data.plan}-${billingPeriod}`,
+            title: `${planName} · ${period.label}`,
+            quantity: 1,
+            unitPrice: Math.round(totalPrice * 100),
+          }],
+          backUrls: {
+            success: `${origin}/${slug}/admin`,
+            failure: `${origin}/register`,
+            pending: `${origin}/${slug}/admin`,
+          },
+          category: 'receita_avulsa',
+          maxInstallments,
+          statementDescriptor: 'COPA FACIL',
+          binaryMode: false,
+        },
+        { headers: { 'x-tenant-id': slug } },
+      )
+
+      const initPoint = (tx.gatewayPayload as Record<string, string>)?.initPoint
+      if (initPoint) {
+        window.location.href = initPoint
+      } else {
+        setCreatedSlug(slug)
+        setDone(true)
+      }
+    } catch (err: unknown) {
+      const msg = (err as AxiosError<{ message?: string | string[] }>)?.response?.data?.message
+      setServerError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Erro ao processar pagamento.'))
+      setSubmitting(false)
+    }
   }
 
   // ── Success screen ───────────────────────────────────────────────────────
@@ -559,7 +581,7 @@ export default function RegisterPage() {
                       <button
                         key={p.id}
                         type="button"
-                        onClick={() => { setBillingPeriod(p.id); setInstallments(1) }}
+                        onClick={() => setBillingPeriod(p.id)}
                         className={`relative rounded-xl border p-3 text-left transition-all ${
                           isSelected
                             ? 'border-primary bg-primary/5 ring-1 ring-primary'
@@ -582,127 +604,17 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Payment method */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Forma de pagamento</p>
-                <div className="grid grid-cols-2 gap-3">
-                  {([
-                    { id: 'cartao', label: 'Cartão de crédito', icon: CreditCard },
-                    { id: 'pix', label: 'Pix', icon: QrCode },
-                  ] as const).map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => setPaymentMethod(m.id)}
-                      className={`flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all ${
-                        paymentMethod === m.id
-                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                          : 'border-border bg-card hover:border-primary/40'
-                      }`}
-                    >
-                      <m.icon className="size-4" /> {m.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Card form */}
-              {paymentMethod === 'cartao' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium">Número do cartão</label>
-                    <Input
-                      className="mt-1"
-                      placeholder="0000 0000 0000 0000"
-                      inputMode="numeric"
-                      value={card.number}
-                      onChange={(e) =>
-                        setCard({ ...card, number: e.target.value.replace(/[^\d\s]/g, '').slice(0, 19) })
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Nome impresso no cartão</label>
-                    <Input
-                      className="mt-1"
-                      placeholder="JOAO S SILVA"
-                      value={card.name}
-                      onChange={(e) => setCard({ ...card, name: e.target.value.toUpperCase() })}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-sm font-medium">Validade</label>
-                      <Input
-                        className="mt-1"
-                        placeholder="MM/AA"
-                        inputMode="numeric"
-                        value={card.expiry}
-                        onChange={(e) => {
-                          const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
-                          setCard({
-                            ...card,
-                            expiry: digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits,
-                          })
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">CVV</label>
-                      <Input
-                        className="mt-1"
-                        placeholder="123"
-                        inputMode="numeric"
-                        value={card.cvv}
-                        onChange={(e) => setCard({ ...card, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Parcelamento</label>
-                    <select
-                      className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                      value={installments}
-                      onChange={(e) => setInstallments(Number(e.target.value))}
-                    >
-                      {installmentOptions.map((n) => (
-                        <option key={n} value={n}>
-                          {n}x de {formatBRL(totalPrice / n)} sem juros
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-
-              {/* Pix */}
-              {paymentMethod === 'pix' && (
-                <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/30 p-4">
-                  <div className="flex size-40 items-center justify-center rounded-lg border-2 border-dashed border-border bg-background">
-                    <QrCode className="size-24 text-muted-foreground" />
-                  </div>
-                  <p className="max-w-full truncate text-[11px] text-muted-foreground">{pixCode}</p>
-                  <Button type="button" variant="outline" size="sm" className="gap-2" onClick={copyPix}>
-                    <Copy className="size-3.5" />
-                    {pixCopied ? 'Copiado!' : 'Copiar código Pix'}
-                  </Button>
-                  <p className="text-center text-[11px] text-muted-foreground">
-                    Escaneie o QR Code ou copie o código e pague no app do seu banco.
-                  </p>
-                </div>
-              )}
-
               {/* Summary */}
               <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3 text-sm">
                 <span className="text-muted-foreground">
                   {PLANS.find((p) => p.id === step2Data.plan)?.name} · {period.label}
                 </span>
-                <span className="font-display text-base font-bold">
-                  {paymentMethod === 'cartao' && installments > 1
-                    ? `${installments}x ${formatBRL(installmentValue)}`
-                    : formatBRL(totalPrice)}
-                </span>
+                <span className="font-display text-base font-bold">{formatBRL(totalPrice)}</span>
               </div>
+
+              <p className="text-[11px] text-center text-muted-foreground">
+                Você será redirecionado para o checkout seguro do Mercado Pago, onde poderá pagar com cartão, Pix ou boleto.
+              </p>
 
               {serverError && (
                 <p className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
@@ -714,18 +626,10 @@ export default function RegisterPage() {
                 <Button type="button" variant="outline" className="gap-2" onClick={() => setStep(2)} disabled={submitting}>
                   <ArrowLeft className="size-4" /> Voltar
                 </Button>
-                <Button
-                  className="flex-1 gap-2"
-                  onClick={handlePay}
-                  disabled={submitting || (paymentMethod === 'cartao' && !cardValid)}
-                >
+                <Button className="flex-1 gap-2" onClick={handlePay} disabled={submitting}>
                   {submitting
-                    ? <><Loader2 className="size-4 animate-spin" /> Processando...</>
-                    : <><Zap className="size-4" /> {paymentMethod === 'pix'
-                        ? 'Já paguei, confirmar'
-                        : installments > 1
-                        ? `Pagar em ${installments}x de ${formatBRL(installmentValue)}`
-                        : `Pagar ${formatBRL(totalPrice)}`}</>
+                    ? <><Loader2 className="size-4 animate-spin" /> Criando conta...</>
+                    : <><ShoppingCart className="size-4" /> Pagar {formatBRL(totalPrice)} com Mercado Pago</>
                   }
                 </Button>
               </div>

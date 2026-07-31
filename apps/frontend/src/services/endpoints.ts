@@ -35,6 +35,7 @@ export const API = {
   },
   payments: {
     base: '/payments',
+    checkoutPro: '/payments/checkout-pro',
     refund: (id: string) => `/payments/${id}/refund`,
     ledger: (championshipId: string) => `/payments/ledger/${championshipId}`,
   },

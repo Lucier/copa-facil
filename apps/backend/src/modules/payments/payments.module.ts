@@ -10,6 +10,7 @@ import { PAYMENT_GATEWAY } from './domain/gateways/i-payment-gateway'
 import { LEDGER_REPOSITORY } from './domain/repositories/i-ledger.repository'
 import { TRANSACTION_REPOSITORY } from './domain/repositories/i-transaction.repository'
 import { CreatePaymentOrderUseCase } from './application/use-cases/create-payment-order.use-case'
+import { CreateCheckoutProPreferenceUseCase } from './application/use-cases/create-checkout-pro-preference.use-case'
 import { GetLedgerSummaryUseCase } from './application/use-cases/get-ledger-summary.use-case'
 import { ListTransactionsUseCase } from './application/use-cases/list-transactions.use-case'
 import { ProcessWebhookUseCase } from './application/use-cases/process-webhook.use-case'
@@ -56,6 +57,7 @@ import { PaymentWebhooksController } from './presentation/webhooks/payment-webho
     { provide: AUDIT_REPOSITORY, useClass: DrizzleAuditRepository },
     EncryptionService,
     CreatePaymentOrderUseCase,
+    CreateCheckoutProPreferenceUseCase,
     ProcessWebhookUseCase,
     RefundTransactionUseCase,
     ListTransactionsUseCase,

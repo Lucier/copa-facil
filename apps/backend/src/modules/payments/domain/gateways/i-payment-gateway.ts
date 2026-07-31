@@ -60,20 +60,52 @@ export interface RefundResponse {
   refundedAt: Date
 }
 
+export interface CheckoutProItem {
+  id: string
+  title: string
+  description?: string
+  quantity: number
+  unitPrice: number
+}
+
+export interface CheckoutProBackUrls {
+  success: string
+  failure: string
+  pending: string
+}
+
+export interface CheckoutProRequest {
+  items: CheckoutProItem[]
+  payer?: { email?: string; lastName?: string }
+  backUrls: CheckoutProBackUrls
+  notificationUrl: string
+  externalReference: string
+  statementDescriptor?: string
+  binaryMode?: boolean
+  maxInstallments?: number
+  excludedPaymentMethods?: string[]
+  excludedPaymentTypes?: string[]
+  expiresAt?: Date
+}
+
+export interface CheckoutProResponse {
+  preferenceId: string
+  initPoint: string
+  sandboxInitPoint: string
+}
+
+export interface PaymentDetails {
+  status: string
+  externalReference?: string
+}
+
 export interface IPaymentGateway {
   createPix(req: PixPaymentRequest): Promise<PixPaymentResponse>
   createBoleto(req: BoletoPaymentRequest): Promise<BoletoPaymentResponse>
   chargeCreditCard(req: CreditCardPaymentRequest): Promise<CreditCardPaymentResponse>
+  createCheckoutProPreference(req: CheckoutProRequest): Promise<CheckoutProResponse>
   refund(req: RefundRequest): Promise<RefundResponse>
-  /**
-   * Fetches the current status of a payment from the gateway.
-   * Returns normalized status: 'approved' | 'rejected' | 'cancelled' | 'refunded' | 'pending'
-   */
-  fetchPaymentStatus(gatewayTransactionId: string): Promise<string>
-  /**
-   * Validates the webhook signature sent by the gateway.
-   * For Mercado Pago: xSignature = X-Signature header, xRequestId = X-Request-Id, dataId = data.id query param.
-   */
+  fetchPaymentDetails(gatewayTransactionId: string): Promise<PaymentDetails>
   verifyWebhookSignature(
     payload: Buffer,
     xSignature: string,

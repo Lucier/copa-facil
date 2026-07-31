@@ -50,6 +50,9 @@ export const envSchema = z.object({
     if (!env.MAIL_PASS) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['MAIL_PASS'], message: 'Required in production' })
     }
+    if (!env.APP_URL) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['APP_URL'], message: 'Required in production (used to build MP notification_url)' })
+    }
   }
 })
 

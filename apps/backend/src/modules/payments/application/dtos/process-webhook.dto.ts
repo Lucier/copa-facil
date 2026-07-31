@@ -16,6 +16,11 @@ export class ProcessWebhookDto {
   @IsEnum(WebhookEventType)
   event!: WebhookEventType
 
+  @ApiPropertyOptional({ description: 'External reference from MP payment (= internal transaction ID for Checkout Pro)' })
+  @IsOptional()
+  @IsString()
+  externalReference?: string
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

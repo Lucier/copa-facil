@@ -9,6 +9,15 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/frontend/package.json ./apps/frontend/
 RUN pnpm install --frozen-lockfile
 
+FROM base AS dev
+WORKDIR /app
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/frontend/node_modules ./apps/frontend/node_modules
+COPY tsconfig.base.json ./
+COPY apps/frontend ./apps/frontend
+ENV NEXT_TELEMETRY_DISABLED=1
+
 FROM base AS builder
 WORKDIR /app
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./

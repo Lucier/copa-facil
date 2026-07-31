@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: copa_facil_db
+    container_name: cerrados_esportes_db
     environment:
       POSTGRES_USER: copafacil
       POSTGRES_PASSWORD: copafacil
@@ -20,7 +20,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: copa_facil_redis
+    container_name: cerrados_esportes_redis
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
       - '6379:6379'
@@ -36,7 +36,7 @@ services:
 
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    container_name: copa_facil_minio
+    container_name: cerrados_esportes_minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
@@ -56,7 +56,7 @@ services:
 
   minio-init:
     image: minio/mc:RELEASE.2025-04-16T19-41-36Z
-    container_name: copa_facil_minio_init
+    container_name: cerrados_esportes_minio_init
     depends_on:
       minio:
         condition: service_healthy
@@ -76,8 +76,8 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
-      target: builder
-    container_name: copa_facil_backend
+      target: dev
+    container_name: cerrados_esportes_backend
     env_file:
       - .env.dev
     environment:
@@ -110,8 +110,10 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
-      target: builder
-    container_name: copa_facil_frontend
+      target: dev
+    container_name: cerrados_esportes_frontend
+    env_file:
+      - .env.dev
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
     ports:
@@ -126,7 +128,7 @@ services:
 
   nginx:
     image: nginx:1.27-alpine
-    container_name: copa_facil_nginx
+    container_name: cerrados_esportes_nginx
     ports:
       - '80:80'
       - '443:443'
@@ -145,7 +147,7 @@ services:
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.123.0
-    container_name: copa_facil_otel
+    container_name: cerrados_esportes_otel
     command: ['--config=/etc/otel/config.yaml']
     volumes:
       - ./config/monitoring/otel-collector-config.yaml:/etc/otel/config.yaml:ro
@@ -162,7 +164,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v3.3.1
-    container_name: copa_facil_prometheus
+    container_name: cerrados_esportes_prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.retention.time=15d'
@@ -181,7 +183,7 @@ services:
 
   grafana:
     image: grafana/grafana:11.6.1
-    container_name: copa_facil_grafana
+    container_name: cerrados_esportes_grafana
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
@@ -201,7 +203,7 @@ services:
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.17.1
-    container_name: copa_facil_pg_exporter
+    container_name: cerrados_esportes_pg_exporter
     environment:
       DATA_SOURCE_NAME: postgresql://copafacil:copafacil@postgres:5432/copafacil?sslmode=disable
     ports:
@@ -216,7 +218,7 @@ services:
 
   redis-exporter:
     image: oliver006/redis_exporter:v1.69.0
-    container_name: copa_facil_redis_exporter
+    container_name: cerrados_esportes_redis_exporter
     environment:
       REDIS_ADDR: redis://redis:6379
     ports:

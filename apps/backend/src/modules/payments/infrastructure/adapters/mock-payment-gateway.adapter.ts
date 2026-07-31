@@ -3,9 +3,12 @@ import { createHmac, timingSafeEqual } from 'crypto'
 import {
   BoletoPaymentRequest,
   BoletoPaymentResponse,
+  CheckoutProRequest,
+  CheckoutProResponse,
   CreditCardPaymentRequest,
   CreditCardPaymentResponse,
   IPaymentGateway,
+  PaymentDetails,
   PixPaymentRequest,
   PixPaymentResponse,
   RefundRequest,
@@ -19,6 +22,7 @@ function shortId(): string {
 @Injectable()
 export class MockPaymentGatewayAdapter implements IPaymentGateway {
   private readonly logger = new Logger(MockPaymentGatewayAdapter.name)
+
   async createPix(req: PixPaymentRequest): Promise<PixPaymentResponse> {
     const transactionId = `MOCK-PIX-${shortId()}`
     const ttl = req.ttlMinutes ?? 30
@@ -52,6 +56,16 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     }
   }
 
+  async createCheckoutProPreference(req: CheckoutProRequest): Promise<CheckoutProResponse> {
+    const preferenceId = `MOCK-PREF-${shortId()}`
+    const baseUrl = 'https://mock-checkout.mercadopago.com.br'
+    return {
+      preferenceId,
+      initPoint: `${baseUrl}/checkout/v1/redirect?pref_id=${preferenceId}`,
+      sandboxInitPoint: `${baseUrl}/checkout/v1/redirect?pref_id=${preferenceId}&sandbox=true&external_reference=${req.externalReference}`,
+    }
+  }
+
   async refund(_req: RefundRequest): Promise<RefundResponse> {
     return {
       refundId: `REFUND-${shortId()}`,
@@ -59,8 +73,8 @@ export class MockPaymentGatewayAdapter implements IPaymentGateway {
     }
   }
 
-  async fetchPaymentStatus(_gatewayTransactionId: string): Promise<string> {
-    return 'approved'
+  async fetchPaymentDetails(_gatewayTransactionId: string): Promise<PaymentDetails> {
+    return { status: 'approved' }
   }
 
   /**

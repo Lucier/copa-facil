@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Delete, Get, HttpCode, HttpStatus,
+  Body, Controller, Delete, Get, Headers, HttpCode, HttpStatus,
   Param, ParseUUIDPipe, Post, Query, UseGuards,
 } from '@nestjs/common'
 import { Throttle } from '@nestjs/throttler'
@@ -10,8 +10,10 @@ import { CurrentUser } from '../../../auth/presentation/decorators/current-user.
 import { Roles } from '../../../auth/presentation/decorators/roles.decorator'
 import { UserRole } from '../../../auth/domain/roles.enum'
 import { CreatePaymentOrderDto } from '../../application/dtos/create-payment-order.dto'
+import { CreateCheckoutProDto } from '../../application/dtos/create-checkout-pro.dto'
 import { RefundTransactionDto } from '../../application/dtos/refund-transaction.dto'
 import { CreatePaymentOrderUseCase } from '../../application/use-cases/create-payment-order.use-case'
+import { CreateCheckoutProPreferenceUseCase } from '../../application/use-cases/create-checkout-pro-preference.use-case'
 import { GetLedgerSummaryUseCase } from '../../application/use-cases/get-ledger-summary.use-case'
 import { ListTransactionsUseCase } from '../../application/use-cases/list-transactions.use-case'
 import { RefundTransactionUseCase } from '../../application/use-cases/refund-transaction.use-case'
@@ -31,6 +33,7 @@ import {
 export class PaymentsController {
   constructor(
     private readonly createOrder: CreatePaymentOrderUseCase,
+    private readonly createCheckoutPro: CreateCheckoutProPreferenceUseCase,
     private readonly refund: RefundTransactionUseCase,
     private readonly listTx: ListTransactionsUseCase,
     private readonly ledger: GetLedgerSummaryUseCase,
@@ -45,6 +48,17 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Create a payment order (PIX, Boleto, or Credit Card)' })
   create(@Body() dto: CreatePaymentOrderDto, @CurrentUser('sub') userId: string) {
     return this.createOrder.execute(dto, userId)
+  }
+
+  @Post('checkout-pro')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create a Checkout Pro preference and return the init_point URL' })
+  createPreference(
+    @Body() dto: CreateCheckoutProDto,
+    @CurrentUser('sub') userId: string,
+    @Headers('x-tenant-id') tenantSlug: string,
+  ) {
+    return this.createCheckoutPro.execute(dto, userId, tenantSlug)
   }
 
   @Post(':id/refund')

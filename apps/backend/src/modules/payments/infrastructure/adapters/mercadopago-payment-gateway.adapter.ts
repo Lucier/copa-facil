@@ -1,13 +1,17 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 import { BadRequestException } from '@nestjs/common'
-import { MercadoPagoConfig} from 'mercadopago'
-import { Payment, PaymentRefund } from 'mercadopago'
+import { MercadoPagoConfig } from 'mercadopago'
+import { Payment, PaymentRefund, Preference } from 'mercadopago'
+import type { PreferenceRequest } from 'mercadopago/dist/clients/preference/commonTypes'
 import {
   BoletoPaymentRequest,
   BoletoPaymentResponse,
+  CheckoutProRequest,
+  CheckoutProResponse,
   CreditCardPaymentRequest,
   CreditCardPaymentResponse,
   IPaymentGateway,
+  PaymentDetails,
   PixPaymentRequest,
   PixPaymentResponse,
   RefundRequest,
@@ -17,6 +21,7 @@ import {
 export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
   private readonly paymentClient: Payment
   private readonly refundClient: PaymentRefund
+  private readonly preferenceClient: Preference
 
   constructor(
     mpConfig: MercadoPagoConfig,
@@ -24,6 +29,7 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
   ) {
     this.paymentClient = new Payment(mpConfig)
     this.refundClient = new PaymentRefund(mpConfig)
+    this.preferenceClient = new Preference(mpConfig)
   }
 
   async createPix(req: PixPaymentRequest): Promise<PixPaymentResponse> {
@@ -112,6 +118,58 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
     }
   }
 
+  async createCheckoutProPreference(req: CheckoutProRequest): Promise<CheckoutProResponse> {
+    const body: PreferenceRequest = {
+      items: req.items.map((item) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unitPrice / 100,
+        currency_id: 'BRL',
+      })),
+      payer: {
+        email: req.payer?.email,
+        surname: req.payer?.lastName,
+      },
+      back_urls: {
+        success: req.backUrls.success,
+        failure: req.backUrls.failure,
+        pending: req.backUrls.pending,
+      },
+      notification_url: req.notificationUrl,
+      external_reference: req.externalReference,
+      statement_descriptor: req.statementDescriptor,
+      binary_mode: req.binaryMode,
+    }
+
+    if (req.maxInstallments !== undefined || req.excludedPaymentMethods?.length || req.excludedPaymentTypes?.length) {
+      body.payment_methods = {
+        installments: req.maxInstallments,
+        excluded_payment_methods: req.excludedPaymentMethods?.map((id) => ({ id })),
+        excluded_payment_types: req.excludedPaymentTypes?.map((id) => ({ id })),
+      }
+    }
+
+    if (req.expiresAt) {
+      body.expires = true
+      body.expiration_date_to = req.expiresAt.toISOString()
+    }
+
+    try {
+      const response = await this.preferenceClient.create({ body })
+      return {
+        preferenceId: response.id ?? '',
+        initPoint: response.init_point ?? '',
+        sandboxInitPoint: response.sandbox_init_point ?? '',
+      }
+    } catch (err: unknown) {
+      const mp = err as { message?: string; cause?: unknown; status?: number }
+      console.error('[MP] createCheckoutProPreference error:', JSON.stringify({ message: mp.message, cause: mp.cause, status: mp.status }, null, 2))
+      throw err
+    }
+  }
+
   async refund(req: RefundRequest): Promise<RefundResponse> {
     const refund = await this.refundClient.create({
       payment_id: Number(req.gatewayTransactionId),
@@ -124,9 +182,12 @@ export class MercadoPagoPaymentGatewayAdapter implements IPaymentGateway {
     }
   }
 
-  async fetchPaymentStatus(gatewayTransactionId: string): Promise<string> {
+  async fetchPaymentDetails(gatewayTransactionId: string): Promise<PaymentDetails> {
     const response = await this.paymentClient.get({ id: gatewayTransactionId })
-    return this.normalizeStatus(response.status ?? 'pending')
+    return {
+      status: this.normalizeStatus(response.status ?? 'pending'),
+      externalReference: response.external_reference ?? undefined,
+    }
   }
 
   verifyWebhookSignature(
